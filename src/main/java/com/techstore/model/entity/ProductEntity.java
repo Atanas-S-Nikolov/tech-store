@@ -55,7 +55,7 @@ public class ProductEntity {
     private Set<String> imageUrls;
 
     public ProductEntity() {
-        this(null ,"", 0.0, 0, null, null, null, new HashSet<>());
+        this(null ,null, 0.0, 0, null, null, null, new HashSet<>());
     }
 
     public ProductEntity(String id, String name, double price, int stocks, ProductCategory category, ProductType type, Date dateOfCreation, Set<String> imageUrls) {

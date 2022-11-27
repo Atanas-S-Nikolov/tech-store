@@ -1,4 +1,4 @@
-package com.techstore.exception;
+package com.techstore.exception.product;
 
 public class ProductConstraintViolationException extends RuntimeException {
     public ProductConstraintViolationException() {

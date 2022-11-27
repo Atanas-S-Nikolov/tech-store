@@ -1,14 +1,12 @@
 package com.techstore.model.enums;
 
-public enum ProductCategory {
-    AUDIO("Audio"),
-    COMPUTERS_AND_LAPTOPS("Computers and laptops"),
-    MICE_AND_KEYBOARDS("Mice and keyboards"),
-    TV_AND_MONITORS("TV and Monitors");
+public enum UserRole {
+    ADMIN("ADMIN"),
+    CUSTOMER("CUSTOMER");
 
     private final String value;
 
-    ProductCategory(String value) {
+    UserRole(String value) {
         this.value = value;
     }
 
@@ -18,7 +16,7 @@ public enum ProductCategory {
 
     @Override
     public String toString() {
-        return "ProductCategory{" +
+        return "UserRole{" +
                 "value='" + value + '\'' +
                 '}';
     }

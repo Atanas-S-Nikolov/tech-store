@@ -1,4 +1,4 @@
-package com.techstore.exception;
+package com.techstore.exception.product;
 
 public class ProductServiceException extends RuntimeException {
     public ProductServiceException() {

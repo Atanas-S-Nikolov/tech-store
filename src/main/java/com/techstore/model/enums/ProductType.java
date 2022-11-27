@@ -1,14 +1,14 @@
 package com.techstore.model.enums;
 
 public enum ProductType {
-    DesktopPC("Desktop PC"),
-    Laptop("Laptop"),
+    DESKTOP_PC("Desktop PC"),
+    LAPTOP("Laptop"),
     TV("TV"),
-    Monitor("Monitor"),
-    Keyboard("Keyboard"),
-    Mouse("Mouse"),
-    Headset("Headset"),
-    Earphones("Earphones"),
+    MONITOR("Monitor"),
+    KEYBOARD("Keyboard"),
+    MOUSE("Mouse"),
+    HEADSET("Headset"),
+    EARPHONES("Earphones"),
     TWS("TWS");
 
     private final String value;

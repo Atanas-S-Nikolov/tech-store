@@ -2,7 +2,7 @@ package com.techstore.controller;
 
 import com.techstore.model.Product;
 import com.techstore.model.dto.ProductDto;
-import com.techstore.service.IProductService;
+import com.techstore.service.product.IProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.techstore.service;
+package com.techstore.service.product;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
@@ -8,7 +8,7 @@ import com.google.cloud.storage.StorageOptions;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.techstore.exception.ProductImageUploaderServiceException;
+import com.techstore.exception.product.ProductImageUploaderServiceException;
 
 import java.io.FileInputStream;
 import java.io.IOException;

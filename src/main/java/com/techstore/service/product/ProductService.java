@@ -1,8 +1,8 @@
-package com.techstore.service;
+package com.techstore.service.product;
 
-import com.techstore.exception.ProductConstraintViolationException;
-import com.techstore.exception.ProductNotFoundException;
-import com.techstore.exception.ProductServiceException;
+import com.techstore.exception.product.ProductConstraintViolationException;
+import com.techstore.exception.product.ProductNotFoundException;
+import com.techstore.exception.product.ProductServiceException;
 import com.techstore.model.ModelConverter;
 import com.techstore.model.Product;
 import com.techstore.model.entity.ProductEntity;
@@ -92,7 +92,7 @@ public class ProductService implements IProductService {
                 .orElseThrow(() -> new ProductNotFoundException(String.format("Product with name '%s' is not found", name))));
     }
 
-    public <T> T executeDBCall(Supplier<T> supplier) {
+    private <T> T executeDBCall(Supplier<T> supplier) {
         try{
             return supplier.get();
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
@@ -102,7 +102,7 @@ public class ProductService implements IProductService {
         }
     }
 
-    public void executeDBCall(Runnable runnable) {
+    private void executeDBCall(Runnable runnable) {
         try {
             runnable.run();
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
