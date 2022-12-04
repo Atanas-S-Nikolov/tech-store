@@ -3,7 +3,7 @@ package com.techstore.service.product;
 import com.techstore.exception.product.ProductConstraintViolationException;
 import com.techstore.exception.product.ProductNotFoundException;
 import com.techstore.exception.product.ProductServiceException;
-import com.techstore.model.ModelConverter;
+import com.techstore.utils.converter.ModelConverter;
 import com.techstore.model.Product;
 import com.techstore.model.entity.ProductEntity;
 import com.techstore.repository.IProductRepository;
@@ -19,8 +19,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.techstore.model.ModelConverter.toEntity;
-import static com.techstore.model.ModelConverter.toModel;
+import static com.techstore.utils.converter.ModelConverter.toEntity;
+import static com.techstore.utils.converter.ModelConverter.toModel;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class ProductService implements IProductService {

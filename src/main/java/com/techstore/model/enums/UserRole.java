@@ -1,8 +1,10 @@
 package com.techstore.model.enums;
 
+import com.techstore.constants.RoleConstants;
+
 public enum UserRole {
-    ADMIN("ADMIN"),
-    CUSTOMER("CUSTOMER");
+    ROLE_ADMIN(RoleConstants.ROLE_ADMIN),
+    ROLE_CUSTOMER(RoleConstants.ROLE_CUSTOMER);
 
     private final String value;
 

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @ComponentScan(basePackages = {
 		"com.techstore.configuration",
+		"com.techstore.security",
 		"com.techstore.controller",
 		"com.techstore.service",
 		"com.techstore.exception.handler"

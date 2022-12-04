@@ -18,7 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 
-import static com.techstore.model.ModelConverter.toModel;
+import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
+import static com.techstore.utils.converter.ModelConverter.toModel;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -26,7 +27,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController(value = "product-controller")
-@RequestMapping(value = "api/v1/product")
+@RequestMapping(value = PRODUCTS_URL)
 public class ProductController {
     private final IProductService service;
 

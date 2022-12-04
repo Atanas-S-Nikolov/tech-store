@@ -14,20 +14,20 @@ public class Product {
     private final int stocks;
     private final ProductCategory category;
     private final ProductType type;
-    private final Date dateOfCreation;
+    private final Date dateOfModification;
     private final Set<String> imageUrls;
 
     public Product() {
         this("", 0.0, 0, null, null, null, new HashSet<>());
     }
 
-    public Product(String name, double price, int stocks, ProductCategory category, ProductType type, Date dateOfCreation, Set<String> imageUrls) {
+    public Product(String name, double price, int stocks, ProductCategory category, ProductType type, Date dateOfModification, Set<String> imageUrls) {
         this.name = name;
         this.price = price;
         this.stocks = stocks;
         this.category = category;
         this.type = type;
-        this.dateOfCreation = dateOfCreation;
+        this.dateOfModification = dateOfModification;
         this.imageUrls = imageUrls;
     }
 
@@ -51,8 +51,8 @@ public class Product {
         return type;
     }
 
-    public Date getDateOfCreation() {
-        return dateOfCreation;
+    public Date getDateOfModification() {
+        return dateOfModification;
     }
 
     public Set<String> getImageUrls() {
@@ -67,7 +67,7 @@ public class Product {
                 ", stocks=" + stocks +
                 ", category=" + category +
                 ", type=" + type +
-                ", dateOfCreation=" + dateOfCreation +
+                ", dateOfModification=" + dateOfModification +
                 ", imageUrls=" + imageUrls +
                 '}';
     }
@@ -77,11 +77,11 @@ public class Product {
         if (this == o) return true;
         if (!(o instanceof Product)) return false;
         Product product = (Product) o;
-        return Double.compare(product.price, price) == 0 && stocks == product.stocks && Objects.equals(name, product.name) && category == product.category && type == product.type && Objects.equals(dateOfCreation, product.dateOfCreation) && Objects.equals(imageUrls, product.imageUrls);
+        return Double.compare(product.price, price) == 0 && stocks == product.stocks && Objects.equals(name, product.name) && category == product.category && type == product.type && Objects.equals(dateOfModification, product.dateOfModification) && Objects.equals(imageUrls, product.imageUrls);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, price, stocks, category, type, dateOfCreation, imageUrls);
+        return Objects.hash(name, price, stocks, category, type, dateOfModification, imageUrls);
     }
 }

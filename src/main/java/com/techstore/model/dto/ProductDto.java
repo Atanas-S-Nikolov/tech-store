@@ -12,7 +12,7 @@ public class ProductDto {
     private final int stocks;
     private final ProductCategory category;
     private final ProductType type;
-    private final Date dateOfCreation;
+    private final Date dateOfModification;
 
     public ProductDto() {
         this("", 0.0, 0, null, null);
@@ -24,7 +24,7 @@ public class ProductDto {
         this.stocks = stocks;
         this.category = category;
         this.type = type;
-        this.dateOfCreation = new Date();
+        this.dateOfModification = new Date();
     }
 
     public String getName() {
@@ -47,8 +47,8 @@ public class ProductDto {
         return type;
     }
 
-    public Date getDateOfCreation() {
-        return dateOfCreation;
+    public Date getDateOfModification() {
+        return dateOfModification;
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ProductDto {
                 ", stocks=" + stocks +
                 ", category=" + category +
                 ", type=" + type +
-                ", dateOfCreation=" + dateOfCreation +
+                ", dateOfModification=" + dateOfModification +
                 '}';
     }
 
@@ -68,11 +68,11 @@ public class ProductDto {
         if (this == o) return true;
         if (!(o instanceof ProductDto)) return false;
         ProductDto that = (ProductDto) o;
-        return Double.compare(that.price, price) == 0 && stocks == that.stocks && Objects.equals(name, that.name) && category == that.category && type == that.type && Objects.equals(dateOfCreation, that.dateOfCreation);
+        return Double.compare(that.price, price) == 0 && stocks == that.stocks && Objects.equals(name, that.name) && category == that.category && type == that.type && Objects.equals(dateOfModification, that.dateOfModification);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, price, stocks, category, type, dateOfCreation);
+        return Objects.hash(name, price, stocks, category, type, dateOfModification);
     }
 }

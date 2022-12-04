@@ -47,8 +47,8 @@ public class ProductEntity {
     @Column(name = "type")
     private ProductType type;
 
-    @Column(name = "date_of_creation")
-    private Date dateOfCreation;
+    @Column(name = "date_of_modification")
+    private Date dateOfModification;
 
     @ElementCollection
     @Column(name = "image_urls", length = 10000)
@@ -58,14 +58,14 @@ public class ProductEntity {
         this(null ,null, 0.0, 0, null, null, null, new HashSet<>());
     }
 
-    public ProductEntity(String id, String name, double price, int stocks, ProductCategory category, ProductType type, Date dateOfCreation, Set<String> imageUrls) {
+    public ProductEntity(String id, String name, double price, int stocks, ProductCategory category, ProductType type, Date dateOfModification, Set<String> imageUrls) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.stocks = stocks;
         this.category = category;
         this.type = type;
-        this.dateOfCreation = dateOfCreation;
+        this.dateOfModification = dateOfModification;
         this.imageUrls = nonNull(imageUrls) ? imageUrls : new HashSet<>();
     }
 
@@ -117,12 +117,12 @@ public class ProductEntity {
         this.type = type;
     }
 
-    public Date getDateOfCreation() {
-        return dateOfCreation;
+    public Date getDateOfModification() {
+        return dateOfModification;
     }
 
-    public void setDateOfCreation(Date dateOfCreation) {
-        this.dateOfCreation = dateOfCreation;
+    public void setDateOfModification(Date dateOfModification) {
+        this.dateOfModification = dateOfModification;
     }
 
     public Set<String> getImageUrls() {
@@ -142,7 +142,7 @@ public class ProductEntity {
                 ", stocks=" + stocks +
                 ", category=" + category +
                 ", type=" + type +
-                ", dateOfCreation=" + dateOfCreation +
+                ", dateOfModification=" + dateOfModification +
                 ", imageUrls=" + imageUrls +
                 '}';
     }
@@ -152,11 +152,11 @@ public class ProductEntity {
         if (this == o) return true;
         if (!(o instanceof ProductEntity)) return false;
         ProductEntity that = (ProductEntity) o;
-        return Double.compare(that.price, price) == 0 && stocks == that.stocks && Objects.equals(id, that.id) && Objects.equals(name, that.name) && category == that.category && type == that.type && Objects.equals(dateOfCreation, that.dateOfCreation) && Objects.equals(imageUrls, that.imageUrls);
+        return Double.compare(that.price, price) == 0 && stocks == that.stocks && Objects.equals(id, that.id) && Objects.equals(name, that.name) && category == that.category && type == that.type && Objects.equals(dateOfModification, that.dateOfModification) && Objects.equals(imageUrls, that.imageUrls);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, price, stocks, category, type, dateOfCreation, imageUrls);
+        return Objects.hash(id, name, price, stocks, category, type, dateOfModification, imageUrls);
     }
 }

@@ -1,4 +1,4 @@
-package com.techstore.exception.user;
+package com.techstore.exception.authentication;
 
 public class InvalidCredentialsException extends RuntimeException {
     public InvalidCredentialsException() {
