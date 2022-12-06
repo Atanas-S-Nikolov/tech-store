@@ -15,12 +15,12 @@ public class ModelConverter {
 
     public static Product toModel(ProductDto dto) {
         return new Product(dto.getName(), dto.getPrice(), dto.getStocks(), dto.getCategory(), dto.getType(),
-                dto.getDateOfModification(), null);
+                dto.isEarlyAccess(), dto.getDateOfModification(), null);
     }
 
     public static Product toModel(ProductEntity entity) {
         return new Product(entity.getName(), entity.getPrice(), entity.getStocks(), entity.getCategory(), entity.getType(),
-                entity.getDateOfModification(), entity.getImageUrls());
+                entity.isEarlyAccess(), entity.getDateOfModification(), entity.getImageUrls());
     }
 
     public static User toModel(UserDto dto) {
@@ -33,7 +33,7 @@ public class ModelConverter {
 
     public static ProductEntity toEntity(Product product) {
         return new ProductEntity(null, product.getName(), product.getPrice(), product.getStocks(), product.getCategory(),
-                product.getType(), product.getDateOfModification(), product.getImageUrls());
+                product.getType(), product.isEarlyAccess(), product.getDateOfModification(), product.getImageUrls());
     }
 
     public static UserEntity toEntity(User user) {

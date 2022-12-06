@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 
+import static com.techstore.constants.ApiConstants.PRODUCTS_EARLY_ACCESS_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
 import static com.techstore.utils.converter.ModelConverter.toModel;
 import static org.springframework.http.HttpStatus.OK;
@@ -49,8 +51,9 @@ public class ProductController {
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<Product>> getAllProducts() {
-        return ResponseEntity.status(OK).body(service.getAllProducts());
+    public ResponseEntity<Collection<Product>> getProducts(
+            @RequestParam(value = PRODUCTS_EARLY_ACCESS_PARAM, required = false, defaultValue = "true")boolean earlyAccess) {
+        return ResponseEntity.status(OK).body(service.getProducts(earlyAccess));
     }
 
     @PutMapping(consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)

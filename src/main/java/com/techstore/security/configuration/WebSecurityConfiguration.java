@@ -26,9 +26,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.techstore.constants.ApiConstants.*;
+import static com.techstore.constants.ApiConstants.BASE_API_URL;
+import static com.techstore.constants.ApiConstants.FULL_REFRESH_TOKEN_URL;
+import static com.techstore.constants.ApiConstants.LOGIN_URL;
+import static com.techstore.constants.ApiConstants.PRODUCTS_EARLY_ACCESS_FALSE_REGEX;
+import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
+import static com.techstore.constants.ApiConstants.PRODUCT_WITH_PATH_VARIABLE_REGEX;
+import static com.techstore.constants.ApiConstants.USERS_URL;
 import static com.techstore.constants.RoleConstants.ROLE_ADMIN;
 import static com.techstore.constants.RoleConstants.ROLE_CUSTOMER;
+
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
@@ -99,7 +106,8 @@ public class WebSecurityConfiguration {
                 .authorizeRequests(auth -> {
                     auth.antMatchers(POST, LOGIN_URL, USERS_URL).permitAll();
                     auth.antMatchers(GET, FULL_REFRESH_TOKEN_URL).permitAll();
-                    auth.antMatchers(GET, PRODUCTS_URL + "/**").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
+                    auth.regexMatchers(GET, PRODUCTS_EARLY_ACCESS_FALSE_REGEX, PRODUCT_WITH_PATH_VARIABLE_REGEX).permitAll();
+                    auth.antMatchers(GET, PRODUCTS_URL, PRODUCTS_URL + "/").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(BASE_API_URL + "/**").hasAuthority(ROLE_ADMIN);
                     auth.anyRequest().authenticated();
                 })

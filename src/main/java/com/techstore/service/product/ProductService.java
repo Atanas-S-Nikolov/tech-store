@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -45,10 +46,10 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Collection<Product> getAllProducts() {
-        return executeDBCall(() -> repository.findAll().stream()
-                .map(ModelConverter::toModel)
-                .collect(Collectors.toList()));
+    public Collection<Product> getProducts(boolean earlyAccess) {
+        List<ProductEntity> entities = executeDBCall(() ->
+                earlyAccess ? repository.findAll() : repository.findProductsWithEarlyAccess(false));
+        return entities.stream().map(ModelConverter::toModel).collect(Collectors.toList());
     }
 
     @Override

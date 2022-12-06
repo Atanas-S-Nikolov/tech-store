@@ -47,6 +47,9 @@ public class ProductEntity {
     @Column(name = "type")
     private ProductType type;
 
+    @Column(name = "early_access")
+    private boolean earlyAccess;
+
     @Column(name = "date_of_modification")
     private Date dateOfModification;
 
@@ -55,16 +58,17 @@ public class ProductEntity {
     private Set<String> imageUrls;
 
     public ProductEntity() {
-        this(null ,null, 0.0, 0, null, null, null, new HashSet<>());
+        this(null ,null, 0.0, 0, null, null, false, null, new HashSet<>());
     }
 
-    public ProductEntity(String id, String name, double price, int stocks, ProductCategory category, ProductType type, Date dateOfModification, Set<String> imageUrls) {
+    public ProductEntity(String id, String name, double price, int stocks, ProductCategory category, ProductType type, boolean earlyAccess, Date dateOfModification, Set<String> imageUrls) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.stocks = stocks;
         this.category = category;
         this.type = type;
+        this.earlyAccess = earlyAccess;
         this.dateOfModification = dateOfModification;
         this.imageUrls = nonNull(imageUrls) ? imageUrls : new HashSet<>();
     }
@@ -117,6 +121,14 @@ public class ProductEntity {
         this.type = type;
     }
 
+    public boolean isEarlyAccess() {
+        return earlyAccess;
+    }
+
+    public void setEarlyAccess(boolean earlyAccess) {
+        this.earlyAccess = earlyAccess;
+    }
+
     public Date getDateOfModification() {
         return dateOfModification;
     }
@@ -136,12 +148,13 @@ public class ProductEntity {
     @Override
     public String toString() {
         return "ProductEntity{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 ", stocks=" + stocks +
                 ", category=" + category +
                 ", type=" + type +
+                ", earlyAccess=" + earlyAccess +
                 ", dateOfModification=" + dateOfModification +
                 ", imageUrls=" + imageUrls +
                 '}';
@@ -152,11 +165,11 @@ public class ProductEntity {
         if (this == o) return true;
         if (!(o instanceof ProductEntity)) return false;
         ProductEntity that = (ProductEntity) o;
-        return Double.compare(that.price, price) == 0 && stocks == that.stocks && Objects.equals(id, that.id) && Objects.equals(name, that.name) && category == that.category && type == that.type && Objects.equals(dateOfModification, that.dateOfModification) && Objects.equals(imageUrls, that.imageUrls);
+        return Double.compare(that.price, price) == 0 && stocks == that.stocks && earlyAccess == that.earlyAccess && Objects.equals(id, that.id) && Objects.equals(name, that.name) && category == that.category && type == that.type && Objects.equals(dateOfModification, that.dateOfModification) && Objects.equals(imageUrls, that.imageUrls);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, price, stocks, category, type, dateOfModification, imageUrls);
+        return Objects.hash(id, name, price, stocks, category, type, earlyAccess, dateOfModification, imageUrls);
     }
 }
