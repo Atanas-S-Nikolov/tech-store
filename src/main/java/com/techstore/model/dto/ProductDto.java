@@ -1,39 +1,47 @@
 package com.techstore.model.dto;
 
-import com.techstore.model.enums.ProductCategory;
-import com.techstore.model.enums.ProductType;
+import com.techstore.validation.product.ProductCategoryConstraint;
+import com.techstore.validation.product.ValidProduct;
+import com.techstore.validation.product.ProductTypeConstraint;
+import com.techstore.validation.product.ValidProductName;
 
-import java.util.Date;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import java.math.BigDecimal;
 import java.util.Objects;
 
+@ValidProduct
 public class ProductDto {
+    @ValidProductName
     private final String name;
-    private final double price;
+    @DecimalMin(value = "0.01", message = "Product price must be greater than 0")
+    private final BigDecimal price;
+    @Min(value = 0, message = "Product stocks must be equal or greater than 0")
     private final int stocks;
-    private final ProductCategory category;
-    private final ProductType type;
+    @ProductCategoryConstraint
+    private final String category;
+    @ProductTypeConstraint
+    private final String type;
     private final boolean earlyAccess;
-    private final Date dateOfModification;
 
     public ProductDto() {
-        this("", 0.0, 0, null, false, null);
+        this("", new BigDecimal("0.0"), 0, "", "", false);
     }
 
-    public ProductDto(String name, double price, int stocks, ProductCategory category, boolean earlyAccess, ProductType type) {
+    public ProductDto(String name, BigDecimal price, int stocks, String category, String type, boolean earlyAccess) {
         this.name = name;
         this.price = price;
         this.stocks = stocks;
         this.category = category;
         this.type = type;
         this.earlyAccess = earlyAccess;
-        this.dateOfModification = new Date();
     }
 
     public String getName() {
         return name;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
@@ -41,20 +49,16 @@ public class ProductDto {
         return stocks;
     }
 
-    public ProductCategory getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public ProductType getType() {
+    public String getType() {
         return type;
     }
 
     public boolean isEarlyAccess() {
         return earlyAccess;
-    }
-
-    public Date getDateOfModification() {
-        return dateOfModification;
     }
 
     @Override
@@ -66,7 +70,6 @@ public class ProductDto {
                 ", category=" + category +
                 ", type=" + type +
                 ", earlyAccess=" + earlyAccess +
-                ", dateOfModification=" + dateOfModification +
                 '}';
     }
 
@@ -75,11 +78,11 @@ public class ProductDto {
         if (this == o) return true;
         if (!(o instanceof ProductDto)) return false;
         ProductDto that = (ProductDto) o;
-        return Double.compare(that.price, price) == 0 && stocks == that.stocks && earlyAccess == that.earlyAccess && Objects.equals(name, that.name) && category == that.category && type == that.type && Objects.equals(dateOfModification, that.dateOfModification);
+        return stocks == that.stocks && earlyAccess == that.earlyAccess && Objects.equals(name, that.name) && Objects.equals(price, that.price) && Objects.equals(category, that.category) && Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, price, stocks, category, type, earlyAccess, dateOfModification);
+        return Objects.hash(name, price, stocks, category, type, earlyAccess);
     }
 }

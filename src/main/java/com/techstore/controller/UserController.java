@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,13 +42,13 @@ public class UserController {
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> createCustomer(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserResponse> createCustomer(@RequestBody @Valid UserDto userDto) {
         UserResponse userResponse = toResponse(service.createCustomer(toModel(userDto)));
         return ResponseEntity.status(CREATED).body(userResponse);
     }
 
     @PostMapping(path = "/admin", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> createAdmin(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserResponse> createAdmin(@RequestBody @Valid UserDto userDto) {
         UserResponse userResponse = toResponse(service.createAdmin(toModel(userDto)));
         return ResponseEntity.status(CREATED).body(userResponse);
     }
@@ -64,7 +65,7 @@ public class UserController {
     }
 
     @PutMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> updateUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserResponse> updateUser(@RequestBody @Valid UserDto userDto) {
         UserResponse userResponse = toResponse(service.updateUser(toModel(userDto)));
         return ResponseEntity.status(OK).body(userResponse);
     }

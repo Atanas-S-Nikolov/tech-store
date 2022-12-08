@@ -13,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +38,9 @@ public class ProductService implements IProductService {
 
     @Override
     public Product createProduct(Product product, Collection<MultipartFile> images) {
-        return tryToSaveProduct(images, toEntity(product));
+        ProductEntity entity = toEntity(product);
+        entity.setDateOfCreation(LocalDateTime.now());
+        return tryToSaveProduct(images, entity);
     }
 
     @Override
@@ -71,6 +74,7 @@ public class ProductService implements IProductService {
 
     private Product tryToSaveProduct(Collection<MultipartFile> images, ProductEntity entity) {
         try {
+            entity.setDateOfModification(LocalDateTime.now());
             return toModel(executeDBCall(() -> repository.save(uploadImages(images, entity))));
         } catch (Exception exception) {
             imageUploaderService.deleteImagesForProduct(lastUploadedImageUrls);

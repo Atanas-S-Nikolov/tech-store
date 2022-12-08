@@ -141,8 +141,8 @@ public class UserService extends AbstractUserService {
     private <T> T executeDBCall(Supplier<T> supplier) {
         try{
             return supplier.get();
-        } catch (DataIntegrityViolationException | ConstraintViolationException violationException) {
-            throw new UserConstraintViolationException("User constraint violation", violationException);
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw new UserConstraintViolationException("User constraint violation", dataIntegrityViolationException);
         } catch (DataAccessException dataAccessException) {
             throw new UserServiceException("Error while connecting the database", dataAccessException);
         }
@@ -151,8 +151,8 @@ public class UserService extends AbstractUserService {
     private void executeDBCall(Runnable runnable) {
         try {
             runnable.run();
-        } catch (DataIntegrityViolationException | ConstraintViolationException violationException) {
-            throw new UserConstraintViolationException("User constraint violation", violationException);
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw new UserConstraintViolationException("User constraint violation", dataIntegrityViolationException);
         } catch (DataAccessException dataAccessException) {
             throw new UserServiceException("Error while connecting the database", dataAccessException);
         }

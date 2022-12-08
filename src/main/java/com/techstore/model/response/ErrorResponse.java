@@ -3,6 +3,7 @@ package com.techstore.model.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.http.HttpStatus;
 
+import java.util.Collection;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -12,12 +13,12 @@ public class ErrorResponse {
     @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd-HH-mm-ss-ns")
     private final LocalDateTime timestamp;
     private final HttpStatus status;
-    private final String message;
+    private final Collection<String> messages;
 
-    public ErrorResponse(HttpStatus status, String message) {
+    public ErrorResponse(HttpStatus status, Collection<String> messages) {
         this.timestamp = LocalDateTime.now();
         this.status = status;
-        this.message = message;
+        this.messages = messages;
     }
 
     public LocalDateTime getTimestamp() {
@@ -28,8 +29,17 @@ public class ErrorResponse {
         return status;
     }
 
-    public String getMessage() {
-        return message;
+    public Collection<String> getMessages() {
+        return messages;
+    }
+
+    @Override
+    public String toString() {
+        return "ErrorResponse{" +
+                "timestamp=" + timestamp +
+                ", status=" + status +
+                ", messages=" + messages +
+                '}';
     }
 
     @Override
@@ -37,11 +47,11 @@ public class ErrorResponse {
         if (this == o) return true;
         if (!(o instanceof ErrorResponse)) return false;
         ErrorResponse that = (ErrorResponse) o;
-        return Objects.equals(timestamp, that.timestamp) && status == that.status && Objects.equals(message, that.message);
+        return Objects.equals(timestamp, that.timestamp) && status == that.status && Objects.equals(messages, that.messages);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(timestamp, status, message);
+        return Objects.hash(timestamp, status, messages);
     }
 }

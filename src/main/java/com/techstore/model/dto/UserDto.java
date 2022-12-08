@@ -1,11 +1,20 @@
 package com.techstore.model.dto;
 
+import com.techstore.validation.user.ValidEmail;
+import com.techstore.validation.user.ValidUser;
+
+import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 
+@ValidUser
 public class UserDto {
+    @NotBlank(message = "First name must not be blank")
     private final String firstName;
+    @NotBlank(message = "Last name must not be blank")
     private final String lastName;
+    @ValidEmail
     private final String email;
+    @NotBlank(message = "Username must not be blank")
     private final String username;
     private final String password;
     private final String newPassword;
