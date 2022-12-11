@@ -1,54 +1,46 @@
 package com.techstore.service.user;
 
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.techstore.exception.authentication.InvalidJWTException;
 import com.techstore.exception.user.UserConstraintViolationException;
 import com.techstore.exception.authentication.InvalidCredentialsException;
+import com.techstore.exception.user.UserNotFoundException;
 import com.techstore.exception.user.UserServiceException;
-import com.techstore.model.response.JWTResponse;
+import com.techstore.model.entity.CartEntity;
+import com.techstore.repository.ICartRepository;
 import com.techstore.utils.converter.ModelConverter;
 import com.techstore.model.User;
 import com.techstore.model.entity.UserEntity;
 import com.techstore.model.enums.UserRole;
 import com.techstore.repository.IUserRepository;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.techstore.constants.JWTConstants.BEARER;
-import static com.techstore.constants.JWTConstants.ROLES_CLAIM;
-import static com.techstore.utils.JWTUtils.*;
 import static com.techstore.utils.converter.ModelConverter.toEntity;
 import static com.techstore.utils.converter.ModelConverter.toModel;
 import static com.techstore.model.enums.UserRole.ROLE_ADMIN;
 import static com.techstore.model.enums.UserRole.ROLE_CUSTOMER;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-public class UserService extends AbstractUserService {
+public class UserService implements IUserService {
     private final IUserRepository repository;
+    private final ICartRepository cartRepository;
     private final PasswordEncoder passwordEncoder;
-    private final String jwtSecret;
 
-    public UserService(IUserRepository repository, PasswordEncoder passwordEncoder, String jwtSecret) {
+    public UserService(IUserRepository repository, ICartRepository cartRepository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.cartRepository = cartRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtSecret = jwtSecret;
     }
 
     @Override
@@ -86,42 +78,22 @@ public class UserService extends AbstractUserService {
         return toModel(executeDBCall(() -> repository.save(entity)));
     }
 
+    @Transactional
     @Override
     public void deleteUser(String username, String password) {
         UserEntity entity = findUserByUsernameAndPassword(username, password);
+        Optional<CartEntity> optionalCartEntity = executeDBCall(() -> cartRepository.findById(entity.getCart().getId()));
+        optionalCartEntity.ifPresent(cartEntity -> executeDBCall(() -> cartRepository.delete(cartEntity)));
         executeDBCall(() -> repository.delete(entity));
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity entity = findUserByUsername(username);
-        List<GrantedAuthority> authorities = convertStringsToAuthorities(singletonList(entity.getRole().getValue()));
-        return new org.springframework.security.core.userdetails.User(username, entity.getPassword(), authorities);
-    }
-
-    @Override
-    public JWTResponse refreshToken(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
-        JWTResponse jwtResponse = new JWTResponse();
-        if (nonNull(authorizationHeader) && authorizationHeader.startsWith(BEARER)) {
-            try {
-                String refreshToken = authorizationHeader.substring(BEARER.length());
-                Algorithm algorithm = generateAlgorithmWithSecret(jwtSecret);
-                DecodedJWT decodedJWT = verifyToken(refreshToken, algorithm);
-                String username = decodedJWT.getSubject();
-                List<String> roles = decodedJWT.getClaim(ROLES_CLAIM).asList(String.class);
-                jwtResponse = new JWTResponse(generateAccessToken(username, roles, algorithm), refreshToken);
-            } catch (Exception e) {
-                throw new InvalidJWTException("Refresh token is invalid", e);
-            }
-        }
-        return jwtResponse;
-    }
-
+    @Transactional
     private User createUserWithRole(User user, UserRole role) {
         UserEntity entity = toEntity(user);
         entity.setRole(role);
         entity.setPassword(passwordEncoder.encode(user.getPassword().trim()));
+        CartEntity cartEntity = executeDBCall(() ->cartRepository.save(new CartEntity(null, null, new HashSet<>(), BigDecimal.ZERO)));
+        entity.setCart(cartEntity);
         return toModel(executeDBCall(() -> repository.save(entity)));
     }
 
@@ -135,7 +107,7 @@ public class UserService extends AbstractUserService {
 
     private UserEntity findUserByUsername(String username) {
         return executeDBCall(() -> repository.findUserByUsername(username))
-                .orElseThrow(() -> new UsernameNotFoundException(format("User with username '%s' is not found", username)));
+                .orElseThrow(() -> new UserNotFoundException(format("User with username '%s' is not found", username)));
     }
 
     private <T> T executeDBCall(Supplier<T> supplier) {

@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import static com.techstore.utils.FileUtils.convertMultiPartToFile;
 import static com.techstore.utils.FileUtils.generateFileName;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 public class ProductImageUploaderService implements IProductImageUploaderService {
     private final static String METADATA_DOWNLOAD_TOKENS_KEY = "firebaseStorageDownloadTokens";
@@ -74,23 +75,25 @@ public class ProductImageUploaderService implements IProductImageUploaderService
 
     @Override
     public void deleteImagesForProduct(Collection<String> imageUrls) {
-        Set<BlobId> blobIds = imageUrls.stream()
-                .map(url -> {
-                    int startIndex = url.indexOf("/o/") + 3;
-                    int endIndex = url.indexOf("?");
-                    return BlobId.of(bucketName, url.substring(startIndex, endIndex));
-                })
-                .collect(Collectors.toSet());
+        if (isNotEmpty(imageUrls)) {
+            Set<BlobId> blobIds = imageUrls.stream()
+                    .map(url -> {
+                        int startIndex = url.indexOf("/o/") + 3;
+                        int endIndex = url.indexOf("?");
+                        return BlobId.of(bucketName, url.substring(startIndex, endIndex));
+                    })
+                    .collect(Collectors.toSet());
 
-        GoogleCredentials credentials;
-        try {
-            credentials = GoogleCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_URL));
-        } catch (IOException e) {
-            throw new ProductImageUploaderServiceException("Failed to load google credentials", e);
+            GoogleCredentials credentials;
+            try {
+                credentials = GoogleCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_URL));
+            } catch (IOException e) {
+                throw new ProductImageUploaderServiceException("Failed to load google credentials", e);
+            }
+
+            Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+            storage.delete(blobIds);
         }
-
-        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        storage.delete(blobIds);
     }
 
     private String buildFailedImageUploadsMessage(Collection<BlobId> failedBloIds) {

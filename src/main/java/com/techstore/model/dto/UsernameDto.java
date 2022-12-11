@@ -7,20 +7,14 @@ import lombok.ToString;
 @NoArgsConstructor(force = true)
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
-public class AuthenticationDto {
+public class UsernameDto {
     private final String username;
-    private final String password;
 
-    public AuthenticationDto(String username, String password) {
+    public UsernameDto(String username) {
         this.username = username;
-        this.password = password;
     }
 
     public String getUsername() {
         return username;
-    }
-
-    public String getPassword() {
-        return password;
     }
 }

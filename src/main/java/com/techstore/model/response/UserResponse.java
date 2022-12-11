@@ -9,7 +9,11 @@ public class UserResponse {
     private final String username;
 
     public UserResponse() {
-        this(null, null, null, null);
+        this(null);
+    }
+
+    public UserResponse(String username) {
+        this(null, null, null, username);
     }
 
     public UserResponse(String firstName, String lastName, String email, String username) {

@@ -2,27 +2,51 @@ package com.techstore.model;
 
 import com.techstore.model.enums.ProductCategory;
 import com.techstore.model.enums.ProductType;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
+@ToString(doNotUseGetters = true)
+@EqualsAndHashCode(doNotUseGetters = true)
 public class Product {
+    @Getter
     private final String name;
+
+    @Getter
     private final BigDecimal price;
+
+    @Getter
     private final int stocks;
+
+    @Getter
     private final ProductCategory category;
+
+    @Getter
     private final ProductType type;
+
+    @Getter
     private final boolean earlyAccess;
+
+    @Getter
     private final LocalDateTime dateOfCreation;
+
+    @Getter
     private final LocalDateTime dateOfModification;
+
+    @Getter
     private final Set<String> imageUrls;
 
     public Product() {
-        this("", new BigDecimal("0.0"), 0, null, null, false, null, null, new HashSet<>());
+        this("");
+    }
+
+    public Product(String name) {
+        this(name, new BigDecimal("0.0"), 0, null, null, false, null, null, new HashSet<>());
     }
 
     public Product(String name, BigDecimal price, int stocks, ProductCategory category, ProductType type, boolean earlyAccess, LocalDateTime dateOfCreation, LocalDateTime dateOfModification, Set<String> imageUrls) {
@@ -35,69 +59,5 @@ public class Product {
         this.dateOfCreation = dateOfCreation;
         this.dateOfModification = dateOfModification;
         this.imageUrls = imageUrls;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public int getStocks() {
-        return stocks;
-    }
-
-    public ProductCategory getCategory() {
-        return category;
-    }
-
-    public ProductType getType() {
-        return type;
-    }
-
-    public boolean isEarlyAccess() {
-        return earlyAccess;
-    }
-
-    public LocalDateTime getDateOfCreation() {
-        return dateOfCreation;
-    }
-
-    public LocalDateTime getDateOfModification() {
-        return dateOfModification;
-    }
-
-    public Set<String> getImageUrls() {
-        return imageUrls;
-    }
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "name='" + name + '\'' +
-                ", price=" + price +
-                ", stocks=" + stocks +
-                ", category=" + category +
-                ", type=" + type +
-                ", earlyAccess=" + earlyAccess +
-                ", dateOfCreation=" + dateOfCreation +
-                ", dateOfModification=" + dateOfModification +
-                ", imageUrls=" + imageUrls +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Product)) return false;
-        Product product = (Product) o;
-        return stocks == product.stocks && earlyAccess == product.earlyAccess && Objects.equals(name, product.name) && Objects.equals(price, product.price) && category == product.category && type == product.type && Objects.equals(dateOfCreation, product.dateOfCreation) && Objects.equals(dateOfModification, product.dateOfModification) && Objects.equals(imageUrls, product.imageUrls);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, price, stocks, category, type, earlyAccess, dateOfCreation, dateOfModification, imageUrls);
     }
 }

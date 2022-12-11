@@ -50,7 +50,7 @@ public class ProductController {
     }
 
     @GetMapping(path = "/{name}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Product> getProduct(@PathVariable @ValidProductName String name) {
+    public ResponseEntity<Product> getProduct(@PathVariable(value = "name") @ValidProductName String name) {
         return ResponseEntity.status(OK).body(service.getProduct(name));
     }
 
@@ -68,7 +68,7 @@ public class ProductController {
     }
 
     @DeleteMapping(path = "/{name}")
-    public ResponseEntity<?> deleteProduct(@PathVariable @ValidProductName String name) {
+    public ResponseEntity<?> deleteProduct(@PathVariable(value = "name") @ValidProductName String name) {
         service.deleteProduct(name);
         return ResponseEntity.status(NO_CONTENT).build();
     }

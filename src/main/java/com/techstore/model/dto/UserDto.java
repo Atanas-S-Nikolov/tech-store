@@ -2,10 +2,15 @@ package com.techstore.model.dto;
 
 import com.techstore.validation.user.ValidEmail;
 import com.techstore.validation.user.ValidUser;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
-import java.util.Objects;
 
+@NoArgsConstructor(force = true)
+@ToString(doNotUseGetters = true)
+@EqualsAndHashCode(doNotUseGetters = true)
 @ValidUser
 public class UserDto {
     @NotBlank(message = "First name must not be blank")
@@ -18,10 +23,6 @@ public class UserDto {
     private final String username;
     private final String password;
     private final String newPassword;
-
-    public UserDto() {
-        this(null, null, null, null, null, null);
-    }
 
     public UserDto(String firstName, String lastName, String email, String username, String password, String newPassword) {
         this.firstName = firstName;
@@ -54,30 +55,5 @@ public class UserDto {
 
     public String getNewPassword() {
         return newPassword;
-    }
-
-    @Override
-    public String toString() {
-        return "UserDto{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", newPassword='" + newPassword + '\'' +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UserDto)) return false;
-        UserDto userDto = (UserDto) o;
-        return Objects.equals(firstName, userDto.firstName) && Objects.equals(lastName, userDto.lastName) && Objects.equals(email, userDto.email) && Objects.equals(username, userDto.username) && Objects.equals(password, userDto.password) && Objects.equals(newPassword, userDto.newPassword);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(firstName, lastName, email, username, password, newPassword);
     }
 }

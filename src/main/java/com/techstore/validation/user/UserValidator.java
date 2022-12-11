@@ -27,7 +27,7 @@ public class UserValidator implements ConstraintValidator<ValidUser, UserDto> {
         RuleResult ruleResult = validatePasswords(user);
 
         if (!ruleResult.isValid()) {
-            buildConstraintViolation(context, "Password is invalid");
+            buildConstraintViolation(context, "Too weak password");
             return false;
         }
 
@@ -43,13 +43,13 @@ public class UserValidator implements ConstraintValidator<ValidUser, UserDto> {
                 new CharacterRule(EnglishCharacterData.LowerCase, 1),
                 new CharacterRule(EnglishCharacterData.Digit, 1),
                 new CharacterRule(EnglishCharacterData.Special, 1),
-                new IllegalSequenceRule(EnglishSequenceData.Alphabetical, 2, false),
-                new IllegalSequenceRule(EnglishSequenceData.Numerical, 2, false),
-                new IllegalSequenceRule(EnglishSequenceData.USQwerty, 2, false),
+                new IllegalSequenceRule(EnglishSequenceData.Alphabetical, 3, false),
+                new IllegalSequenceRule(EnglishSequenceData.Numerical, 3, false),
+                new IllegalSequenceRule(EnglishSequenceData.USQwerty, 3, false),
                 new WhitespaceRule()
         );
         RuleResult ruleResult = validator.validate(new PasswordData(password));
-        if (nonNull(newPassword) && ruleResult.isValid()) {
+        if (nonNull(newPassword) && !newPassword.isEmpty() && ruleResult.isValid()) {
             ruleResult = validator.validate(new PasswordData(newPassword));
         }
         return ruleResult;

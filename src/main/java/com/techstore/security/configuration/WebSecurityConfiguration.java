@@ -3,8 +3,7 @@ package com.techstore.security.configuration;
 import com.techstore.repository.IUserRepository;
 import com.techstore.security.filter.CustomAuthenticationFilter;
 import com.techstore.security.filter.CustomAuthorizationFilter;
-import com.techstore.service.user.AbstractUserService;
-import com.techstore.service.user.UserService;
+import com.techstore.service.access.AccessControlService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,8 +13,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -27,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.techstore.constants.ApiConstants.BASE_API_URL;
+import static com.techstore.constants.ApiConstants.CARTS_URL;
+import static com.techstore.constants.ApiConstants.FULL_ADD_PRODUCT_TO_CART_URL;
 import static com.techstore.constants.ApiConstants.FULL_REFRESH_TOKEN_URL;
 import static com.techstore.constants.ApiConstants.LOGIN_URL;
 import static com.techstore.constants.ApiConstants.PRODUCTS_EARLY_ACCESS_FALSE_REGEX;
@@ -53,14 +52,9 @@ public class WebSecurityConfiguration {
     @Autowired
     private IUserRepository userRepository;
 
-    @Bean("password-encoder")
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean("user-service")
-    public AbstractUserService userService() {
-        return new UserService(userRepository, passwordEncoder(), jwtSecret);
+    @Bean("access-control-service")
+    public AccessControlService accessControlService() {
+        return new AccessControlService(userRepository, jwtSecret);
     }
 
     @Bean("cors-config-source")
@@ -77,7 +71,7 @@ public class WebSecurityConfiguration {
     @Bean("authentication-manager")
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(userService())
+                .userDetailsService(accessControlService())
                 .and()
                 .build();
     }
@@ -107,7 +101,8 @@ public class WebSecurityConfiguration {
                     auth.antMatchers(POST, LOGIN_URL, USERS_URL).permitAll();
                     auth.antMatchers(GET, FULL_REFRESH_TOKEN_URL).permitAll();
                     auth.regexMatchers(GET, PRODUCTS_EARLY_ACCESS_FALSE_REGEX, PRODUCT_WITH_PATH_VARIABLE_REGEX).permitAll();
-                    auth.antMatchers(GET, PRODUCTS_URL, PRODUCTS_URL + "/").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
+                    auth.antMatchers(FULL_ADD_PRODUCT_TO_CART_URL).hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
+                    auth.antMatchers(GET, PRODUCTS_URL, PRODUCTS_URL + "/", CARTS_URL).hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(BASE_API_URL + "/**").hasAuthority(ROLE_ADMIN);
                     auth.anyRequest().authenticated();
                 })

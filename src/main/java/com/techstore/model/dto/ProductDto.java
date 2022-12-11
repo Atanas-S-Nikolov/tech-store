@@ -4,12 +4,17 @@ import com.techstore.validation.product.ProductCategoryConstraint;
 import com.techstore.validation.product.ValidProduct;
 import com.techstore.validation.product.ProductTypeConstraint;
 import com.techstore.validation.product.ValidProductName;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
-import java.util.Objects;
 
+@NoArgsConstructor(force = true)
+@ToString(doNotUseGetters = true)
+@EqualsAndHashCode(doNotUseGetters = true)
 @ValidProduct
 public class ProductDto {
     @ValidProductName
@@ -23,10 +28,6 @@ public class ProductDto {
     @ProductTypeConstraint
     private final String type;
     private final boolean earlyAccess;
-
-    public ProductDto() {
-        this("", new BigDecimal("0.0"), 0, "", "", false);
-    }
 
     public ProductDto(String name, BigDecimal price, int stocks, String category, String type, boolean earlyAccess) {
         this.name = name;
@@ -59,30 +60,5 @@ public class ProductDto {
 
     public boolean isEarlyAccess() {
         return earlyAccess;
-    }
-
-    @Override
-    public String toString() {
-        return "ProductDto{" +
-                "name='" + name + '\'' +
-                ", price=" + price +
-                ", stocks=" + stocks +
-                ", category=" + category +
-                ", type=" + type +
-                ", earlyAccess=" + earlyAccess +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ProductDto)) return false;
-        ProductDto that = (ProductDto) o;
-        return stocks == that.stocks && earlyAccess == that.earlyAccess && Objects.equals(name, that.name) && Objects.equals(price, that.price) && Objects.equals(category, that.category) && Objects.equals(type, that.type);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, price, stocks, category, type, earlyAccess);
     }
 }

@@ -1,5 +1,7 @@
 package com.techstore.model.enums;
 
+import java.util.Arrays;
+
 public enum ProductCategory {
     AUDIO("Audio"),
     COMPUTERS_AND_LAPTOPS("Computers and laptops"),
@@ -14,6 +16,12 @@ public enum ProductCategory {
 
     public String getValue() {
         return value;
+    }
+
+    public static ProductCategory getKeyByValue(String value) {
+        return Arrays.stream(values())
+                .filter(productType -> productType.getValue().equals(value))
+                .findFirst().orElse(null);
     }
 
     @Override
