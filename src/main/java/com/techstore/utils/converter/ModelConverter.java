@@ -44,10 +44,6 @@ public class ModelConverter {
                 "", entity.getRole());
     }
 
-    public static Cart toModel(CartDto dto) {
-        return new Cart(new UserResponse(dto.getUsername()), convertProductNamesToModels(dto.getProductsToBuy()),dto.getTotalPrice());
-    }
-
     public static Cart toModel(CartEntity entity) {
         UserResponse userResponse = toResponse(toModel(entity.getUser()));
         return new Cart(userResponse, convertEntitiesToModels(entity.getProducts()), entity.getTotalPrice());
@@ -66,12 +62,6 @@ public class ModelConverter {
 
     public static Set<Product> convertEntitiesToModels(Set<ProductEntity> entities) {
         return entities.stream().map(ModelConverter::toModel).collect(toSet());
-    }
-
-    public static Set<Product> convertProductNamesToModels(Set<ProductToBuyDto> productsToBuy) {
-        return productsToBuy.stream()
-                .map(productToBuy -> new Product(productToBuy.getProductName()))
-                .collect(toSet());
     }
 
     public static ProductToBuy convertProductToProductToBuy(ProductEntity entity, long quantity) {
