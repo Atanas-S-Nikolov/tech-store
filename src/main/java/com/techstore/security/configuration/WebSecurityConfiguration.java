@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -30,7 +31,6 @@ import static com.techstore.constants.ApiConstants.FULL_REFRESH_TOKEN_URL;
 import static com.techstore.constants.ApiConstants.LOGIN_URL;
 import static com.techstore.constants.ApiConstants.PRODUCTS_EARLY_ACCESS_FALSE_REGEX;
 import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
-import static com.techstore.constants.ApiConstants.PRODUCT_WITH_PATH_VARIABLE_REGEX;
 import static com.techstore.constants.ApiConstants.USERS_URL;
 import static com.techstore.constants.RoleConstants.ROLE_ADMIN;
 import static com.techstore.constants.RoleConstants.ROLE_CUSTOMER;
@@ -89,6 +89,11 @@ public class WebSecurityConfiguration {
         return new CustomAuthorizationFilter();
     }
 
+    @Bean("web-security-customizer")
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().antMatchers("/api/v1/product/{name:[A-z-\\d]+}");
+    }
+
     @Bean("security-filter-chain")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -100,7 +105,7 @@ public class WebSecurityConfiguration {
                 .authorizeRequests(auth -> {
                     auth.antMatchers(POST, LOGIN_URL, USERS_URL).permitAll();
                     auth.antMatchers(GET, FULL_REFRESH_TOKEN_URL).permitAll();
-                    auth.regexMatchers(GET, PRODUCTS_EARLY_ACCESS_FALSE_REGEX, PRODUCT_WITH_PATH_VARIABLE_REGEX).permitAll();
+                    auth.regexMatchers(GET, PRODUCTS_EARLY_ACCESS_FALSE_REGEX).permitAll();
                     auth.antMatchers(FULL_ADD_PRODUCT_TO_CART_URL).hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(GET, PRODUCTS_URL, PRODUCTS_URL + "/", CARTS_URL).hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(BASE_API_URL + "/**").hasAuthority(ROLE_ADMIN);

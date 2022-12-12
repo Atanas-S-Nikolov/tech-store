@@ -71,7 +71,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {ProductServiceException.class, ProductImageUploaderServiceException.class,
             UserServiceException.class, CartServiceException.class, Exception.class})
-    public ResponseEntity<Object> handleServiceAndUnknownException(RuntimeException exception) {
+    public ResponseEntity<Object> handleServiceAndUnknownException(Exception exception) {
         logError(exception);
         return buildErrorResponse(INTERNAL_SERVER_ERROR, "Internal server error");
     }

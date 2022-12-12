@@ -8,7 +8,6 @@ public interface ApiConstants {
     String PRODUCTS_URL_REGEX = "\\/api\\/v1\\" + PRODUCT_URL;
     String PRODUCTS_EARLY_ACCESS_PARAM = "early_access";
     String PRODUCTS_EARLY_ACCESS_FALSE_REGEX = PRODUCTS_URL_REGEX + "\\?early_access=false";
-    String PRODUCT_WITH_PATH_VARIABLE_REGEX = PRODUCTS_URL_REGEX + "\\/\\{name\\}";
     String ACCESS_CONTROL_URL = BASE_API_URL + "/auth";
     String LOGIN_URL = ACCESS_CONTROL_URL + "/login";
     String REFRESH_TOKEN_URL = "/refresh_token";
