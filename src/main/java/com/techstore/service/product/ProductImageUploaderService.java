@@ -12,7 +12,6 @@ import com.techstore.exception.product.ProductImageUploaderServiceException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.techstore.utils.FileUtils.convertMultiPartToFile;
 import static com.techstore.utils.FileUtils.generateFileName;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
@@ -55,7 +53,7 @@ public class ProductImageUploaderService implements IProductImageUploaderService
             try {
                 GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_URL));
                 storage[0] = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-                storage[0].create(blobInfo, Files.readAllBytes(convertMultiPartToFile(imageFile).toPath()));
+                storage[0].create(blobInfo, imageFile.getBytes());
                 token = storage[0].get(bucketName, filePath).getMetadata().get(METADATA_DOWNLOAD_TOKENS_KEY);
             } catch (IOException ioe) {
                 failedBloIds.add(blobId);
