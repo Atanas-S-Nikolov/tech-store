@@ -26,12 +26,13 @@ import java.util.List;
 
 import static com.techstore.constants.ApiConstants.BASE_API_URL;
 import static com.techstore.constants.ApiConstants.CARTS_URL;
+import static com.techstore.constants.ApiConstants.CREATE_CUSTOMER_URL;
 import static com.techstore.constants.ApiConstants.FULL_ADD_PRODUCT_TO_CART_URL;
 import static com.techstore.constants.ApiConstants.FULL_REFRESH_TOKEN_URL;
+import static com.techstore.constants.ApiConstants.FULL_REGISTER_URL;
 import static com.techstore.constants.ApiConstants.LOGIN_URL;
 import static com.techstore.constants.ApiConstants.PRODUCTS_EARLY_ACCESS_FALSE_REGEX;
 import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
-import static com.techstore.constants.ApiConstants.USERS_URL;
 import static com.techstore.constants.RoleConstants.ROLE_ADMIN;
 import static com.techstore.constants.RoleConstants.ROLE_CUSTOMER;
 
@@ -103,7 +104,7 @@ public class WebSecurityConfiguration {
                 .sessionManagement().sessionCreationPolicy(STATELESS)
                 .and()
                 .authorizeRequests(auth -> {
-                    auth.antMatchers(POST, LOGIN_URL, USERS_URL).permitAll();
+                    auth.antMatchers(POST, LOGIN_URL, FULL_REGISTER_URL, CREATE_CUSTOMER_URL).permitAll();
                     auth.antMatchers(GET, FULL_REFRESH_TOKEN_URL).permitAll();
                     auth.regexMatchers(GET, PRODUCTS_EARLY_ACCESS_FALSE_REGEX).permitAll();
                     auth.antMatchers(FULL_ADD_PRODUCT_TO_CART_URL).hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);

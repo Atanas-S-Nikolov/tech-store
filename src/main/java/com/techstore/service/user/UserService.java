@@ -1,17 +1,16 @@
 package com.techstore.service.user;
 
-import com.techstore.exception.user.UserConstraintViolationException;
 import com.techstore.exception.authentication.InvalidCredentialsException;
+import com.techstore.exception.user.UserConstraintViolationException;
 import com.techstore.exception.user.UserNotFoundException;
 import com.techstore.exception.user.UserServiceException;
-import com.techstore.model.entity.CartEntity;
-import com.techstore.repository.ICartRepository;
-import com.techstore.utils.converter.ModelConverter;
 import com.techstore.model.User;
+import com.techstore.model.entity.CartEntity;
 import com.techstore.model.entity.UserEntity;
 import com.techstore.model.enums.UserRole;
+import com.techstore.repository.ICartRepository;
 import com.techstore.repository.IUserRepository;
-
+import com.techstore.utils.converter.ModelConverter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,9 +24,6 @@ import java.util.function.Supplier;
 
 import static com.techstore.utils.converter.ModelConverter.toEntity;
 import static com.techstore.utils.converter.ModelConverter.toModel;
-import static com.techstore.model.enums.UserRole.ROLE_ADMIN;
-import static com.techstore.model.enums.UserRole.ROLE_CUSTOMER;
-
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
@@ -44,13 +40,14 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User createCustomer(User user) {
-        return createUserWithRole(user, ROLE_CUSTOMER);
-    }
-
-    @Override
-    public User createAdmin(User user) {
-        return createUserWithRole(user, ROLE_ADMIN);
+    @Transactional
+    public User createUserWithRole(User user, UserRole role) {
+        UserEntity entity = toEntity(user);
+        entity.setRole(role);
+        entity.setPassword(passwordEncoder.encode(user.getPassword().trim()));
+        CartEntity cartEntity = executeDBCall(() ->cartRepository.save(new CartEntity(null, null, new HashSet<>(), BigDecimal.ZERO)));
+        entity.setCart(cartEntity);
+        return toModel(executeDBCall(() -> repository.save(entity)));
     }
 
     @Override
@@ -85,16 +82,6 @@ public class UserService implements IUserService {
         Optional<CartEntity> optionalCartEntity = executeDBCall(() -> cartRepository.findById(entity.getCart().getId()));
         optionalCartEntity.ifPresent(cartEntity -> executeDBCall(() -> cartRepository.delete(cartEntity)));
         executeDBCall(() -> repository.delete(entity));
-    }
-
-    @Transactional
-    private User createUserWithRole(User user, UserRole role) {
-        UserEntity entity = toEntity(user);
-        entity.setRole(role);
-        entity.setPassword(passwordEncoder.encode(user.getPassword().trim()));
-        CartEntity cartEntity = executeDBCall(() ->cartRepository.save(new CartEntity(null, null, new HashSet<>(), BigDecimal.ZERO)));
-        entity.setCart(cartEntity);
-        return toModel(executeDBCall(() -> repository.save(entity)));
     }
 
     private UserEntity findUserByUsernameAndPassword(String username, String password) {

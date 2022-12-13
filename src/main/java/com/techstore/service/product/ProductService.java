@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 
 import static com.techstore.utils.converter.ModelConverter.toEntity;
 import static com.techstore.utils.converter.ModelConverter.toModel;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class ProductService implements IProductService {
@@ -74,12 +76,32 @@ public class ProductService implements IProductService {
 
     private Product tryToSaveProduct(Collection<MultipartFile> images, ProductEntity entity) {
         try {
+            Collection<MultipartFile> imagesToRemove = findImagesToBeRemoved(images, entity.getImageUrls());
+            images.removeAll(imagesToRemove);
             entity.setDateOfModification(LocalDateTime.now());
             return toModel(executeDBCall(() -> repository.save(uploadImages(images, entity))));
         } catch (Exception exception) {
             imageUploaderService.deleteImagesForProduct(lastUploadedImageUrls);
             throw exception;
         }
+    }
+
+    private Collection<MultipartFile> findImagesToBeRemoved(Collection<MultipartFile> images, Set<String> existingImageUrls) {
+        Collection<MultipartFile> imagesToRemove = new HashSet<>();
+        if (!isEmpty(images)) {
+            for (String url : existingImageUrls) {
+                for (MultipartFile image : images) {
+                    String imageName = nonNull(image.getOriginalFilename())
+                            ? image.getOriginalFilename()
+                            : EMPTY;
+                    if (url.contains(imageName)) {
+                        imagesToRemove.add(image);
+                        break;
+                    }
+                }
+            }
+        }
+        return imagesToRemove;
     }
 
     private ProductEntity uploadImages(Collection<MultipartFile> images, ProductEntity entity) {
