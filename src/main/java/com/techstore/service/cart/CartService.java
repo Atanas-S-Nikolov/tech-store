@@ -1,25 +1,30 @@
 package com.techstore.service.cart;
 
+import com.techstore.exception.cart.CartConstraintViolationException;
 import com.techstore.exception.cart.CartNotFoundException;
 import com.techstore.exception.cart.CartServiceException;
 import com.techstore.model.Cart;
-import com.techstore.model.ProductToBuy;
 import com.techstore.model.dto.CartDto;
 import com.techstore.model.dto.ProductToBuyDto;
 import com.techstore.model.entity.CartEntity;
 import com.techstore.model.entity.ProductEntity;
+import com.techstore.model.entity.ProductToBuyEntity;
 import com.techstore.model.entity.UserEntity;
 import com.techstore.repository.ICartRepository;
 import com.techstore.repository.IProductRepository;
+import com.techstore.repository.IProductToBuyRepository;
 import com.techstore.repository.IUserRepository;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import static com.techstore.utils.converter.ModelConverter.convertProductToProductToBuy;
 import static com.techstore.utils.converter.ModelConverter.toModel;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
@@ -28,11 +33,18 @@ public class CartService implements ICartService {
     private final ICartRepository repository;
     private final IUserRepository userRepository;
     private final IProductRepository productRepository;
+    private final IProductToBuyRepository productToBuyRepository;
 
-    public CartService(ICartRepository repository, IUserRepository userRepository, IProductRepository productRepository) {
+    public CartService(ICartRepository repository, IUserRepository userRepository, IProductRepository productRepository, IProductToBuyRepository productToBuyRepository) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.productToBuyRepository = productToBuyRepository;
+    }
+
+    @Override
+    public CartEntity createDefaultCart() {
+        return executeDBCall(() -> repository.save(new CartEntity(null, null, new HashSet<>(), BigDecimal.ZERO)));
     }
 
     @Override
@@ -40,26 +52,44 @@ public class CartService implements ICartService {
         return toModel(findCart(username));
     }
 
+    @Transactional
     @Override
-    public Cart addProductsToCart(CartDto cartDto) {
+    public Cart updateCart(CartDto cartDto) {
         String username = cartDto.getUsername();
         Set<ProductToBuyDto> toBuyDtos = cartDto.getProductsToBuy();
         CartEntity cartEntity = findCart(username);
-
-        Set<ProductEntity> productEntities = cartEntity.getProducts();
-        toBuyDtos.forEach(productToBuy -> {
-                productRepository.findProductByName(productToBuy.getProductName()).ifPresent(productEntities::add);
-        });
-        cartEntity.setProducts(productEntities);
-
-        Set<ProductToBuy> products = convertToProductsToBuy(productEntities, toBuyDtos);
-        cartEntity.setTotalPrice(calculateTotalPrice(products));
+        Set<ProductToBuyEntity> toBuyEntities = toBuyDtos.stream()
+                .map(this::persistProductToBuy)
+                .filter(Objects::nonNull)
+                .collect(toSet());
+        cartEntity.setProductsToBuy(toBuyEntities);
+        cartEntity.setTotalPrice(calculateTotalPrice(toBuyEntities));
         return toModel(executeDBCall(() -> repository.save(cartEntity)));
     }
 
+    @Transactional
+    @Override
+    public Cart clearCart(String username) {
+        CartEntity cartEntity = findCart(username);
+        Set<ProductToBuyEntity> productsToDelete = cartEntity.getProductsToBuy();
+        cartEntity.setTotalPrice(BigDecimal.ZERO);
+        cartEntity.setProductsToBuy(new HashSet<>());
+        CartEntity persistedEntity = executeDBCall(() -> repository.save(cartEntity));
+        deleteProductsToBuy(productsToDelete);
+        return toModel(persistedEntity);
+    }
+
+    @Transactional
     @Override
     public void deleteCart(String username) {
-        executeDBCall(() -> repository.delete(findCart(username)));
+        CartEntity cartEntity = findCart(username);
+        deleteProductsToBuy(cartEntity.getProductsToBuy());
+        executeDBCall(() -> repository.delete(cartEntity));
+    }
+
+    private void deleteProductsToBuy(Set<ProductToBuyEntity> productToBuyEntities) {
+
+        executeDBCall(() -> productToBuyEntities.forEach(productToBuyRepository::delete));
     }
 
     private CartEntity findCart(String username) {
@@ -72,23 +102,27 @@ public class CartService implements ICartService {
         return entity;
     }
 
-    private Set<ProductToBuy> convertToProductsToBuy(Set<ProductEntity> productEntities, Set<ProductToBuyDto> toBuyDtos) {
-        return productEntities.stream().map(product -> {
-            long quantity = 0L;
-            for (ProductToBuyDto toBuyDto : toBuyDtos) {
-                if (toBuyDto.getProductName().equals(product.getName())) {
-                    quantity = toBuyDto.getQuantity();
-                }
-            }
-            return convertProductToProductToBuy(product, quantity);
-        }).collect(toSet());
+    private ProductToBuyEntity persistProductToBuy(ProductToBuyDto toBuyDto) {
+        Optional<ProductEntity> optionalProductEntity = productRepository.findProductByName(toBuyDto.getProductName());
+        if (optionalProductEntity.isPresent()) {
+            ProductEntity productEntity = optionalProductEntity.get();
+            ProductToBuyEntity toBuyEntity = productToBuyRepository.findProductToBuyByProduct(productEntity)
+                    .orElseGet(ProductToBuyEntity::new);
+            toBuyEntity.setQuantity(toBuyDto.getQuantity());
+            toBuyEntity.setProduct(productEntity);
+            toBuyEntity = productToBuyRepository.save(toBuyEntity);
+            productEntity.setProductToBuy(toBuyEntity);
+            productRepository.save(productEntity);
+            return toBuyEntity;
+        }
+        return null;
     }
 
-    private BigDecimal calculateTotalPrice(Set<ProductToBuy> productsToBuy) {
+    private BigDecimal calculateTotalPrice(Set<ProductToBuyEntity> productsToBuy) {
         BigDecimal totalPrice = BigDecimal.ZERO;
-        for (ProductToBuy productToBuy : productsToBuy) {
-            BigDecimal price = productToBuy.getProduct().getPrice();
-            BigDecimal quantity = new BigDecimal(productToBuy.getQuantity());
+        for (ProductToBuyEntity toBuyEntity : productsToBuy) {
+            BigDecimal price = toBuyEntity.getProduct().getPrice();
+            BigDecimal quantity = new BigDecimal(toBuyEntity.getQuantity());
             totalPrice = totalPrice.add(price.multiply(quantity));
         }
         return totalPrice;
@@ -97,6 +131,8 @@ public class CartService implements ICartService {
     private <T> T executeDBCall(Supplier<T> supplier) {
         try{
             return supplier.get();
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw new CartConstraintViolationException("Cart constraint violation");
         } catch (DataAccessException dataAccessException) {
             throw new CartServiceException("Error while connecting the database", dataAccessException);
         }
@@ -105,6 +141,8 @@ public class CartService implements ICartService {
     private void executeDBCall(Runnable runnable) {
         try {
             runnable.run();
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw new CartConstraintViolationException("Cart constraint violation");
         } catch (DataAccessException dataAccessException) {
             throw new CartServiceException("Error while connecting the database", dataAccessException);
         }

@@ -2,6 +2,7 @@ package com.techstore.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -10,36 +11,31 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import java.math.BigDecimal;
 import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@EqualsAndHashCode(exclude = {"product", "carts"})
 @Entity
-@Table(name = "carts")
-public class CartEntity {
+@Table(name = "product_to_buy")
+public class ProductToBuyEntity {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", unique = true)
     private String id;
 
-    @OneToOne(mappedBy = "cart")
-    private UserEntity user;
+    @Column(name = "quantity")
+    private long quantity;
 
-    @ManyToMany
-    @JoinTable(
-            name = "carts_products_to_buy",
-            joinColumns = @JoinColumn(name = "cart_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_to_buy_id")
-    )
-    private Set<ProductToBuyEntity> productsToBuy;
+    @OneToOne
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
+    private ProductEntity product;
 
-    @Column(name = "total_price")
-    private BigDecimal totalPrice;
+    @ManyToMany(mappedBy = "productsToBuy")
+    private Set<CartEntity> carts;
 }

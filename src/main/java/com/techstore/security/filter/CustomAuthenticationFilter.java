@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -60,8 +61,14 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
         String accessToken = generateAccessToken(username, roles, algorithm);
         String refreshToken = generateRefreshToken(username, algorithm);
-
+//        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
+//        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+//        accessTokenCookie.setHttpOnly(true);
+//        refreshTokenCookie.setHttpOnly(true);
+//        response.addCookie(accessTokenCookie);
+//        response.addCookie(refreshTokenCookie);
         response.setContentType(APPLICATION_JSON_VALUE);
+
         toJson(response.getOutputStream(), new JWTResponse(accessToken, refreshToken));
     }
 

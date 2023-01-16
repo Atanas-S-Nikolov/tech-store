@@ -1,11 +1,25 @@
 package com.techstore.model.response;
 
-import java.util.Objects;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
+@ToString(doNotUseGetters = true)
+@EqualsAndHashCode(doNotUseGetters = true)
 public class UserResponse {
+    @Getter
     private final String firstName;
+
+    @Getter
     private final String lastName;
+
+    @Getter
     private final String email;
+
+    @Getter
+    private final String phone;
+
+    @Getter
     private final String username;
 
     public UserResponse() {
@@ -13,52 +27,14 @@ public class UserResponse {
     }
 
     public UserResponse(String username) {
-        this(null, null, null, username);
+        this(null, null, null, null, username);
     }
 
-    public UserResponse(String firstName, String lastName, String email, String username) {
+    public UserResponse(String firstName, String lastName, String email, String phone, String username) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.phone = phone;
         this.username = username;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public String toString() {
-        return "UserResponse{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", username='" + username + '\'' +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UserResponse)) return false;
-        UserResponse that = (UserResponse) o;
-        return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(email, that.email) && Objects.equals(username, that.username);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(firstName, lastName, email, username);
     }
 }

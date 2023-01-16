@@ -20,9 +20,10 @@ import static java.util.stream.Collectors.toList;
 
 public class JWTUtils {
     private static final long ONE_MINUTE = 1000L * 60L;
+    private static final long FIVE_MINUTES = ONE_MINUTE * 5L;
     private static final long ONE_HOUR = ONE_MINUTE *  60L;
     private static final long ONE_DAY = ONE_HOUR * 24L;
-    private static final long THIRTY_DAYS = ONE_DAY * 30L;
+    private static final long FOUR_WEEKS = ONE_DAY * 28L;
     
     public static DecodedJWT verifyToken(String token, Algorithm algorithm) {
         DecodedJWT decodedJWT;
@@ -38,7 +39,7 @@ public class JWTUtils {
     public static String generateAccessToken(String username, List<String> roles, Algorithm algorithm) {
         return JWT.create()
                 .withSubject(username)
-                .withExpiresAt(new Date(currentTimeMillis() + ONE_HOUR))
+                .withExpiresAt(new Date(currentTimeMillis() + FIVE_MINUTES))
                 .withClaim(ROLES_CLAIM, roles)
                 .sign(algorithm);
     }
@@ -46,7 +47,7 @@ public class JWTUtils {
     public static String generateRefreshToken(String username, Algorithm algorithm) {
         return JWT.create()
                 .withSubject(username)
-                .withExpiresAt(new Date(currentTimeMillis() + THIRTY_DAYS))
+                .withExpiresAt(new Date(currentTimeMillis() + FOUR_WEEKS))
                 .sign(algorithm);
     }
 

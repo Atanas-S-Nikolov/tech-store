@@ -5,21 +5,17 @@ import com.techstore.exception.user.UserConstraintViolationException;
 import com.techstore.exception.user.UserNotFoundException;
 import com.techstore.exception.user.UserServiceException;
 import com.techstore.model.User;
-import com.techstore.model.entity.CartEntity;
 import com.techstore.model.entity.UserEntity;
 import com.techstore.model.enums.UserRole;
-import com.techstore.repository.ICartRepository;
 import com.techstore.repository.IUserRepository;
+import com.techstore.service.cart.ICartService;
 import com.techstore.utils.converter.ModelConverter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.techstore.utils.converter.ModelConverter.toEntity;
@@ -30,23 +26,22 @@ import static java.util.stream.Collectors.toList;
 
 public class UserService implements IUserService {
     private final IUserRepository repository;
-    private final ICartRepository cartRepository;
+    private final ICartService cartService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(IUserRepository repository, ICartRepository cartRepository, PasswordEncoder passwordEncoder) {
+    public UserService(IUserRepository repository, ICartService cartService, PasswordEncoder passwordEncoder) {
         this.repository = repository;
-        this.cartRepository = cartRepository;
+        this.cartService = cartService;
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
     @Transactional
+    @Override
     public User createUserWithRole(User user, UserRole role) {
         UserEntity entity = toEntity(user);
         entity.setRole(role);
         entity.setPassword(passwordEncoder.encode(user.getPassword().trim()));
-        CartEntity cartEntity = executeDBCall(() ->cartRepository.save(new CartEntity(null, null, new HashSet<>(), BigDecimal.ZERO)));
-        entity.setCart(cartEntity);
+        entity.setCart(cartService.createDefaultCart());
         return toModel(executeDBCall(() -> repository.save(entity)));
     }
 
@@ -79,8 +74,7 @@ public class UserService implements IUserService {
     @Override
     public void deleteUser(String username, String password) {
         UserEntity entity = findUserByUsernameAndPassword(username, password);
-        Optional<CartEntity> optionalCartEntity = executeDBCall(() -> cartRepository.findById(entity.getCart().getId()));
-        optionalCartEntity.ifPresent(cartEntity -> executeDBCall(() -> cartRepository.delete(cartEntity)));
+        cartService.deleteCart(username);
         executeDBCall(() -> repository.delete(entity));
     }
 

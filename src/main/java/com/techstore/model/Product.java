@@ -30,6 +30,15 @@ public class Product {
     private final ProductType type;
 
     @Getter
+    private final String brand;
+
+    @Getter
+    private final String model;
+
+    @Getter
+    private final String description;
+
+    @Getter
     private final boolean earlyAccess;
 
     @Getter
@@ -46,15 +55,18 @@ public class Product {
     }
 
     public Product(String name) {
-        this(name, new BigDecimal("0.0"), 0, null, null, false, null, null, new HashSet<>());
+        this(name, new BigDecimal("0.0"), 0, null, null, null, null, null, false, null, null, new HashSet<>());
     }
 
-    public Product(String name, BigDecimal price, int stocks, ProductCategory category, ProductType type, boolean earlyAccess, LocalDateTime dateOfCreation, LocalDateTime dateOfModification, Set<String> imageUrls) {
+    public Product(String name, BigDecimal price, int stocks, ProductCategory category, ProductType type, String brand, String model, String description, boolean earlyAccess, LocalDateTime dateOfCreation, LocalDateTime dateOfModification, Set<String> imageUrls) {
         this.name = name;
         this.price = price;
         this.stocks = stocks;
         this.category = category;
         this.type = type;
+        this.brand = brand;
+        this.model = model;
+        this.description = description;
         this.earlyAccess = earlyAccess;
         this.dateOfCreation = dateOfCreation;
         this.dateOfModification = dateOfModification;

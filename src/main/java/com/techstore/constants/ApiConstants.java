@@ -18,6 +18,6 @@ public interface ApiConstants {
     String REFRESH_TOKEN_URL = "/refresh_token";
     String FULL_REFRESH_TOKEN_URL = ACCESS_CONTROL_URL + REFRESH_TOKEN_URL;
     String CARTS_URL = BASE_API_URL + "/cart";
-    String FULL_ADD_PRODUCT_TO_CART_URL = CARTS_URL + PRODUCT_URL;
     String CREATE_CUSTOMER_URL = USERS_URL + "/role/" + ROLE_CUSTOMER;
+    String CLEAR_CART_URL = "/clear";
 }

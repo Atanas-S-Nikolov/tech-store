@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.techstore.constants.ApiConstants.CARTS_URL;
-import static com.techstore.constants.ApiConstants.PRODUCT_URL;
+import static com.techstore.constants.ApiConstants.CLEAR_CART_URL;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -34,9 +34,14 @@ public class CartController {
         return ResponseEntity.status(OK).body(service.getCart(usernameDto.getUsername()));
     }
 
-    @PutMapping(path = PRODUCT_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Cart> addProductToCart(@RequestBody CartDto dto) {
-        return ResponseEntity.status(OK).body(service.addProductsToCart(dto));
+    @PutMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Cart> updateCart(@RequestBody CartDto dto) {
+        return ResponseEntity.status(OK).body(service.updateCart(dto));
+    }
+
+    @PutMapping(path = CLEAR_CART_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Cart> clearCart(@RequestBody UsernameDto usernameDto) {
+        return ResponseEntity.status(OK).body(service.clearCart(usernameDto.getUsername()));
     }
 
     @DeleteMapping(consumes = APPLICATION_JSON_VALUE)

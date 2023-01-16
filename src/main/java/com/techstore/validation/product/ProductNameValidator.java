@@ -4,7 +4,6 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import static com.techstore.validation.builder.ConstraintViolationBuilder.buildConstraintViolation;
-import static org.apache.commons.lang3.StringUtils.containsWhitespace;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class ProductNameValidator implements ConstraintValidator<ValidProductName, String> {
@@ -18,12 +17,6 @@ public class ProductNameValidator implements ConstraintValidator<ValidProductNam
             buildConstraintViolation(context, "Product name must not be blank");
             return false;
         }
-
-        if (containsWhitespace(name)) {
-            buildConstraintViolation(context, "Product name must not contains spaces");
-            return false;
-        }
-
         return true;
     }
 }

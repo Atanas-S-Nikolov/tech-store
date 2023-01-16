@@ -2,6 +2,7 @@ package com.techstore.configuration;
 
 import com.techstore.repository.ICartRepository;
 import com.techstore.repository.IProductRepository;
+import com.techstore.repository.IProductToBuyRepository;
 import com.techstore.repository.IUserRepository;
 import com.techstore.service.cart.CartService;
 import com.techstore.service.cart.ICartService;
@@ -33,6 +34,9 @@ public class BeanConfiguration {
     @Autowired
     private ICartRepository cartRepository;
 
+    @Autowired
+    private IProductToBuyRepository productToBuyRepository;
+
     @Bean("password-encoder")
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -49,13 +53,13 @@ public class BeanConfiguration {
         return new ProductService(productRepository, imageUploaderService());
     }
 
-    @Bean("user-service")
-    public IUserService userService() {
-        return new UserService(userRepository, cartRepository, passwordEncoder());
-    }
-
     @Bean("cart-service")
     public ICartService cartService() {
-        return new CartService(cartRepository, userRepository, productRepository);
+        return new CartService(cartRepository, userRepository, productRepository, productToBuyRepository);
+    }
+
+    @Bean("user-service")
+    public IUserService userService() {
+        return new UserService(userRepository, cartService(), passwordEncoder());
     }
 }

@@ -22,6 +22,9 @@ public class User {
     private final String email;
 
     @Getter
+    private final String phone;
+
+    @Getter
     private final String username;
 
     @Getter

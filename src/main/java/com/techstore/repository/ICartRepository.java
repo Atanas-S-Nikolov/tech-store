@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface ICartRepository extends JpaRepository<CartEntity, String> {
+
     @Query("SELECT c FROM CartEntity c where c.user = :user")
     Optional<CartEntity> findByUser(@Param(value = "user") UserEntity user);
 }

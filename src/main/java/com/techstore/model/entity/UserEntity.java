@@ -2,8 +2,10 @@ package com.techstore.model.entity;
 
 import com.techstore.model.enums.UserRole;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -16,6 +18,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @EqualsAndHashCode(exclude = "cart")
 @Entity
@@ -36,6 +40,9 @@ public class UserEntity {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "phone")
+    private String phone;
+
     @Column(name = "username", unique = true)
     private String username;
 
@@ -49,19 +56,4 @@ public class UserEntity {
     @OneToOne
     @JoinColumn(name = "cart_id", referencedColumnName = "id")
     private CartEntity cart;
-
-    public UserEntity() {
-        this(null, null, null, null, null, null, null, null);
-    }
-
-    public UserEntity(String id, String firstName, String lastName, String email, String username, String password, UserRole role, CartEntity cart) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.username = username;
-        this.password = password;
-        this.role = role;
-        this.cart = cart;
-    }
 }

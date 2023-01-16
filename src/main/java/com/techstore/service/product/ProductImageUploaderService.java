@@ -27,6 +27,11 @@ public class ProductImageUploaderService implements IProductImageUploaderService
     private final static String SERVICE_ACCOUNT_JSON_URL = "C:/Users/J/Downloads/tech-store-2e9a6-firebase-adminsdk-oew5e-cdbb73a8c2.json";
     private final static String IMAGE_URL_FORMAT = "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media&token=%s";
 
+    private static final String DASH = "-";
+    private static final String WHITESPACE = "\\s+";
+    private final static String FORWARD_SLASH =  "/";
+    private final static String URL_ENCODED_FORWARD_SLASH =  "%2F";
+
     private final String bucketName;
 
     public ProductImageUploaderService(String bucketName) {
@@ -40,7 +45,7 @@ public class ProductImageUploaderService implements IProductImageUploaderService
         final Exception[] occurredException = {null};
 
         Set<String> imageUrls = images.stream().map(imageFile -> {
-            String filePath = (productName + "/" + generateFileName(imageFile)).replace("?", "");
+            String filePath = (productName.replaceAll(WHITESPACE, DASH) + "/" + generateFileName(imageFile)).replace("?", "");
             BlobId blobId = BlobId.of(bucketName, filePath);
             Map<String, String> metadata = new HashMap<>();
             metadata.put(METADATA_DOWNLOAD_TOKENS_KEY, filePath);
@@ -60,7 +65,7 @@ public class ProductImageUploaderService implements IProductImageUploaderService
                 occurredException[0] = ioe;
             }
 
-            return String.format(IMAGE_URL_FORMAT, bucketName, filePath, token);
+            return String.format(IMAGE_URL_FORMAT, bucketName, formatUrl(filePath), formatUrl(token));
         }).collect(Collectors.toSet());
 
         if (!failedBloIds.isEmpty()) {
@@ -78,7 +83,8 @@ public class ProductImageUploaderService implements IProductImageUploaderService
                     .map(url -> {
                         int startIndex = url.indexOf("/o/") + 3;
                         int endIndex = url.indexOf("?");
-                        return BlobId.of(bucketName, url.substring(startIndex, endIndex));
+                        String urlToDelete = formatUrl(url.substring(startIndex, endIndex));
+                        return BlobId.of(bucketName, urlToDelete);
                     })
                     .collect(Collectors.toSet());
 
@@ -99,5 +105,10 @@ public class ProductImageUploaderService implements IProductImageUploaderService
         failedBloIds.stream().map(BlobId::getName).forEach(name -> builder.append(name).append(", "));
         builder.append("}");
         return builder.toString();
+    }
+
+
+    private String formatUrl(String str) {
+        return str.replace(FORWARD_SLASH, URL_ENCODED_FORWARD_SLASH);
     }
 }

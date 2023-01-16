@@ -1,6 +1,7 @@
 package com.techstore.exception.handler;
 
 import com.techstore.exception.authentication.InvalidJWTException;
+import com.techstore.exception.cart.CartConstraintViolationException;
 import com.techstore.exception.cart.CartNotFoundException;
 import com.techstore.exception.cart.CartServiceException;
 import com.techstore.exception.product.ProductConstraintViolationException;
@@ -15,6 +16,7 @@ import com.techstore.model.response.ValidationErrorResponse.RejectedValue;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +47,22 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @Slf4j
 @RestControllerAdvice(basePackages = {"com.techstore.controller"})
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-    @ExceptionHandler(value = {ProductConstraintViolationException.class, UserConstraintViolationException.class})
-    public ResponseEntity<Object> handleConstraintViolationException(RuntimeException exception) {
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException exception) {
+        logError(exception);
+        return buildErrorResponse(BAD_REQUEST, exception);
+    }
+
+    // Workaround for unable to catch DataIntegrityViolationException in UserService
+    @ExceptionHandler(value = DataIntegrityViolationException.class)
+    public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
+        logError(exception);
+        return buildErrorResponse(CONFLICT, "Database constraint violation. Maybe you are trying to create entity which already exists or delete entity with relations");
+    }
+
+    @ExceptionHandler(value = {ProductConstraintViolationException.class, UserConstraintViolationException.class,
+            CartConstraintViolationException.class})
+    public ResponseEntity<Object> handleCustomConstraintViolationException(RuntimeException exception) {
         logError(exception);
         return buildErrorResponse(CONFLICT, exception);
     }
@@ -74,12 +90,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleServiceAndUnknownException(Exception exception) {
         logError(exception);
         return buildErrorResponse(INTERNAL_SERVER_ERROR, "Internal server error");
-    }
-
-    @ExceptionHandler(value = ConstraintViolationException.class)
-    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException exception) {
-        logError(exception);
-        return buildErrorResponse(BAD_REQUEST, exception);
     }
 
     @Override
