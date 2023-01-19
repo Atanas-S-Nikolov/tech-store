@@ -89,11 +89,6 @@ public class WebSecurityConfiguration {
         return new CustomAuthorizationFilter();
     }
 
-    @Bean("web-security-customizer")
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers("/api/v1/product/{name:[A-z-\\d]+}");
-    }
-
     @Bean("security-filter-chain")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -105,6 +100,7 @@ public class WebSecurityConfiguration {
                 .authorizeRequests(auth -> {
                     auth.antMatchers(POST, LOGIN_URL, FULL_REGISTER_URL, CREATE_CUSTOMER_URL).permitAll();
                     auth.antMatchers(GET, FULL_REFRESH_TOKEN_URL).permitAll();
+                    auth.antMatchers(GET, "/api/v1/product/{name:[A-z\\s\\d]+}").permitAll();
                     auth.regexMatchers(GET, PRODUCTS_EARLY_ACCESS_FALSE_REGEX).permitAll();
                     auth.antMatchers(CARTS_URL + "/**").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(GET, PRODUCTS_URL, PRODUCTS_URL + "/").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
