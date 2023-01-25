@@ -3,6 +3,8 @@ package com.techstore.controller;
 import com.techstore.model.Product;
 import com.techstore.model.dto.ProductDto;
 import com.techstore.service.product.IProductService;
+import com.techstore.validation.product.ProductCategoryConstraint;
+import com.techstore.validation.product.ProductTypeConstraint;
 import com.techstore.validation.product.ValidProductName;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,10 @@ import javax.validation.Valid;
 import java.util.Collection;
 
 import static com.techstore.constants.ApiConstants.PRODUCTS_EARLY_ACCESS_PARAM;
+import static com.techstore.constants.ApiConstants.PRODUCTS_CATEGORY_PARAM;
+import static com.techstore.constants.ApiConstants.PRODUCTS_TYPE_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
+import static com.techstore.constants.FieldConstants.VALIDATED_PARAM_DEFAULT_VALUE;
 import static com.techstore.utils.converter.ModelConverter.toModel;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -56,8 +61,16 @@ public class ProductController {
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<Product>> getProducts(
-            @RequestParam(value = PRODUCTS_EARLY_ACCESS_PARAM, required = false, defaultValue = "true")boolean earlyAccess) {
-        return ResponseEntity.status(OK).body(service.getProducts(earlyAccess));
+            @RequestParam(value = PRODUCTS_EARLY_ACCESS_PARAM, required = false, defaultValue = "true")
+                    boolean earlyAccess,
+            @ProductCategoryConstraint
+            @RequestParam(value = PRODUCTS_CATEGORY_PARAM, required = false, defaultValue = VALIDATED_PARAM_DEFAULT_VALUE)
+                    String category,
+            @ProductTypeConstraint
+            @RequestParam(value = PRODUCTS_TYPE_PARAM, required = false, defaultValue = VALIDATED_PARAM_DEFAULT_VALUE)
+                    String type
+    ) {
+        return ResponseEntity.status(OK).body(service.getProducts(earlyAccess, category, type));
     }
 
     @PutMapping(consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)

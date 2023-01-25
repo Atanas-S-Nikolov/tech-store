@@ -14,6 +14,12 @@ public interface IProductRepository extends JpaRepository<ProductEntity, String>
 
     Optional<ProductEntity> findProductByName(String name);
 
+    @Query("SELECT p FROM ProductEntity p where p.category = :category")
+    List<ProductEntity> findByCategory(@Param("category") String category);
+
+    @Query("SELECT p FROM ProductEntity p where p.type = :type")
+    List<ProductEntity> findByType(@Param("type") String type);
+
     @Query("SELECT p FROM ProductEntity p where p.earlyAccess = :earlyAccess")
     List<ProductEntity> findProductsWithEarlyAccess(@Param("earlyAccess") boolean earlyAccess);
 }

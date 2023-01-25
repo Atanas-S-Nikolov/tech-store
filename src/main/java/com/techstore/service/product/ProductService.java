@@ -3,15 +3,23 @@ package com.techstore.service.product;
 import com.techstore.exception.product.ProductConstraintViolationException;
 import com.techstore.exception.product.ProductNotFoundException;
 import com.techstore.exception.product.ProductServiceException;
+import com.techstore.model.enums.ProductCategory;
+import com.techstore.model.enums.ProductType;
 import com.techstore.utils.converter.ModelConverter;
 import com.techstore.model.Product;
 import com.techstore.model.entity.ProductEntity;
 import com.techstore.repository.IProductRepository;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -21,6 +29,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.techstore.constants.FieldConstants.VALIDATED_PARAM_DEFAULT_VALUE;
 import static com.techstore.utils.converter.ModelConverter.toEntity;
 import static com.techstore.utils.converter.ModelConverter.toModel;
 import static java.util.Objects.nonNull;
@@ -30,6 +39,9 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class ProductService implements IProductService {
     private final IProductRepository repository;
     private final IProductImageUploaderService imageUploaderService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
     private Set<String> lastUploadedImageUrls = new HashSet<>();
 
     @Autowired
@@ -51,9 +63,20 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Collection<Product> getProducts(boolean earlyAccess) {
-        List<ProductEntity> entities = executeDBCall(() ->
-                earlyAccess ? repository.findAll() : repository.findProductsWithEarlyAccess(false));
+    @SuppressWarnings("unchecked")
+    public Collection<Product> getProducts(boolean earlyAccess, String category, String type) {
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(ProductEntity.class);
+        if (!earlyAccess) {
+            criteria.add(Restrictions.eq("earlyAccess", false));
+        }
+        if (!category.equals(VALIDATED_PARAM_DEFAULT_VALUE)) {
+            criteria.add(Restrictions.eq("category", ProductCategory.getKeyByValue(category)));
+        }
+        if (!type.equals(VALIDATED_PARAM_DEFAULT_VALUE)) {
+            criteria.add(Restrictions.eq("type", ProductType.getKeyByValue(type)));
+        }
+        List<ProductEntity> entities = executeDBCall(criteria::list);
         return entities.stream().map(ModelConverter::toModel).collect(Collectors.toList());
     }
 
@@ -124,8 +147,8 @@ public class ProductService implements IProductService {
             return supplier.get();
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             throw new ProductConstraintViolationException("Product constraint violation", dataIntegrityViolationException);
-        } catch (DataAccessException dataAccessException) {
-            throw new ProductServiceException("Error while connecting the database", dataAccessException);
+        } catch (DataAccessException | HibernateException dbException) {
+            throw new ProductServiceException("Error while connecting the database", dbException);
         }
     }
 

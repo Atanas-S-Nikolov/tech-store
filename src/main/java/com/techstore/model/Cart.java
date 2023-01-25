@@ -1,5 +1,6 @@
 package com.techstore.model;
 
+import com.techstore.model.response.ProductToBuyResponse;
 import com.techstore.model.response.UserResponse;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -19,7 +20,7 @@ public class Cart {
     private final UserResponse user;
 
     @Getter
-    private final Set<Product> products;
+    private final Set<ProductToBuyResponse> products;
 
     @Getter
     private final BigDecimal totalPrice;

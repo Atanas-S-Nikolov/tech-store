@@ -11,6 +11,7 @@ import com.techstore.model.entity.ProductToBuyEntity;
 import com.techstore.model.entity.UserEntity;
 import com.techstore.model.enums.ProductCategory;
 import com.techstore.model.enums.ProductType;
+import com.techstore.model.response.ProductToBuyResponse;
 import com.techstore.model.response.UserResponse;
 
 import java.util.Set;
@@ -20,6 +21,10 @@ import static java.util.stream.Collectors.toSet;
 public class ModelConverter {
     public static UserResponse toResponse(User user) {
         return new UserResponse(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getUsername());
+    }
+
+    public static ProductToBuyResponse toResponse(ProductToBuyEntity toBuyEntity) {
+        return new ProductToBuyResponse(toModel(toBuyEntity), toBuyEntity.getQuantity());
     }
 
     public static Product toModel(ProductDto dto) {
@@ -50,7 +55,7 @@ public class ModelConverter {
 
     public static Cart toModel(CartEntity entity) {
         UserResponse userResponse = toResponse(toModel(entity.getUser()));
-        return new Cart(userResponse, convertEntitiesToModels(entity.getProductsToBuy()), entity.getTotalPrice());
+        return new Cart(userResponse, convertEntitiesToResponses(entity.getProductsToBuy()), entity.getTotalPrice());
     }
 
     public static ProductEntity toEntity(Product product) {
@@ -64,7 +69,7 @@ public class ModelConverter {
                 user.getPassword(), null, null);
     }
 
-    public static Set<Product> convertEntitiesToModels(Set<ProductToBuyEntity> entities) {
-        return entities.stream().map(ModelConverter::toModel).collect(toSet());
+    public static Set<ProductToBuyResponse> convertEntitiesToResponses(Set<ProductToBuyEntity> entities) {
+        return entities.stream().map(ModelConverter::toResponse).collect(toSet());
     }
 }

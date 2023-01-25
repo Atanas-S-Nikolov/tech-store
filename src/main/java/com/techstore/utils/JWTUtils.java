@@ -39,7 +39,7 @@ public class JWTUtils {
     public static String generateAccessToken(String username, List<String> roles, Algorithm algorithm) {
         return JWT.create()
                 .withSubject(username)
-                .withExpiresAt(new Date(currentTimeMillis() + FIVE_MINUTES))
+                .withExpiresAt(new Date(currentTimeMillis() + ONE_HOUR))
                 .withClaim(ROLES_CLAIM, roles)
                 .sign(algorithm);
     }

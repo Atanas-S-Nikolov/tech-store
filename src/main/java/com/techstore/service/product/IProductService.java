@@ -13,7 +13,7 @@ public interface IProductService {
 
     Product getProduct(String productName) throws ProductConstraintViolationException, ProductServiceException, ProductNotFoundException;
 
-    Collection<Product> getProducts(boolean earlyAccess) throws ProductConstraintViolationException, ProductServiceException;
+    Collection<Product> getProducts(boolean earlyAccess, String category, String type) throws ProductConstraintViolationException, ProductServiceException;
 
     Product updateProduct(Product product, Collection<MultipartFile> images) throws ProductConstraintViolationException, ProductServiceException, ProductNotFoundException;
 
