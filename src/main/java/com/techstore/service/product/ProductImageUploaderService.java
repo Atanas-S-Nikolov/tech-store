@@ -4,11 +4,14 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageException;
 import com.google.cloud.storage.StorageOptions;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.techstore.exception.product.ProductImageUploaderServiceException;
+import com.techstore.exception.product.DeleteProductImageException;
+import com.techstore.exception.product.UploadProductImageException;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,18 +22,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.techstore.utils.FileUtils.generateFileName;
+import static com.techstore.utils.ImageUploadUtils.formatDeleteUrl;
+import static com.techstore.utils.ImageUploadUtils.formatUrl;
+import static com.techstore.utils.ImageUploadUtils.generateFilePath;
+import static java.lang.System.lineSeparator;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 public class ProductImageUploaderService implements IProductImageUploaderService {
     private final static String METADATA_DOWNLOAD_TOKENS_KEY = "firebaseStorageDownloadTokens";
     private final static String SERVICE_ACCOUNT_JSON_URL = "C:/Users/J/Downloads/tech-store-2e9a6-firebase-adminsdk-oew5e-cdbb73a8c2.json";
     private final static String IMAGE_URL_FORMAT = "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media&token=%s";
-
-    private static final String DASH = "-";
-    private static final String WHITESPACE = "\\s+";
-    private final static String FORWARD_SLASH =  "/";
-    private final static String URL_ENCODED_FORWARD_SLASH =  "%2F";
 
     private final String bucketName;
 
@@ -45,7 +46,7 @@ public class ProductImageUploaderService implements IProductImageUploaderService
         final Exception[] occurredException = {null};
 
         Set<String> imageUrls = images.stream().map(imageFile -> {
-            String filePath = (productName.replaceAll(WHITESPACE, DASH) + "/" + generateFileName(imageFile)).replace("?", "");
+            String filePath = generateFilePath(imageFile, productName);
             BlobId blobId = BlobId.of(bucketName, filePath);
             Map<String, String> metadata = new HashMap<>();
             metadata.put(METADATA_DOWNLOAD_TOKENS_KEY, filePath);
@@ -70,7 +71,8 @@ public class ProductImageUploaderService implements IProductImageUploaderService
 
         if (!failedBloIds.isEmpty()) {
             storage[0].delete(failedBloIds);
-            throw new ProductImageUploaderServiceException(buildFailedImageUploadsMessage(failedBloIds), occurredException[0]);
+            String message = "Failed to upload images" + lineSeparator() + buildFailedImageUploadsMessage(failedBloIds);
+            throw new UploadProductImageException(message, occurredException[0]);
         }
 
         return imageUrls;
@@ -83,20 +85,21 @@ public class ProductImageUploaderService implements IProductImageUploaderService
                     .map(url -> {
                         int startIndex = url.indexOf("/o/") + 3;
                         int endIndex = url.indexOf("?");
-                        String urlToDelete = formatUrl(url.substring(startIndex, endIndex));
+                        String urlToDelete = formatDeleteUrl(url.substring(startIndex, endIndex));
                         return BlobId.of(bucketName, urlToDelete);
                     })
                     .collect(Collectors.toSet());
 
-            GoogleCredentials credentials;
             try {
-                credentials = GoogleCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_URL));
+                GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_URL));
+                Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+                storage.delete(blobIds);
+            } catch (StorageException e) {
+                String message = "Failed to delete images" + lineSeparator() + buildFailedImageUploadsMessage(blobIds);
+                throw new DeleteProductImageException(message);
             } catch (IOException e) {
                 throw new ProductImageUploaderServiceException("Failed to load google credentials", e);
             }
-
-            Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-            storage.delete(blobIds);
         }
     }
 
@@ -105,10 +108,5 @@ public class ProductImageUploaderService implements IProductImageUploaderService
         failedBloIds.stream().map(BlobId::getName).forEach(name -> builder.append(name).append(", "));
         builder.append("}");
         return builder.toString();
-    }
-
-
-    private String formatUrl(String str) {
-        return str.replace(FORWARD_SLASH, URL_ENCODED_FORWARD_SLASH);
     }
 }

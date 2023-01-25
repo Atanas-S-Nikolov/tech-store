@@ -4,18 +4,17 @@ import java.util.Collection;
 
 import com.techstore.exception.product.ProductConstraintViolationException;
 import com.techstore.exception.product.ProductNotFoundException;
-import com.techstore.exception.product.ProductServiceException;
 import com.techstore.model.Product;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface IProductService {
-    Product createProduct(Product product, Collection<MultipartFile> images) throws ProductConstraintViolationException, ProductServiceException;
+    Product createProduct(Product product, Collection<MultipartFile> images) throws ProductConstraintViolationException;
 
-    Product getProduct(String productName) throws ProductConstraintViolationException, ProductServiceException, ProductNotFoundException;
+    Product getProduct(String productName) throws ProductConstraintViolationException, ProductNotFoundException;
 
-    Collection<Product> getProducts(boolean earlyAccess, String category, String type) throws ProductConstraintViolationException, ProductServiceException;
+    Collection<Product> getProducts(boolean earlyAccess, String category, String type) throws ProductConstraintViolationException;
 
-    Product updateProduct(Product product, Collection<MultipartFile> images) throws ProductConstraintViolationException, ProductServiceException, ProductNotFoundException;
+    Product updateProduct(Product product, Collection<MultipartFile> images) throws ProductConstraintViolationException, ProductNotFoundException;
 
-    void deleteProduct(String productName) throws ProductConstraintViolationException, ProductServiceException, ProductNotFoundException;
+    void deleteProduct(String productName) throws ProductConstraintViolationException, ProductNotFoundException;
 }

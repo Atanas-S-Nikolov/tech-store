@@ -2,7 +2,6 @@ package com.techstore.service.product;
 
 import com.techstore.exception.product.ProductConstraintViolationException;
 import com.techstore.exception.product.ProductNotFoundException;
-import com.techstore.exception.product.ProductServiceException;
 import com.techstore.model.enums.ProductCategory;
 import com.techstore.model.enums.ProductType;
 import com.techstore.utils.converter.ModelConverter;
@@ -10,11 +9,9 @@ import com.techstore.model.Product;
 import com.techstore.model.entity.ProductEntity;
 import com.techstore.repository.IProductRepository;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -147,8 +144,6 @@ public class ProductService implements IProductService {
             return supplier.get();
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             throw new ProductConstraintViolationException("Product constraint violation", dataIntegrityViolationException);
-        } catch (DataAccessException | HibernateException dbException) {
-            throw new ProductServiceException("Error while connecting the database", dbException);
         }
     }
 
@@ -157,8 +152,6 @@ public class ProductService implements IProductService {
             runnable.run();
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             throw new ProductConstraintViolationException("Product constraint violation", dataIntegrityViolationException);
-        } catch (DataAccessException dataAccessException) {
-            throw new ProductServiceException("Error while connecting the database", dataAccessException);
         }
     }
 }

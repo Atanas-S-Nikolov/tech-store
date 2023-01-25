@@ -3,14 +3,12 @@ package com.techstore.service.access;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
-import com.techstore.exception.access.AccessControlServiceException;
 import com.techstore.exception.authentication.InvalidJWTException;
 import com.techstore.model.entity.UserEntity;
 import com.techstore.model.response.JWTResponse;
 import com.techstore.repository.IUserRepository;
 import com.techstore.service.jwt.IJWTService;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,7 +16,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static com.techstore.constants.JWTConstants.BEARER;
 import static com.techstore.constants.JWTConstants.ROLES_CLAIM;
@@ -69,15 +66,7 @@ public class AccessControlService implements UserDetailsService, IJWTService {
     }
 
     private UserEntity findUserByUsername(String username) {
-        return executeDBCall(() -> repository.findUserByUsername(username))
+        return repository.findUserByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(format("User with username '%s' is not found", username)));
-    }
-
-    private <T> T executeDBCall(Supplier<T> supplier) {
-        try{
-            return supplier.get();
-        } catch (DataAccessException dataAccessException) {
-            throw new AccessControlServiceException("Error while connecting the database", dataAccessException);
-        }
     }
 }

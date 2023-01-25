@@ -2,7 +2,6 @@ package com.techstore.service.cart;
 
 import com.techstore.exception.cart.CartConstraintViolationException;
 import com.techstore.exception.cart.CartNotFoundException;
-import com.techstore.exception.cart.CartServiceException;
 import com.techstore.model.Cart;
 import com.techstore.model.dto.CartDto;
 import com.techstore.model.dto.ProductToBuyDto;
@@ -14,7 +13,6 @@ import com.techstore.repository.ICartRepository;
 import com.techstore.repository.IProductRepository;
 import com.techstore.repository.IProductToBuyRepository;
 import com.techstore.repository.IUserRepository;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import javax.transaction.Transactional;
@@ -88,7 +86,6 @@ public class CartService implements ICartService {
     }
 
     private void deleteProductsToBuy(Set<ProductToBuyEntity> productToBuyEntities) {
-
         executeDBCall(() -> productToBuyEntities.forEach(productToBuyRepository::delete));
     }
 
@@ -129,12 +126,10 @@ public class CartService implements ICartService {
     }
 
     private <T> T executeDBCall(Supplier<T> supplier) {
-        try{
+        try {
             return supplier.get();
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             throw new CartConstraintViolationException("Cart constraint violation");
-        } catch (DataAccessException dataAccessException) {
-            throw new CartServiceException("Error while connecting the database", dataAccessException);
         }
     }
 
@@ -143,8 +138,6 @@ public class CartService implements ICartService {
             runnable.run();
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             throw new CartConstraintViolationException("Cart constraint violation");
-        } catch (DataAccessException dataAccessException) {
-            throw new CartServiceException("Error while connecting the database", dataAccessException);
         }
     }
 }
