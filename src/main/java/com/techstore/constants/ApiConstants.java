@@ -12,7 +12,7 @@ public interface ApiConstants {
     String PRODUCTS_EARLY_ACCESS_PARAM = "early_access";
     String PRODUCTS_CATEGORY_PARAM = "category";
     String PRODUCTS_TYPE_PARAM = "type";
-    String PRODUCTS_WITH_PARAMS_REGEX = PRODUCTS_URL_REGEX + "\\?early_access=false.*";
+    String PRODUCTS_WITH_PARAMS_REGEX = PRODUCTS_URL_REGEX + ".*[?&]early_access=false.*";
     String ACCESS_CONTROL_URL = BASE_API_URL + "/auth";
     String LOGIN_URL = ACCESS_CONTROL_URL + "/login";
     String REGISTER_URL = "/register";
