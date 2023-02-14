@@ -21,7 +21,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@EqualsAndHashCode(exclude = "cart")
+@EqualsAndHashCode(exclude = {"cart", "favorite"})
 @Entity
 @Table(name = "users")
 public class UserEntity {
@@ -56,4 +56,8 @@ public class UserEntity {
     @OneToOne
     @JoinColumn(name = "cart_id", referencedColumnName = "id")
     private CartEntity cart;
+
+    @OneToOne
+    @JoinColumn(name = "favorite_id", referencedColumnName = "id")
+    private FavoritesEntity favorite;
 }

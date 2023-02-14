@@ -1,5 +1,6 @@
 package com.techstore.model.dto;
 
+import com.techstore.validation.favorites.ValidFavorites;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,11 +14,12 @@ import java.util.Set;
 @AllArgsConstructor
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
-public class CartDto {
+@ValidFavorites
+public class FavoritesDto {
     @NotBlank(message = "Username must not be blank")
     @Getter
     private final String username;
 
     @Getter
-    private final Set<ProductToBuyDto> productsToBuy;
+    private final Set<String> productNames;
 }

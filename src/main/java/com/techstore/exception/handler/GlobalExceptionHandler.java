@@ -4,6 +4,7 @@ import com.techstore.exception.authentication.InvalidJWTException;
 import com.techstore.exception.cart.CartConstraintViolationException;
 import com.techstore.exception.cart.CartNotFoundException;
 import com.techstore.exception.authentication.InvalidCredentialsException;
+import com.techstore.exception.favorites.FavoritesNotFoundException;
 import com.techstore.exception.product.DeleteProductImageException;
 import com.techstore.exception.product.ProductConstraintViolationException;
 import com.techstore.exception.product.ProductImageUploaderServiceException;
@@ -67,7 +68,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(FORBIDDEN, exception);
     }
 
-    @ExceptionHandler(value = {ProductNotFoundException.class, UserNotFoundException.class, CartNotFoundException.class})
+    @ExceptionHandler(value = {ProductNotFoundException.class, UserNotFoundException.class, CartNotFoundException.class,
+            FavoritesNotFoundException.class})
     public ResponseEntity<Object> handleNotFoundException(RuntimeException exception) {
         logError(exception);
         return buildErrorResponse(NOT_FOUND, exception);

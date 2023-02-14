@@ -6,14 +6,17 @@ import com.techstore.model.User;
 import com.techstore.model.dto.ProductDto;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.entity.CartEntity;
+import com.techstore.model.entity.FavoritesEntity;
 import com.techstore.model.entity.ProductEntity;
 import com.techstore.model.entity.ProductToBuyEntity;
 import com.techstore.model.entity.UserEntity;
 import com.techstore.model.enums.ProductCategory;
 import com.techstore.model.enums.ProductType;
+import com.techstore.model.response.FavoritesResponse;
 import com.techstore.model.response.ProductToBuyResponse;
 import com.techstore.model.response.UserResponse;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -23,8 +26,17 @@ public class ModelConverter {
         return new UserResponse(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getUsername());
     }
 
+    public static UserResponse toResponse(UserEntity entity) {
+        return new UserResponse(entity.getFirstName(), entity.getLastName(), entity.getEmail(), entity.getPhone(), entity.getUsername());
+    }
+
     public static ProductToBuyResponse toResponse(ProductToBuyEntity toBuyEntity) {
         return new ProductToBuyResponse(toModel(toBuyEntity), toBuyEntity.getQuantity());
+    }
+
+    public static FavoritesResponse toResponse(FavoritesEntity entity) {
+        Set<Product> products = entity.getProducts().stream().map(ModelConverter::toModel).collect(toSet());
+        return new FavoritesResponse(toResponse(entity.getUser()), products);
     }
 
     public static Product toModel(ProductDto dto) {
@@ -61,12 +73,12 @@ public class ModelConverter {
     public static ProductEntity toEntity(Product product) {
         return new ProductEntity(null, product.getName(), product.getPrice(), product.getStocks(), product.getCategory(),
                 product.getType(), product.getBrand(), product.getModel(), product.getDescription(), product.isEarlyAccess(),
-                product.getDateOfCreation(), product.getDateOfModification(), product.getImageUrls(), null);
+                product.getDateOfCreation(), product.getDateOfModification(), product.getImageUrls(), null, new HashSet<>());
     }
 
     public static UserEntity toEntity(User user) {
         return new UserEntity(null, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getUsername(),
-                user.getPassword(), null, null);
+                user.getPassword(), null, null, null);
     }
 
     public static Set<ProductToBuyResponse> convertEntitiesToResponses(Set<ProductToBuyEntity> entities) {

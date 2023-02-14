@@ -8,6 +8,7 @@ import com.techstore.model.entity.UserEntity;
 import com.techstore.model.enums.UserRole;
 import com.techstore.repository.IUserRepository;
 import com.techstore.service.cart.ICartService;
+import com.techstore.service.favorites.IFavoritesService;
 import com.techstore.utils.converter.ModelConverter;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,13 +25,15 @@ import static java.util.stream.Collectors.toList;
 
 public class UserService implements IUserService {
     private final IUserRepository repository;
-    private final ICartService cartService;
     private final PasswordEncoder passwordEncoder;
+    private final ICartService cartService;
+    private final IFavoritesService favoritesService;
 
-    public UserService(IUserRepository repository, ICartService cartService, PasswordEncoder passwordEncoder) {
+    public UserService(IUserRepository repository, PasswordEncoder passwordEncoder, ICartService cartService, IFavoritesService favoritesService) {
         this.repository = repository;
-        this.cartService = cartService;
         this.passwordEncoder = passwordEncoder;
+        this.cartService = cartService;
+        this.favoritesService = favoritesService;
     }
 
     @Transactional
@@ -40,6 +43,7 @@ public class UserService implements IUserService {
         entity.setRole(role);
         entity.setPassword(passwordEncoder.encode(user.getPassword().trim()));
         entity.setCart(cartService.createDefaultCart());
+        entity.setFavorite(favoritesService.createDefaultFavorites());
         return toModel(executeDBCall(() -> repository.save(entity)));
     }
 
@@ -73,6 +77,7 @@ public class UserService implements IUserService {
     public void deleteUser(String username, String password) {
         UserEntity entity = findUserByUsernameAndPassword(username, password);
         cartService.deleteCart(username);
+        favoritesService.deleteFavorites(username);
         executeDBCall(() -> repository.delete(entity));
     }
 

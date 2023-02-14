@@ -23,14 +23,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.techstore.constants.ApiConstants.BASE_API_URL;
-import static com.techstore.constants.ApiConstants.CARTS_URL;
+import static com.techstore.constants.ApiConstants.ALL_CART_URLS_MATCHER;
+import static com.techstore.constants.ApiConstants.ALL_FAVORITES_URLS_MATCHER;
+import static com.techstore.constants.ApiConstants.BASE_API_URL_MATCHER;
 import static com.techstore.constants.ApiConstants.CREATE_CUSTOMER_URL;
 import static com.techstore.constants.ApiConstants.FULL_REFRESH_TOKEN_URL;
 import static com.techstore.constants.ApiConstants.FULL_REGISTER_URL;
 import static com.techstore.constants.ApiConstants.LOGIN_URL;
-import static com.techstore.constants.ApiConstants.PRODUCTS_WITH_PARAMS_REGEX;
 import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
+import static com.techstore.constants.ApiConstants.PRODUCTS_WITH_PARAMS_REGEX;
+import static com.techstore.constants.ApiConstants.PRODUCT_WITH_NAME_PATH_VARIABLE;
 import static com.techstore.constants.RoleConstants.ROLE_ADMIN;
 import static com.techstore.constants.RoleConstants.ROLE_CUSTOMER;
 
@@ -99,11 +101,11 @@ public class WebSecurityConfiguration {
                 .authorizeRequests(auth -> {
                     auth.antMatchers(POST, LOGIN_URL, FULL_REGISTER_URL, CREATE_CUSTOMER_URL).permitAll();
                     auth.antMatchers(GET, FULL_REFRESH_TOKEN_URL).permitAll();
-                    auth.antMatchers(GET, "/api/v1/product/{name:[A-z\\s\\d-]+}").permitAll();
+                    auth.antMatchers(GET, PRODUCT_WITH_NAME_PATH_VARIABLE).permitAll();
                     auth.regexMatchers(GET, PRODUCTS_WITH_PARAMS_REGEX).permitAll();
-                    auth.antMatchers(CARTS_URL + "/**").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
+                    auth.antMatchers(ALL_CART_URLS_MATCHER, ALL_FAVORITES_URLS_MATCHER).hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(GET, PRODUCTS_URL, PRODUCTS_URL + "/").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
-                    auth.antMatchers(BASE_API_URL + "/**").hasAuthority(ROLE_ADMIN);
+                    auth.antMatchers(BASE_API_URL_MATCHER).hasAuthority(ROLE_ADMIN);
                     auth.anyRequest().authenticated();
                 })
                 .addFilter(customAuthenticationFilter(http))

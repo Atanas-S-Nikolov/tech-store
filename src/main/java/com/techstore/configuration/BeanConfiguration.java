@@ -1,18 +1,21 @@
 package com.techstore.configuration;
 
 import com.techstore.repository.ICartRepository;
+import com.techstore.repository.IFavoritesRepository;
 import com.techstore.repository.IProductRepository;
 import com.techstore.repository.IProductToBuyRepository;
 import com.techstore.repository.IUserRepository;
 import com.techstore.service.cart.CartService;
 import com.techstore.service.cart.ICartService;
+import com.techstore.service.favorites.FavoritesService;
+import com.techstore.service.favorites.IFavoritesService;
 import com.techstore.service.product.IProductImageUploaderService;
 import com.techstore.service.product.IProductService;
 import com.techstore.service.product.ProductImageUploaderService;
 import com.techstore.service.product.ProductService;
-
 import com.techstore.service.user.IUserService;
 import com.techstore.service.user.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -35,13 +38,15 @@ public class BeanConfiguration {
     private ICartRepository cartRepository;
 
     @Autowired
+    private IFavoritesRepository favoritesRepository;
+
+    @Autowired
     private IProductToBuyRepository productToBuyRepository;
 
     @Bean("password-encoder")
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
     @Bean("image-uploader-service")
     IProductImageUploaderService imageUploaderService() {
@@ -58,8 +63,13 @@ public class BeanConfiguration {
         return new CartService(cartRepository, userRepository, productRepository, productToBuyRepository);
     }
 
+    @Bean("favorites-service")
+    public IFavoritesService favoritesService() {
+        return new FavoritesService(favoritesRepository, userRepository, productRepository);
+    }
+
     @Bean("user-service")
     public IUserService userService() {
-        return new UserService(userRepository, cartService(), passwordEncoder());
+        return new UserService(userRepository, passwordEncoder(), cartService(), favoritesService());
     }
 }

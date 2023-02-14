@@ -13,6 +13,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -75,13 +76,17 @@ public class ProductEntity {
     @OneToOne(mappedBy = "product")
     private ProductToBuyEntity productToBuy;
 
+    @ManyToMany(mappedBy = "products")
+    private Set<FavoritesEntity> favorites;
+
     public ProductEntity() {
-        this(null ,null, new BigDecimal("0.0"), 0, null, null, null, null, null,false, null, null, new HashSet<>(), null);
+        this(null ,null, new BigDecimal("0.0"), 0, null, null, null, null,
+                null,false, null, null, new HashSet<>(), null, new HashSet<>());
     }
 
     public ProductEntity(String id, String name, BigDecimal price, int stocks, ProductCategory category, ProductType type,
                          String brand, String model, String description, boolean earlyAccess, LocalDateTime dateOfCreation, LocalDateTime dateOfModification,
-                         Set<String> imageUrls, ProductToBuyEntity productToBuy) {
+                         Set<String> imageUrls, ProductToBuyEntity productToBuy, Set<FavoritesEntity> favorites) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -96,5 +101,6 @@ public class ProductEntity {
         this.dateOfModification = dateOfModification;
         this.imageUrls = nonNull(imageUrls) ? imageUrls : new HashSet<>();
         this.productToBuy = productToBuy;
+        this.favorites = favorites;
     }
 }
