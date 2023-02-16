@@ -50,6 +50,7 @@ public class CartService implements ICartService {
         return toModel(findCart(username));
     }
 
+    @Transactional
     @Override
     public Cart addProductToCart(CartDto cartDto) {
         String username = cartDto.getUsername();
