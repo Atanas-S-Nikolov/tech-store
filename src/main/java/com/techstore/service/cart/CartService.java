@@ -50,6 +50,21 @@ public class CartService implements ICartService {
         return toModel(findCart(username));
     }
 
+    @Override
+    public Cart addProductToCart(CartDto cartDto) {
+        String username = cartDto.getUsername();
+        ProductToBuyDto toBuyDto = cartDto.getProductsToBuy().iterator().next();
+        CartEntity cartEntity = findCart(username);
+
+        ProductToBuyEntity toBuyEntity = persistProductToBuy(toBuyDto);
+        Set<ProductToBuyEntity> entities = cartEntity.getProductsToBuy();
+        entities.add(toBuyEntity);
+        cartEntity.setProductsToBuy(entities);
+        cartEntity.setTotalPrice(calculateTotalPrice(entities));
+
+        return toModel(executeDBCall(() -> repository.save(cartEntity)));
+    }
+
     @Transactional
     @Override
     public Cart updateCart(CartDto cartDto) {

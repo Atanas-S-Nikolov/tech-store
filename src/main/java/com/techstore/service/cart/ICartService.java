@@ -11,9 +11,11 @@ public interface ICartService {
 
     Cart getCart(String username) throws CartNotFoundException;
 
-    Cart updateCart(CartDto cartDto) throws CartNotFoundException, CartConstraintViolationException;
+    Cart addProductToCart(CartDto cartDto) throws CartNotFoundException;
 
-    Cart clearCart(String username) throws CartNotFoundException, CartConstraintViolationException;
+    Cart updateCart(CartDto cartDto) throws CartNotFoundException;
 
-    void deleteCart(String username) throws CartConstraintViolationException;
+    Cart clearCart(String username) throws CartNotFoundException;
+
+    void deleteCart(String username) throws CartNotFoundException, CartConstraintViolationException;
 }
