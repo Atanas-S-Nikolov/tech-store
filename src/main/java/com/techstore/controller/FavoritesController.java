@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.techstore.constants.ApiConstants.ADD_FAVORITES_URL;
+import static com.techstore.constants.ApiConstants.ADD_URL;
 import static com.techstore.constants.ApiConstants.FAVORITES_URL;
-import static com.techstore.constants.ApiConstants.REMOVE_FAVORITES_URL;
+import static com.techstore.constants.ApiConstants.REMOVE_URL;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -36,12 +36,12 @@ public class FavoritesController {
         return ResponseEntity.status(OK).body(service.getFavorites(usernameDto.getUsername()));
     }
 
-    @PutMapping(path = ADD_FAVORITES_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @PutMapping(path = ADD_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<FavoritesResponse> addFavorite(@RequestBody FavoritesDto dto) {
         return ResponseEntity.status(OK).body(service.addFavorite(dto));
     }
 
-    @PutMapping(path = REMOVE_FAVORITES_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @PutMapping(path = REMOVE_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<FavoritesResponse> removeFavorite(@RequestBody FavoritesDto dto) {
         return ResponseEntity.status(OK).body(service.removeFavorite(dto));
     }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.techstore.constants.ApiConstants.ADD_URL;
 import static com.techstore.constants.ApiConstants.CARTS_URL;
 import static com.techstore.constants.ApiConstants.CLEAR_CART_URL;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -32,6 +33,11 @@ public class CartController {
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Cart> getCart(@RequestBody UsernameDto usernameDto) {
         return ResponseEntity.status(OK).body(service.getCart(usernameDto.getUsername()));
+    }
+
+    @PutMapping(path = ADD_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Cart> addProductToCart(@RequestBody CartDto dto) {
+        return ResponseEntity.status(OK).body(service.addProductToCart(dto));
     }
 
     @PutMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

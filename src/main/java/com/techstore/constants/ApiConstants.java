@@ -27,7 +27,7 @@ public interface ApiConstants {
     String CLEAR_CART_URL = "/clear";
     String ALL_CART_URLS_MATCHER = CARTS_URL + ALL_MATCHER;
     String FAVORITES_URL = BASE_API_URL + "/favorites";
-    String ADD_FAVORITES_URL = "/add";
-    String REMOVE_FAVORITES_URL = "/remove";
+    String ADD_URL = "/add";
+    String REMOVE_URL = "/remove";
     String ALL_FAVORITES_URLS_MATCHER = FAVORITES_URL + ALL_MATCHER;
 }
