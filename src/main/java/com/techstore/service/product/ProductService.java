@@ -1,6 +1,5 @@
 package com.techstore.service.product;
 
-import com.techstore.exception.product.ProductConstraintViolationException;
 import com.techstore.exception.product.ProductNotFoundException;
 import com.techstore.model.enums.ProductCategory;
 import com.techstore.model.enums.ProductType;
@@ -12,7 +11,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
@@ -23,7 +21,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.techstore.constants.FieldConstants.VALIDATED_PARAM_DEFAULT_VALUE;
@@ -73,7 +70,7 @@ public class ProductService implements IProductService {
         if (!type.equals(VALIDATED_PARAM_DEFAULT_VALUE)) {
             criteria.add(Restrictions.eq("type", ProductType.getKeyByValue(type)));
         }
-        List<ProductEntity> entities = executeDBCall(criteria::list);
+        List<ProductEntity> entities = criteria.list();
         return entities.stream().map(ModelConverter::toModel).collect(Collectors.toList());
     }
 
@@ -91,7 +88,7 @@ public class ProductService implements IProductService {
     public void deleteProduct(String productName) {
         ProductEntity entity = findProductEntityByName(productName);
         imageUploaderService.deleteImagesForProduct(entity.getImageUrls());
-        executeDBCall(() -> repository.delete(entity));
+        repository.delete(entity);
     }
 
     private Product tryToSaveProduct(Collection<MultipartFile> images, ProductEntity entity) {
@@ -99,7 +96,7 @@ public class ProductService implements IProductService {
             Collection<MultipartFile> imagesToRemove = findImagesToBeRemoved(images, entity.getImageUrls());
             images.removeAll(imagesToRemove);
             entity.setDateOfModification(LocalDateTime.now());
-            return toModel(executeDBCall(() -> repository.save(uploadImages(images, entity))));
+            return toModel(repository.save(uploadImages(images, entity)));
         } catch (Exception exception) {
             imageUploaderService.deleteImagesForProduct(lastUploadedImageUrls);
             throw exception;
@@ -135,23 +132,7 @@ public class ProductService implements IProductService {
     }
 
     private ProductEntity findProductEntityByName(String name) {
-        return executeDBCall(() -> repository.findProductByName(name)
-                .orElseThrow(() -> new ProductNotFoundException(String.format("Product with name '%s' is not found", name))));
-    }
-
-    private <T> T executeDBCall(Supplier<T> supplier) {
-        try{
-            return supplier.get();
-        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
-            throw new ProductConstraintViolationException("Product constraint violation", dataIntegrityViolationException);
-        }
-    }
-
-    private void executeDBCall(Runnable runnable) {
-        try {
-            runnable.run();
-        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
-            throw new ProductConstraintViolationException("Product constraint violation", dataIntegrityViolationException);
-        }
+        return repository.findProductByName(name)
+                .orElseThrow(() -> new ProductNotFoundException(String.format("Product with name '%s' is not found", name)));
     }
 }
