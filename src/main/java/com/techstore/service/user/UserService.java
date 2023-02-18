@@ -10,12 +10,10 @@ import com.techstore.repository.IUserRepository;
 import com.techstore.service.cart.ICartService;
 import com.techstore.service.favorites.IFavoritesService;
 import com.techstore.utils.converter.ModelConverter;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.transaction.Transactional;
 import java.util.Collection;
-import java.util.function.Supplier;
 
 import static com.techstore.utils.converter.ModelConverter.toEntity;
 import static com.techstore.utils.converter.ModelConverter.toModel;
@@ -44,14 +42,12 @@ public class UserService implements IUserService {
         entity.setPassword(passwordEncoder.encode(user.getPassword().trim()));
         entity.setCart(cartService.createDefaultCart());
         entity.setFavorite(favoritesService.createDefaultFavorites());
-        return toModel(executeDBCall(() -> repository.save(entity)));
+        return toModel(repository.save(entity));
     }
 
     @Override
     public Collection<User> getAllUsers() {
-        return executeDBCall(() -> repository.findAll().stream()
-                .map(ModelConverter::toModel)
-                .collect(toList()));
+        return repository.findAll().stream().map(ModelConverter::toModel).collect(toList());
     }
 
     @Override
@@ -69,7 +65,7 @@ public class UserService implements IUserService {
             throw new UserConstraintViolationException("Cannot overwrite user role");
         }
 
-        return toModel(executeDBCall(() -> repository.save(entity)));
+        return toModel(repository.save(entity));
     }
 
     @Transactional
@@ -78,7 +74,7 @@ public class UserService implements IUserService {
         UserEntity entity = findUserByUsernameAndPassword(username, password);
         cartService.deleteCart(username);
         favoritesService.deleteFavorites(username);
-        executeDBCall(() -> repository.delete(entity));
+        repository.delete(entity);
     }
 
     private UserEntity findUserByUsernameAndPassword(String username, String password) {
@@ -90,23 +86,7 @@ public class UserService implements IUserService {
     }
 
     private UserEntity findUserByUsername(String username) {
-        return executeDBCall(() -> repository.findUserByUsername(username))
+        return repository.findUserByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(format("User with username '%s' is not found", username)));
-    }
-
-    private <T> T executeDBCall(Supplier<T> supplier) {
-        try{
-            return supplier.get();
-        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
-            throw new UserConstraintViolationException("User constraint violation", dataIntegrityViolationException);
-        }
-    }
-
-    private void executeDBCall(Runnable runnable) {
-        try {
-            runnable.run();
-        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
-            throw new UserConstraintViolationException("User constraint violation", dataIntegrityViolationException);
-        }
     }
 }

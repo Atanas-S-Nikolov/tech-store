@@ -1,12 +1,10 @@
 package com.techstore.exception.handler;
 
 import com.techstore.exception.authentication.InvalidJWTException;
-import com.techstore.exception.cart.CartConstraintViolationException;
 import com.techstore.exception.cart.CartNotFoundException;
 import com.techstore.exception.authentication.InvalidCredentialsException;
 import com.techstore.exception.favorites.FavoritesNotFoundException;
 import com.techstore.exception.product.DeleteProductImageException;
-import com.techstore.exception.product.ProductConstraintViolationException;
 import com.techstore.exception.product.ProductImageUploaderServiceException;
 import com.techstore.exception.product.ProductNotFoundException;
 import com.techstore.exception.product.UploadProductImageException;
@@ -75,14 +73,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(NOT_FOUND, exception);
     }
 
-    @ExceptionHandler(value = {ProductConstraintViolationException.class, UserConstraintViolationException.class,
-            CartConstraintViolationException.class})
+    @ExceptionHandler(value = UserConstraintViolationException.class)
     public ResponseEntity<Object> handleCustomConstraintViolationException(RuntimeException exception) {
         logError(exception);
         return buildErrorResponse(CONFLICT, exception);
     }
 
-    // Workaround for unable to catch DataIntegrityViolationException in UserService
     @ExceptionHandler(value = DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
         logError(exception);
