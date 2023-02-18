@@ -21,12 +21,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.techstore.constants.FieldConstants.VALIDATED_PARAM_DEFAULT_VALUE;
 import static com.techstore.utils.converter.ModelConverter.toEntity;
 import static com.techstore.utils.converter.ModelConverter.toModel;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -71,7 +73,9 @@ public class ProductService implements IProductService {
             criteria.add(Restrictions.eq("type", ProductType.getKeyByValue(type)));
         }
         List<ProductEntity> entities = criteria.list();
-        return entities.stream().map(ModelConverter::toModel).collect(Collectors.toList());
+        return entities.stream().map(ModelConverter::toModel)
+                .sorted(comparing(Product::isEarlyAccess, reverseOrder()))
+                .collect(toList());
     }
 
     @Override
