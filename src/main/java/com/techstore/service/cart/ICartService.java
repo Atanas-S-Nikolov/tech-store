@@ -14,6 +14,8 @@ public interface ICartService {
 
     Cart removeProductFromCart(CartDto cartDto) throws CartNotFoundException;
 
+    Cart doPurchase(String username) throws CartNotFoundException;
+
     Cart clearCart(String username) throws CartNotFoundException;
 
     void deleteCart(String username) throws CartNotFoundException;

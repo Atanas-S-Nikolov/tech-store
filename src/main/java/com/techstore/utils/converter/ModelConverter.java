@@ -17,8 +17,12 @@ import com.techstore.model.response.ProductToBuyResponse;
 import com.techstore.model.response.UserResponse;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.toSet;
 
 public class ModelConverter {
@@ -82,6 +86,8 @@ public class ModelConverter {
     }
 
     public static Set<ProductToBuyResponse> convertEntitiesToResponses(Set<ProductToBuyEntity> entities) {
-        return entities.stream().map(ModelConverter::toResponse).collect(toSet());
+        return entities.stream().map(ModelConverter::toResponse)
+                .sorted(comparing(toBuyResponse -> toBuyResponse.getProduct().getPrice(), reverseOrder()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }
