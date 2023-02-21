@@ -4,6 +4,7 @@ import com.techstore.exception.authentication.InvalidJWTException;
 import com.techstore.exception.cart.CartNotFoundException;
 import com.techstore.exception.authentication.InvalidCredentialsException;
 import com.techstore.exception.favorites.FavoritesNotFoundException;
+import com.techstore.exception.product.CannotBuyProductException;
 import com.techstore.exception.product.DeleteProductImageException;
 import com.techstore.exception.product.ProductImageUploaderServiceException;
 import com.techstore.exception.product.ProductNotFoundException;
@@ -48,8 +49,8 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @RestControllerAdvice(basePackages = {"com.techstore.controller"})
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     //4xx
-    @ExceptionHandler(value = ConstraintViolationException.class)
-    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException exception) {
+    @ExceptionHandler(value = {ConstraintViolationException.class, CannotBuyProductException.class})
+    public ResponseEntity<Object> handleBadRequest(RuntimeException exception) {
         logError(exception);
         return buildErrorResponse(BAD_REQUEST, exception);
     }

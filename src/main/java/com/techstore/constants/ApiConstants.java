@@ -29,5 +29,6 @@ public interface ApiConstants {
     String FAVORITES_URL = BASE_API_URL + "/favorites";
     String ADD_URL = "/add";
     String REMOVE_URL = "/remove";
+    String PURCHASE_URL = "/purchase";
     String ALL_FAVORITES_URLS_MATCHER = FAVORITES_URL + ALL_MATCHER;
 }

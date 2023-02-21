@@ -32,7 +32,7 @@ public class ProductToBuyEntity {
     private String id;
 
     @Column(name = "quantity")
-    private long quantity;
+    private int quantity;
 
     @OneToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")

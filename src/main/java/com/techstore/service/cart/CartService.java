@@ -1,6 +1,7 @@
 package com.techstore.service.cart;
 
 import com.techstore.exception.cart.CartNotFoundException;
+import com.techstore.exception.product.CannotBuyProductException;
 import com.techstore.exception.product.ProductNotFoundException;
 import com.techstore.model.Cart;
 import com.techstore.model.dto.CartDto;
@@ -88,14 +89,18 @@ public class CartService implements ICartService {
 
     @Transactional
     @Override
+    public Cart doPurchase(String username) {
+        CartEntity cartEntity = findCart(username);
+        Set<ProductToBuyEntity> products = cartEntity.getProductsToBuy();
+        decreaseStocks(products);
+        return clearCartDetails(cartEntity, products);
+    }
+
+    @Transactional
+    @Override
     public Cart clearCart(String username) {
         CartEntity cartEntity = findCart(username);
-        Set<ProductToBuyEntity> productsToDelete = cartEntity.getProductsToBuy();
-        cartEntity.setTotalPrice(BigDecimal.ZERO);
-        cartEntity.setProductsToBuy(new HashSet<>());
-        CartEntity persistedEntity = repository.save(cartEntity);
-        deleteProductsToBuy(productsToDelete);
-        return toModel(persistedEntity);
+        return clearCartDetails(cartEntity, cartEntity.getProductsToBuy());
     }
 
     @Transactional
@@ -122,10 +127,14 @@ public class CartService implements ICartService {
 
     private ProductToBuyEntity persistProductToBuy(ProductToBuyDto toBuyDto) {
         String productName = toBuyDto.getProductName();
+        int quantity = toBuyDto.getQuantity();
         ProductEntity productEntity = findProductEntityByName(productName);
+        if (quantity > productEntity.getStocks()) {
+            throw new CannotBuyProductException("We currently do not have enough stocks for this product");
+        }
         ProductToBuyEntity toBuyEntity = productToBuyRepository.findProductToBuyByName(productName)
                 .orElseGet(ProductToBuyEntity::new);
-        toBuyEntity.setQuantity(toBuyDto.getQuantity());
+        toBuyEntity.setQuantity(quantity);
         toBuyEntity.setProduct(productEntity);
         toBuyEntity = productToBuyRepository.save(toBuyEntity);
         productEntity.setProductToBuy(toBuyEntity);
@@ -146,5 +155,21 @@ public class CartService implements ICartService {
             totalPrice = totalPrice.add(price.multiply(quantity));
         }
         return totalPrice;
+    }
+
+    private void decreaseStocks(Set<ProductToBuyEntity> productsToBuy) {
+        productsToBuy.forEach(productToBuy -> {
+            ProductEntity product = productToBuy.getProduct();
+            product.setStocks(product.getStocks() - productToBuy.getQuantity());
+            productRepository.save(product);
+        });
+    }
+
+    private Cart clearCartDetails(CartEntity cartEntity, Set<ProductToBuyEntity> productsToDelete) {
+        cartEntity.setTotalPrice(BigDecimal.ZERO);
+        cartEntity.setProductsToBuy(new HashSet<>());
+        CartEntity persistedEntity = repository.save(cartEntity);
+        deleteProductsToBuy(productsToDelete);
+        return toModel(persistedEntity);
     }
 }

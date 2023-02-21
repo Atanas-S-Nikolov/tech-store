@@ -20,5 +20,5 @@ public class ProductToBuyDto {
 
     @Min(value = 1, message = "Quantity must be greater than 0")
     @Getter
-    private final long quantity;
+    private final int quantity;
 }

@@ -15,5 +15,5 @@ public class ProductToBuy {
     private final Product product;
 
     @Getter
-    private final long quantity;
+    private final int quantity;
 }

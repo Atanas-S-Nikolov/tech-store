@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.techstore.constants.ApiConstants.ADD_URL;
+import static com.techstore.constants.ApiConstants.PURCHASE_URL;
 import static com.techstore.constants.ApiConstants.CARTS_URL;
 import static com.techstore.constants.ApiConstants.CLEAR_CART_URL;
 import static com.techstore.constants.ApiConstants.REMOVE_URL;
@@ -44,6 +45,11 @@ public class CartController {
     @PutMapping(path = REMOVE_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Cart> removeProductToCart(@RequestBody CartDto dto) {
         return ResponseEntity.status(OK).body(service.removeProductFromCart(dto));
+    }
+
+    @PutMapping(path = PURCHASE_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Cart> purchase(@RequestBody UsernameDto usernameDto) {
+        return ResponseEntity.status(OK).body(service.doPurchase(usernameDto.getUsername()));
     }
 
     @PutMapping(path = CLEAR_CART_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
