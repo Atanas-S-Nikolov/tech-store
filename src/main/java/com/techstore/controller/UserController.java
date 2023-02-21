@@ -9,6 +9,7 @@ import com.techstore.service.user.IUserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,6 +23,7 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+@Validated
 @RestController(value = "user-controller")
 @RequestMapping(value = USERS_URL)
 public class UserController {
@@ -54,7 +56,7 @@ public class UserController {
     }
 
     @DeleteMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteUser(@RequestBody AuthenticationDto deletionDto) {
+    public ResponseEntity<?> deleteUser(@RequestBody @Valid AuthenticationDto deletionDto) {
         service.deleteUser(deletionDto.getUsername(), deletionDto.getPassword());
         return ResponseEntity.status(NO_CONTENT).build();
     }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ public class CartDto {
     @Getter
     private final String username;
 
+    @Valid
     @Getter
     private final Set<ProductToBuyDto> productsToBuy;
 }
