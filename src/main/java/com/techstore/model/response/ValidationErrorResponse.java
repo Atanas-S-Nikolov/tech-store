@@ -40,12 +40,18 @@ public class ValidationErrorResponse extends ErrorResponse{
     }
 
     public static class RejectedValue {
+        private final String message;
         private final String property;
         private final String value;
 
-        public RejectedValue(String property, String value) {
+        public RejectedValue(String message, String property, String value) {
+            this.message = message;
             this.property = property;
             this.value = value;
+        }
+
+        public String getMessage() {
+            return message;
         }
 
         public String getProperty() {
@@ -59,7 +65,8 @@ public class ValidationErrorResponse extends ErrorResponse{
         @Override
         public String toString() {
             return "RejectedValue{" +
-                    "property='" + property + '\'' +
+                    "message='" + message + '\'' +
+                    ", property='" + property + '\'' +
                     ", value='" + value + '\'' +
                     '}';
         }
@@ -69,12 +76,12 @@ public class ValidationErrorResponse extends ErrorResponse{
             if (this == o) return true;
             if (!(o instanceof RejectedValue)) return false;
             RejectedValue that = (RejectedValue) o;
-            return Objects.equals(property, that.property) && Objects.equals(value, that.value);
+            return Objects.equals(message, that.message) && Objects.equals(property, that.property) && Objects.equals(value, that.value);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(property, value);
+            return Objects.hash(message, property, value);
         }
     }
 }

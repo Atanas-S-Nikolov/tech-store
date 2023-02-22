@@ -112,7 +112,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatus status,
             WebRequest request) {
         logError(exception);
-        Set<String> messages = new HashSet<>();
+        Set<String> globalMessages = new HashSet<>();
         List<RejectedValue> rejectedValues = new ArrayList<>();
 
         BindingResult bindingResult = exception.getBindingResult();
@@ -121,16 +121,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             for (FieldError fieldError : bindingResult.getFieldErrors()) {
                 String property = fieldError.getField();
                 String value = fieldError.getRejectedValue().toString();
-                rejectedValues.add(new RejectedValue(property, value));
-                messages.add(fieldError.getDefaultMessage());
+                String message = fieldError.getDefaultMessage();
+                rejectedValues.add(new RejectedValue(message, property, value));
             }
         } else if (bindingResult.hasGlobalErrors()) {
             for (ObjectError globalError : bindingResult.getGlobalErrors()) {
-                messages.add(globalError.getDefaultMessage());
+                globalMessages.add(globalError.getDefaultMessage());
             }
         }
 
-        return buildValidationErrorResponse(status, messages, rejectedValues);
+        return buildValidationErrorResponse(status, globalMessages, rejectedValues);
     }
 
     private void logError(Exception exception) {
