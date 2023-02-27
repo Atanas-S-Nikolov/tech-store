@@ -1,7 +1,5 @@
-package com.techstore.model;
+package com.techstore.model.response;
 
-import com.techstore.model.response.ProductToBuyResponse;
-import com.techstore.model.response.UserResponse;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,7 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
-public class Cart {
+public class CartResponse {
     @Getter
     private final UserResponse user;
 

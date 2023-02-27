@@ -1,10 +1,11 @@
 package com.techstore.service.product;
 
 import com.techstore.exception.product.ProductNotFoundException;
+import com.techstore.model.dto.ProductDto;
 import com.techstore.model.enums.ProductCategory;
 import com.techstore.model.enums.ProductType;
 import com.techstore.utils.converter.ModelConverter;
-import com.techstore.model.Product;
+import com.techstore.model.response.ProductResponse;
 import com.techstore.model.entity.ProductEntity;
 import com.techstore.repository.IProductRepository;
 import org.hibernate.Criteria;
@@ -24,9 +25,9 @@ import java.util.Set;
 
 import static com.techstore.constants.FieldConstants.VALIDATED_PARAM_DEFAULT_VALUE;
 import static com.techstore.utils.converter.ModelConverter.toEntity;
-import static com.techstore.utils.converter.ModelConverter.toModel;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -47,20 +48,20 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product createProduct(Product product, Collection<MultipartFile> images) {
-        ProductEntity entity = toEntity(product);
+    public ProductResponse createProduct(ProductDto productDto, Collection<MultipartFile> images) {
+        ProductEntity entity = toEntity(productDto);
         entity.setDateOfCreation(LocalDateTime.now());
         return tryToSaveProduct(images, entity);
     }
 
     @Override
-    public Product getProduct(String productName) {
-        return toModel(findProductEntityByName(productName));
+    public ProductResponse getProduct(String productName) {
+        return ModelConverter.toResponse(findProductEntityByName(productName));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Collection<Product> getProducts(boolean earlyAccess, String category, String type) {
+    public Collection<ProductResponse> getProducts(boolean earlyAccess, String category, String type) {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(ProductEntity.class);
         if (!earlyAccess) {
@@ -73,15 +74,15 @@ public class ProductService implements IProductService {
             criteria.add(Restrictions.eq("type", ProductType.getKeyByValue(type)));
         }
         List<ProductEntity> entities = criteria.list();
-        return entities.stream().map(ModelConverter::toModel)
-                .sorted(comparing(Product::isEarlyAccess, reverseOrder()))
+        return entities.stream().map(ModelConverter::toResponse)
+                .sorted(comparing(ProductResponse::isEarlyAccess, reverseOrder()))
                 .collect(toList());
     }
 
     @Override
-    public Product updateProduct(Product product, Collection<MultipartFile> images) {
-        ProductEntity existingEntity = findProductEntityByName(product.getName());
-        ProductEntity productEntity = toEntity(product);
+    public ProductResponse updateProduct(ProductDto productDto, Collection<MultipartFile> images) {
+        ProductEntity existingEntity = findProductEntityByName(productDto.getName());
+        ProductEntity productEntity = toEntity(productDto);
         productEntity.setId(existingEntity.getId());
         productEntity.setImageUrls(existingEntity.getImageUrls());
         return tryToSaveProduct(images, productEntity);
@@ -95,12 +96,13 @@ public class ProductService implements IProductService {
         repository.delete(entity);
     }
 
-    private Product tryToSaveProduct(Collection<MultipartFile> images, ProductEntity entity) {
+    private ProductResponse tryToSaveProduct(Collection<MultipartFile> images, ProductEntity entity) {
         try {
+            images = nonNull(images) ? images : new HashSet<>();
             Collection<MultipartFile> imagesToRemove = findImagesToBeRemoved(images, entity.getImageUrls());
             images.removeAll(imagesToRemove);
             entity.setDateOfModification(LocalDateTime.now());
-            return toModel(repository.save(uploadImages(images, entity)));
+            return ModelConverter.toResponse(repository.save(uploadImages(images, entity)));
         } catch (Exception exception) {
             imageUploaderService.deleteImagesForProduct(lastUploadedImageUrls);
             throw exception;

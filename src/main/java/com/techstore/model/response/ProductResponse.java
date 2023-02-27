@@ -1,4 +1,4 @@
-package com.techstore.model;
+package com.techstore.model.response;
 
 import com.techstore.model.enums.ProductCategory;
 import com.techstore.model.enums.ProductType;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
-public class Product {
+public class ProductResponse {
     @Getter
     private final String name;
 
@@ -50,15 +50,15 @@ public class Product {
     @Getter
     private final Set<String> imageUrls;
 
-    public Product() {
+    public ProductResponse() {
         this("");
     }
 
-    public Product(String name) {
+    public ProductResponse(String name) {
         this(name, new BigDecimal("0.0"), 0, null, null, null, null, null, false, null, null, new HashSet<>());
     }
 
-    public Product(String name, BigDecimal price, int stocks, ProductCategory category, ProductType type, String brand, String model, String description, boolean earlyAccess, LocalDateTime dateOfCreation, LocalDateTime dateOfModification, Set<String> imageUrls) {
+    public ProductResponse(String name, BigDecimal price, int stocks, ProductCategory category, ProductType type, String brand, String model, String description, boolean earlyAccess, LocalDateTime dateOfCreation, LocalDateTime dateOfModification, Set<String> imageUrls) {
         this.name = name;
         this.price = price;
         this.stocks = stocks;

@@ -1,22 +1,22 @@
 package com.techstore.service.cart;
 
 import com.techstore.exception.cart.CartNotFoundException;
-import com.techstore.model.Cart;
+import com.techstore.model.response.CartResponse;
 import com.techstore.model.dto.CartDto;
 import com.techstore.model.entity.CartEntity;
 
 public interface ICartService {
     CartEntity createDefaultCart();
 
-    Cart getCart(String username) throws CartNotFoundException;
+    CartResponse getCart(String username) throws CartNotFoundException;
 
-    Cart addProductToCart(CartDto cartDto) throws CartNotFoundException;
+    CartResponse addProductToCart(CartDto cartDto) throws CartNotFoundException;
 
-    Cart removeProductFromCart(CartDto cartDto) throws CartNotFoundException;
+    CartResponse removeProductFromCart(CartDto cartDto) throws CartNotFoundException;
 
-    Cart doPurchase(String username) throws CartNotFoundException;
+    CartResponse doPurchase(String username) throws CartNotFoundException;
 
-    Cart clearCart(String username) throws CartNotFoundException;
+    CartResponse clearCart(String username) throws CartNotFoundException;
 
     void deleteCart(String username) throws CartNotFoundException;
 }

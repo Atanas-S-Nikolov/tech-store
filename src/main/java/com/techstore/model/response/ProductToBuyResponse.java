@@ -1,7 +1,5 @@
 package com.techstore.model.response;
 
-import com.techstore.model.Product;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -10,7 +8,7 @@ import lombok.ToString;
 @EqualsAndHashCode(doNotUseGetters = true)
 public class ProductToBuyResponse {
     @Getter
-    private final Product product;
+    private final ProductResponse product;
 
     @Getter
     private final long quantity;
@@ -19,7 +17,7 @@ public class ProductToBuyResponse {
         this(null, 0L);
     }
 
-    public ProductToBuyResponse(Product product, long quantity) {
+    public ProductToBuyResponse(ProductResponse product, long quantity) {
         this.product = product;
         this.quantity = quantity;
     }

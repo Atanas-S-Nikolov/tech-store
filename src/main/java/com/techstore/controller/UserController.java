@@ -1,7 +1,6 @@
 package com.techstore.controller;
 
 import com.techstore.model.enums.UserRole;
-import com.techstore.utils.converter.ModelConverter;
 import com.techstore.model.dto.AuthenticationDto;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.response.UserResponse;
@@ -10,17 +9,22 @@ import com.techstore.service.user.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.List;
 
 import static com.techstore.constants.ApiConstants.USERS_URL;
-import static com.techstore.utils.converter.ModelConverter.toModel;
-import static com.techstore.utils.converter.ModelConverter.toResponse;
-import static java.util.stream.Collectors.toList;
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Validated
@@ -39,20 +43,17 @@ public class UserController {
             @PathVariable(value = "role") UserRole role,
             @RequestBody @Valid UserDto userDto)
     {
-        UserResponse userResponse = toResponse(service.createUserWithRole(toModel(userDto), role));
-        return ResponseEntity.status(CREATED).body(userResponse);
+        return ResponseEntity.status(CREATED).body(service.createUserWithRole(userDto, role));
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<UserResponse>> getAllUsers() {
-        List<UserResponse> users = service.getAllUsers().stream().map(ModelConverter::toResponse).collect(toList());
-        return ResponseEntity.status(OK).body(users);
+        return ResponseEntity.status(OK).body(service.getAllUsers());
     }
 
     @PutMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> updateUser(@RequestBody @Valid UserDto userDto) {
-        UserResponse userResponse = toResponse(service.updateUser(toModel(userDto)));
-        return ResponseEntity.status(OK).body(userResponse);
+        return ResponseEntity.status(OK).body(service.updateUser(userDto));
     }
 
     @DeleteMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
