@@ -3,9 +3,10 @@ package com.techstore.service.user;
 import com.techstore.exception.authentication.InvalidCredentialsException;
 import com.techstore.exception.user.UserConstraintViolationException;
 import com.techstore.exception.user.UserNotFoundException;
-import com.techstore.model.User;
+import com.techstore.model.dto.UserDto;
 import com.techstore.model.entity.UserEntity;
 import com.techstore.model.enums.UserRole;
+import com.techstore.model.response.UserResponse;
 import com.techstore.repository.IUserRepository;
 import com.techstore.service.cart.ICartService;
 import com.techstore.service.favorites.IFavoritesService;
@@ -15,8 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.transaction.Transactional;
 import java.util.Collection;
 
-import static com.techstore.utils.converter.ModelConverter.toEntity;
-import static com.techstore.utils.converter.ModelConverter.toModel;
+import static com.techstore.utils.converter.ModelConverter.*;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
@@ -36,22 +36,22 @@ public class UserService implements IUserService {
 
     @Transactional
     @Override
-    public User createUserWithRole(User user, UserRole role) {
+    public UserResponse createUserWithRole(UserDto user, UserRole role) {
         UserEntity entity = toEntity(user);
         entity.setRole(role);
         entity.setPassword(passwordEncoder.encode(user.getPassword().trim()));
         entity.setCart(cartService.createDefaultCart());
         entity.setFavorite(favoritesService.createDefaultFavorites());
-        return toModel(repository.save(entity));
+        return toResponse(repository.save(entity));
     }
 
     @Override
-    public Collection<User> getAllUsers() {
-        return repository.findAll().stream().map(ModelConverter::toModel).collect(toList());
+    public Collection<UserResponse> getAllUsers() {
+        return repository.findAll().stream().map(ModelConverter::toResponse).collect(toList());
     }
 
     @Override
-    public User updateUser(User user) {
+    public UserResponse updateUser(UserDto user) {
         UserEntity existingEntity = findUserByUsernameAndPassword(user.getUsername(), user.getPassword());
         UserEntity entity = toEntity(user);
         entity.setId(existingEntity.getId());
@@ -65,7 +65,7 @@ public class UserService implements IUserService {
             throw new UserConstraintViolationException("Cannot overwrite user role");
         }
 
-        return toModel(repository.save(entity));
+        return toResponse(repository.save(entity));
     }
 
     @Transactional

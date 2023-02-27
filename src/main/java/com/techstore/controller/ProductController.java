@@ -1,6 +1,6 @@
 package com.techstore.controller;
 
-import com.techstore.model.Product;
+import com.techstore.model.response.ProductResponse;
 import com.techstore.model.dto.ProductDto;
 import com.techstore.service.product.IProductService;
 import com.techstore.validation.product.ProductCategoryConstraint;
@@ -29,7 +29,6 @@ import static com.techstore.constants.ApiConstants.PRODUCTS_CATEGORY_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_TYPE_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
 import static com.techstore.constants.FieldConstants.VALIDATED_PARAM_DEFAULT_VALUE;
-import static com.techstore.utils.converter.ModelConverter.toModel;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -48,19 +47,19 @@ public class ProductController {
     }
 
     @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Product> createProduct(
+    public ResponseEntity<ProductResponse> createProduct(
             @RequestPart(value = "product") @Valid ProductDto productDto,
             @RequestPart(value = "images", required = false) Collection<MultipartFile> images) {
-        return ResponseEntity.status(CREATED).body(service.createProduct(toModel(productDto), images));
+        return ResponseEntity.status(CREATED).body(service.createProduct(productDto, images));
     }
 
     @GetMapping(path = "/{name}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Product> getProduct(@PathVariable(value = "name") @ValidProductName String name) {
+    public ResponseEntity<ProductResponse> getProduct(@PathVariable(value = "name") @ValidProductName String name) {
         return ResponseEntity.status(OK).body(service.getProduct(name));
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<Product>> getProducts(
+    public ResponseEntity<Collection<ProductResponse>> getProducts(
             @RequestParam(value = PRODUCTS_EARLY_ACCESS_PARAM, required = false, defaultValue = "true")
                     boolean earlyAccess,
             @ProductCategoryConstraint
@@ -74,10 +73,10 @@ public class ProductController {
     }
 
     @PutMapping(consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Product> updateProduct(
+    public ResponseEntity<ProductResponse> updateProduct(
             @RequestPart(value = "product") @Valid ProductDto productDto,
             @RequestPart(value = "images", required = false) Collection<MultipartFile> images) {
-        return ResponseEntity.status(OK).body(service.updateProduct(toModel(productDto), images));
+        return ResponseEntity.status(OK).body(service.updateProduct(productDto, images));
     }
 
     @DeleteMapping(path = "/{name}")

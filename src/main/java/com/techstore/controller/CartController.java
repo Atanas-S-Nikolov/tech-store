@@ -1,6 +1,6 @@
 package com.techstore.controller;
 
-import com.techstore.model.Cart;
+import com.techstore.model.response.CartResponse;
 import com.techstore.model.dto.CartDto;
 import com.techstore.model.dto.UsernameDto;
 import com.techstore.service.cart.ICartService;
@@ -37,27 +37,27 @@ public class CartController {
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Cart> getCart(@RequestBody @Valid UsernameDto usernameDto) {
+    public ResponseEntity<CartResponse> getCart(@RequestBody @Valid UsernameDto usernameDto) {
         return ResponseEntity.status(OK).body(service.getCart(usernameDto.getUsername()));
     }
 
     @PutMapping(path = ADD_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Cart> addProductToCart(@RequestBody @Valid CartDto dto) {
+    public ResponseEntity<CartResponse> addProductToCart(@RequestBody @Valid CartDto dto) {
         return ResponseEntity.status(OK).body(service.addProductToCart(dto));
     }
 
     @PutMapping(path = REMOVE_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Cart> removeProductToCart(@RequestBody @Valid CartDto dto) {
+    public ResponseEntity<CartResponse> removeProductToCart(@RequestBody @Valid CartDto dto) {
         return ResponseEntity.status(OK).body(service.removeProductFromCart(dto));
     }
 
     @PutMapping(path = PURCHASE_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Cart> purchase(@RequestBody @Valid UsernameDto usernameDto) {
+    public ResponseEntity<CartResponse> purchase(@RequestBody @Valid UsernameDto usernameDto) {
         return ResponseEntity.status(OK).body(service.doPurchase(usernameDto.getUsername()));
     }
 
     @PutMapping(path = CLEAR_CART_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Cart> clearCart(@RequestBody @Valid UsernameDto usernameDto) {
+    public ResponseEntity<CartResponse> clearCart(@RequestBody @Valid UsernameDto usernameDto) {
         return ResponseEntity.status(OK).body(service.clearCart(usernameDto.getUsername()));
     }
 

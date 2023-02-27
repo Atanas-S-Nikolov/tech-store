@@ -3,7 +3,7 @@ package com.techstore.service.cart;
 import com.techstore.exception.cart.CartNotFoundException;
 import com.techstore.exception.product.CannotBuyProductException;
 import com.techstore.exception.product.ProductNotFoundException;
-import com.techstore.model.Cart;
+import com.techstore.model.response.CartResponse;
 import com.techstore.model.dto.CartDto;
 import com.techstore.model.dto.ProductToBuyDto;
 import com.techstore.model.entity.CartEntity;
@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.techstore.utils.converter.ModelConverter.toModel;
+import static com.techstore.utils.converter.ModelConverter.toResponse;
 import static java.lang.String.format;
 
 public class CartService implements ICartService {
@@ -43,13 +43,13 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public Cart getCart(String username) {
-        return toModel(findCart(username));
+    public CartResponse getCart(String username) {
+        return toResponse(findCart(username));
     }
 
     @Transactional
     @Override
-    public Cart addProductToCart(CartDto cartDto) {
+    public CartResponse addProductToCart(CartDto cartDto) {
         String username = cartDto.getUsername();
         ProductToBuyDto toBuyDto = cartDto.getProductsToBuy().iterator().next();
         CartEntity cartEntity = findCart(username);
@@ -60,12 +60,12 @@ public class CartService implements ICartService {
         cartEntity.setProductsToBuy(entities);
         cartEntity.setTotalPrice(calculateTotalPrice(entities));
 
-        return toModel(repository.save(cartEntity));
+        return toResponse(repository.save(cartEntity));
     }
 
     @Transactional
     @Override
-    public Cart removeProductFromCart(CartDto cartDto) {
+    public CartResponse removeProductFromCart(CartDto cartDto) {
         String username = cartDto.getUsername();
         ProductToBuyDto toBuyDto = cartDto.getProductsToBuy().iterator().next();
         CartEntity cartEntity = findCart(username);
@@ -84,12 +84,12 @@ public class CartService implements ICartService {
             productEntity.setProductToBuy(null);
         }
 
-        return toModel(repository.save(cartEntity));
+        return toResponse(repository.save(cartEntity));
     }
 
     @Transactional
     @Override
-    public Cart doPurchase(String username) {
+    public CartResponse doPurchase(String username) {
         CartEntity cartEntity = findCart(username);
         Set<ProductToBuyEntity> products = cartEntity.getProductsToBuy();
         decreaseStocks(products);
@@ -98,7 +98,7 @@ public class CartService implements ICartService {
 
     @Transactional
     @Override
-    public Cart clearCart(String username) {
+    public CartResponse clearCart(String username) {
         CartEntity cartEntity = findCart(username);
         return clearCartDetails(cartEntity, cartEntity.getProductsToBuy());
     }
@@ -165,11 +165,11 @@ public class CartService implements ICartService {
         });
     }
 
-    private Cart clearCartDetails(CartEntity cartEntity, Set<ProductToBuyEntity> productsToDelete) {
+    private CartResponse clearCartDetails(CartEntity cartEntity, Set<ProductToBuyEntity> productsToDelete) {
         cartEntity.setTotalPrice(BigDecimal.ZERO);
         cartEntity.setProductsToBuy(new HashSet<>());
         CartEntity persistedEntity = repository.save(cartEntity);
         deleteProductsToBuy(productsToDelete);
-        return toModel(persistedEntity);
+        return toResponse(persistedEntity);
     }
 }

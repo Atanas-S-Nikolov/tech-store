@@ -1,8 +1,7 @@
 package com.techstore.utils.converter;
 
-import com.techstore.model.Cart;
-import com.techstore.model.Product;
-import com.techstore.model.User;
+import com.techstore.model.response.CartResponse;
+import com.techstore.model.response.ProductResponse;
 import com.techstore.model.dto.ProductDto;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.entity.CartEntity;
@@ -26,61 +25,42 @@ import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.toSet;
 
 public class ModelConverter {
-    public static UserResponse toResponse(User user) {
-        return new UserResponse(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getUsername());
-    }
-
     public static UserResponse toResponse(UserEntity entity) {
         return new UserResponse(entity.getFirstName(), entity.getLastName(), entity.getEmail(), entity.getPhone(), entity.getUsername());
     }
 
     public static ProductToBuyResponse toResponse(ProductToBuyEntity toBuyEntity) {
-        return new ProductToBuyResponse(toModel(toBuyEntity), toBuyEntity.getQuantity());
+        return new ProductToBuyResponse(toProductResponse(toBuyEntity), toBuyEntity.getQuantity());
+    }
+
+    public static CartResponse toResponse(CartEntity entity) {
+        UserResponse userResponse = toResponse(entity.getUser());
+        return new CartResponse(userResponse, convertEntitiesToResponses(entity.getProductsToBuy()), entity.getTotalPrice());
     }
 
     public static FavoritesResponse toResponse(FavoritesEntity entity) {
-        Set<Product> products = entity.getProducts().stream().map(ModelConverter::toModel).collect(toSet());
-        return new FavoritesResponse(toResponse(entity.getUser()), products);
+        Set<ProductResponse> productResponses = entity.getProducts().stream().map(ModelConverter::toResponse).collect(toSet());
+        return new FavoritesResponse(toResponse(entity.getUser()), productResponses);
     }
 
-    public static Product toModel(ProductDto dto) {
-        return new Product(dto.getName(), dto.getPrice(), dto.getStocks(), ProductCategory.getKeyByValue(dto.getCategory()),
-                ProductType.getKeyByValue(dto.getType()), dto.getBrand(), dto.getModel(), dto.getDescription(), dto.isEarlyAccess(),
-                null, null, null);
-    }
-
-    public static Product toModel(ProductEntity entity) {
-        return new Product(entity.getName(), entity.getPrice(), entity.getStocks(), entity.getCategory(), entity.getType(),
+    public static ProductResponse toResponse(ProductEntity entity) {
+        return new ProductResponse(entity.getName(), entity.getPrice(), entity.getStocks(), entity.getCategory(), entity.getType(),
                 entity.getBrand(), entity.getModel(), entity.getDescription(), entity.isEarlyAccess(), entity.getDateOfCreation(),
                 entity.getDateOfModification(), entity.getImageUrls());
     }
 
-    public static Product toModel(ProductToBuyEntity toBuyEntity) {
-        return toModel(toBuyEntity.getProduct());
+    public static ProductResponse toProductResponse(ProductToBuyEntity toBuyEntity) {
+        return toResponse(toBuyEntity.getProduct());
     }
 
-    public static User toModel(UserDto dto) {
-        return new User(dto.getFirstName(), dto.getLastName(), dto.getEmail(), dto.getPhone(), dto.getUsername(), dto.getPassword(),
-                null, null);
+    public static ProductEntity toEntity(ProductDto productDto) {
+        return new ProductEntity(null, productDto.getName(), productDto.getPrice(), productDto.getStocks(),
+                ProductCategory.getKeyByValue(productDto.getCategory()), ProductType.getKeyByValue(productDto.getType()),
+                productDto.getBrand(), productDto.getModel(), productDto.getDescription(), productDto.isEarlyAccess(),
+                null, null, new HashSet<>(), null, new HashSet<>());
     }
 
-    public static User toModel(UserEntity entity) {
-        return new User(entity.getFirstName(), entity.getLastName(), entity.getEmail(), entity.getPhone(), entity.getUsername(),
-                entity.getPassword(), "", entity.getRole());
-    }
-
-    public static Cart toModel(CartEntity entity) {
-        UserResponse userResponse = toResponse(toModel(entity.getUser()));
-        return new Cart(userResponse, convertEntitiesToResponses(entity.getProductsToBuy()), entity.getTotalPrice());
-    }
-
-    public static ProductEntity toEntity(Product product) {
-        return new ProductEntity(null, product.getName(), product.getPrice(), product.getStocks(), product.getCategory(),
-                product.getType(), product.getBrand(), product.getModel(), product.getDescription(), product.isEarlyAccess(),
-                product.getDateOfCreation(), product.getDateOfModification(), product.getImageUrls(), null, new HashSet<>());
-    }
-
-    public static UserEntity toEntity(User user) {
+    public static UserEntity toEntity(UserDto user) {
         return new UserEntity(null, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getUsername(),
                 user.getPassword(), null, null, null);
     }

@@ -1,6 +1,5 @@
 package com.techstore.model.response;
 
-import com.techstore.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,5 +17,5 @@ public class FavoritesResponse {
     private final UserResponse user;
 
     @Getter
-    private final Set<Product> products;
+    private final Set<ProductResponse> products;
 }
