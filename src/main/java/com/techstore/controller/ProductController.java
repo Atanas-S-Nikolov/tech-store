@@ -1,5 +1,6 @@
 package com.techstore.controller;
 
+import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.ProductResponse;
 import com.techstore.model.dto.ProductDto;
 import com.techstore.service.product.IProductService;
@@ -24,10 +25,12 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.util.Collection;
 
-import static com.techstore.constants.ApiConstants.PRODUCTS_EARLY_ACCESS_PARAM;
+import static com.techstore.constants.ApiConstants.PAGE_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_CATEGORY_PARAM;
+import static com.techstore.constants.ApiConstants.PRODUCTS_EARLY_ACCESS_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_TYPE_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
+import static com.techstore.constants.ApiConstants.SIZE_PARAM;
 import static com.techstore.constants.FieldConstants.VALIDATED_PARAM_DEFAULT_VALUE;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -59,7 +62,7 @@ public class ProductController {
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<ProductResponse>> getProducts(
+    public ResponseEntity<PageResponse<ProductResponse>> getProducts(
             @RequestParam(value = PRODUCTS_EARLY_ACCESS_PARAM, required = false, defaultValue = "true")
                     boolean earlyAccess,
             @ProductCategoryConstraint
@@ -67,9 +70,11 @@ public class ProductController {
                     String category,
             @ProductTypeConstraint
             @RequestParam(value = PRODUCTS_TYPE_PARAM, required = false, defaultValue = VALIDATED_PARAM_DEFAULT_VALUE)
-                    String type
+                    String type,
+            @RequestParam(value = PAGE_PARAM, defaultValue = "0") Integer page,
+            @RequestParam(value = SIZE_PARAM, defaultValue = "10") Integer size
     ) {
-        return ResponseEntity.status(OK).body(service.getProducts(earlyAccess, category, type));
+        return ResponseEntity.status(OK).body(service.getProducts(earlyAccess, category, type, page, size));
     }
 
     @PutMapping(consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
