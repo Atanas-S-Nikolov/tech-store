@@ -20,7 +20,7 @@ public interface ApiConstants {
     String LOGIN_URL = ACCESS_CONTROL_URL + "/login";
     String REGISTER_URL = "/register";
     String FULL_REGISTER_URL = ACCESS_CONTROL_URL + REGISTER_URL;
-    String REFRESH_TOKEN_URL = "/refreshToken";
+    String REFRESH_TOKEN_URL = "/refresh-token";
     String FULL_REFRESH_TOKEN_URL = ACCESS_CONTROL_URL + REFRESH_TOKEN_URL;
     String CREATE_CUSTOMER_URL = USERS_URL + "/role/" + ROLE_CUSTOMER;
     String CARTS_URL = BASE_API_URL + "/cart";
