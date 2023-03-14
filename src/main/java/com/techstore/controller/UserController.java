@@ -3,6 +3,7 @@ package com.techstore.controller;
 import com.techstore.model.enums.UserRole;
 import com.techstore.model.dto.AuthenticationDto;
 import com.techstore.model.dto.UserDto;
+import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.UserResponse;
 import com.techstore.service.user.IUserService;
 
@@ -16,11 +17,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.Collection;
 
+import static com.techstore.constants.ApiConstants.PAGE_PARAM;
+import static com.techstore.constants.ApiConstants.SIZE_PARAM;
 import static com.techstore.constants.ApiConstants.USERS_URL;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -47,8 +50,10 @@ public class UserController {
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<UserResponse>> getAllUsers() {
-        return ResponseEntity.status(OK).body(service.getAllUsers());
+    public ResponseEntity<PageResponse<UserResponse>> getAllUsers(
+            @RequestParam(value = PAGE_PARAM, defaultValue = "0") Integer page,
+            @RequestParam(value = SIZE_PARAM, defaultValue = "10") Integer size) {
+        return ResponseEntity.status(OK).body(service.getAllUsers(page, size));
     }
 
     @PutMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
