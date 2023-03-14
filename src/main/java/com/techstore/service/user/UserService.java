@@ -1,20 +1,22 @@
 package com.techstore.service.user;
 
 import com.techstore.exception.authentication.InvalidCredentialsException;
-import com.techstore.exception.user.UserConstraintViolationException;
 import com.techstore.exception.user.UserNotFoundException;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.entity.UserEntity;
 import com.techstore.model.enums.UserRole;
+import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.UserResponse;
 import com.techstore.repository.IUserRepository;
 import com.techstore.service.cart.ICartService;
 import com.techstore.service.favorites.IFavoritesService;
 import com.techstore.utils.converter.ModelConverter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.transaction.Transactional;
-import java.util.Collection;
+import java.util.List;
 
 import static com.techstore.utils.converter.ModelConverter.*;
 import static java.lang.String.format;
@@ -46,8 +48,10 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Collection<UserResponse> getAllUsers() {
-        return repository.findAll().stream().map(ModelConverter::toResponse).collect(toList());
+    public PageResponse<UserResponse> getAllUsers(Integer page, Integer size) {
+        Page<UserEntity> usersPage = repository.findAll(PageRequest.of(page, size));
+        List<UserResponse> users = usersPage.stream().map(ModelConverter::toResponse).collect(toList());
+        return new PageResponse<>(usersPage.getTotalElements(), usersPage.getTotalPages(), usersPage.getNumber(), users);
     }
 
     @Override
@@ -59,10 +63,6 @@ public class UserService implements IUserService {
         String newPassword = user.getNewPassword();
         if (nonNull(newPassword) && !newPassword.trim().isEmpty()) {
             entity.setPassword(passwordEncoder.encode(newPassword));
-        }
-
-        if (existingEntity.getRole() != entity.getRole()) {
-            throw new UserConstraintViolationException("Cannot overwrite user role");
         }
 
         return toResponse(repository.save(entity));
