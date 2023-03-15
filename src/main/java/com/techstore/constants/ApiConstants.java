@@ -1,7 +1,5 @@
 package com.techstore.constants;
 
-import static com.techstore.constants.RoleConstants.ROLE_CUSTOMER;
-
 public interface ApiConstants {
     String ALL_MATCHER = "/**";
     String BASE_API_URL = "/api/v1";
@@ -22,7 +20,6 @@ public interface ApiConstants {
     String FULL_REGISTER_URL = ACCESS_CONTROL_URL + REGISTER_URL;
     String REFRESH_TOKEN_URL = "/refresh-token";
     String FULL_REFRESH_TOKEN_URL = ACCESS_CONTROL_URL + REFRESH_TOKEN_URL;
-    String CREATE_CUSTOMER_URL = USERS_URL + "/role/" + ROLE_CUSTOMER;
     String CARTS_URL = BASE_API_URL + "/cart";
     String CLEAR_CART_URL = "/clear";
     String ALL_CART_URLS_MATCHER = CARTS_URL + ALL_MATCHER;

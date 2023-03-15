@@ -1,10 +1,10 @@
 package com.techstore.service.user;
 
 import com.techstore.exception.authentication.InvalidCredentialsException;
+import com.techstore.exception.user.UserConstraintViolationException;
 import com.techstore.exception.user.UserNotFoundException;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.entity.UserEntity;
-import com.techstore.model.enums.UserRole;
 import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.UserResponse;
 import com.techstore.repository.IUserRepository;
@@ -18,7 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.transaction.Transactional;
 import java.util.List;
 
-import static com.techstore.utils.converter.ModelConverter.*;
+import static com.techstore.utils.converter.ModelConverter.toEntity;
+import static com.techstore.utils.converter.ModelConverter.toResponse;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
@@ -38,9 +39,8 @@ public class UserService implements IUserService {
 
     @Transactional
     @Override
-    public UserResponse createUserWithRole(UserDto user, UserRole role) {
+    public UserResponse createUser(UserDto user) {
         UserEntity entity = toEntity(user);
-        entity.setRole(role);
         entity.setPassword(passwordEncoder.encode(user.getPassword().trim()));
         entity.setCart(cartService.createDefaultCart());
         entity.setFavorite(favoritesService.createDefaultFavorites());
@@ -59,6 +59,10 @@ public class UserService implements IUserService {
         UserEntity existingEntity = findUserByUsernameAndPassword(user.getUsername(), user.getPassword());
         UserEntity entity = toEntity(user);
         entity.setId(existingEntity.getId());
+
+        if (user.getRole() != entity.getRole()) {
+            throw new UserConstraintViolationException("Cannot overwrite user role");
+        }
 
         String newPassword = user.getNewPassword();
         if (nonNull(newPassword) && !newPassword.trim().isEmpty()) {

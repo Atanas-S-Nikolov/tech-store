@@ -1,6 +1,5 @@
 package com.techstore.controller;
 
-import com.techstore.model.enums.UserRole;
 import com.techstore.model.dto.AuthenticationDto;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.response.PageResponse;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,12 +39,9 @@ public class UserController {
         this.service = service;
     }
 
-    @PostMapping(path = "/role/{role}",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> createUser(
-            @PathVariable(value = "role") UserRole role,
-            @RequestBody @Valid UserDto userDto)
-    {
-        return ResponseEntity.status(CREATED).body(service.createUserWithRole(userDto, role));
+    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserResponse> createUser(@RequestBody @Valid UserDto userDto) {
+        return ResponseEntity.status(CREATED).body(service.createUser(userDto));
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)

@@ -1,11 +1,14 @@
 package com.techstore.model.dto;
 
+import com.techstore.model.enums.UserRole;
 import com.techstore.validation.user.ValidEmail;
 import com.techstore.validation.user.ValidUser;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
@@ -40,4 +43,8 @@ public class UserDto {
 
     @Getter
     private final String newPassword;
+
+    @Getter
+    @Setter
+    private UserRole role;
 }

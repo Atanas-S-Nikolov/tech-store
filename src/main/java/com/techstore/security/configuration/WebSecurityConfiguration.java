@@ -26,7 +26,6 @@ import java.util.List;
 import static com.techstore.constants.ApiConstants.ALL_CART_URLS_MATCHER;
 import static com.techstore.constants.ApiConstants.ALL_FAVORITES_URLS_MATCHER;
 import static com.techstore.constants.ApiConstants.BASE_API_URL_MATCHER;
-import static com.techstore.constants.ApiConstants.CREATE_CUSTOMER_URL;
 import static com.techstore.constants.ApiConstants.FULL_REFRESH_TOKEN_URL;
 import static com.techstore.constants.ApiConstants.FULL_REGISTER_URL;
 import static com.techstore.constants.ApiConstants.LOGIN_URL;
@@ -99,7 +98,7 @@ public class WebSecurityConfiguration {
                 .sessionManagement().sessionCreationPolicy(STATELESS)
                 .and()
                 .authorizeRequests(auth -> {
-                    auth.antMatchers(POST, LOGIN_URL, FULL_REGISTER_URL, CREATE_CUSTOMER_URL).permitAll();
+                    auth.antMatchers(POST, LOGIN_URL, FULL_REGISTER_URL).permitAll();
                     auth.antMatchers(GET, FULL_REFRESH_TOKEN_URL).permitAll();
                     auth.antMatchers(GET, PRODUCT_WITH_NAME_PATH_VARIABLE).permitAll();
                     auth.regexMatchers(GET, PRODUCTS_WITH_PARAMS_REGEX).permitAll();
