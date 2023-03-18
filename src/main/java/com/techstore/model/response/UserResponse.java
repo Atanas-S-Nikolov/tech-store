@@ -1,5 +1,6 @@
 package com.techstore.model.response;
 
+import com.techstore.model.enums.UserRole;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -22,19 +23,23 @@ public class UserResponse {
     @Getter
     private final String username;
 
+    @Getter
+    private final UserRole role;
+
     public UserResponse() {
         this(null);
     }
 
     public UserResponse(String username) {
-        this(null, null, null, null, username);
+        this(username, null, null, null, null, null);
     }
 
-    public UserResponse(String firstName, String lastName, String email, String phone, String username) {
+    public UserResponse(String username, String firstName, String lastName, String email, String phone, UserRole role) {
+        this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
-        this.username = username;
+        this.role = role;
     }
 }

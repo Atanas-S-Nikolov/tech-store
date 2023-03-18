@@ -26,7 +26,8 @@ import static java.util.stream.Collectors.toSet;
 
 public class ModelConverter {
     public static UserResponse toResponse(UserEntity entity) {
-        return new UserResponse(entity.getFirstName(), entity.getLastName(), entity.getEmail(), entity.getPhone(), entity.getUsername());
+        return new UserResponse(entity.getUsername(), entity.getFirstName(), entity.getLastName(), entity.getEmail(),
+                entity.getPhone(), entity.getRole());
     }
 
     public static ProductToBuyResponse toResponse(ProductToBuyEntity toBuyEntity) {
@@ -44,9 +45,9 @@ public class ModelConverter {
     }
 
     public static ProductResponse toResponse(ProductEntity entity) {
-        return new ProductResponse(entity.getName(), entity.getPrice(), entity.getStocks(), entity.getCategory(), entity.getType(),
-                entity.getBrand(), entity.getModel(), entity.getDescription(), entity.isEarlyAccess(), entity.getDateOfCreation(),
-                entity.getDateOfModification(), entity.getImageUrls());
+        return new ProductResponse(entity.getName(), entity.getPrice(), entity.getStocks(), entity.getCategory().getValue(),
+                entity.getType().getValue(), entity.getBrand(), entity.getModel(), entity.getDescription(), entity.isEarlyAccess(),
+                entity.getDateOfCreation(), entity.getDateOfModification(), entity.getImageUrls());
     }
 
     public static ProductResponse toProductResponse(ProductToBuyEntity toBuyEntity) {

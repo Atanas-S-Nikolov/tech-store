@@ -1,7 +1,5 @@
 package com.techstore.model.response;
 
-import com.techstore.model.enums.ProductCategory;
-import com.techstore.model.enums.ProductType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -24,10 +22,10 @@ public class ProductResponse {
     private final int stocks;
 
     @Getter
-    private final ProductCategory category;
+    private final String category;
 
     @Getter
-    private final ProductType type;
+    private final String type;
 
     @Getter
     private final String brand;
@@ -55,10 +53,13 @@ public class ProductResponse {
     }
 
     public ProductResponse(String name) {
-        this(name, new BigDecimal("0.0"), 0, null, null, null, null, null, false, null, null, new HashSet<>());
+        this(name, new BigDecimal("0.0"), 0, null, null, null, null, null,
+                false, null, null, new HashSet<>());
     }
 
-    public ProductResponse(String name, BigDecimal price, int stocks, ProductCategory category, ProductType type, String brand, String model, String description, boolean earlyAccess, LocalDateTime dateOfCreation, LocalDateTime dateOfModification, Set<String> imageUrls) {
+    public ProductResponse(String name, BigDecimal price, int stocks, String category, String type, String brand, String model,
+                           String description, boolean earlyAccess, LocalDateTime dateOfCreation, LocalDateTime dateOfModification,
+                           Set<String> imageUrls) {
         this.name = name;
         this.price = price;
         this.stocks = stocks;
