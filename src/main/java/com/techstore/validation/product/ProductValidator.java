@@ -1,11 +1,9 @@
 package com.techstore.validation.product;
 
 import com.techstore.model.dto.ProductDto;
-import com.techstore.model.enums.ProductType;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -23,7 +21,6 @@ import static com.techstore.model.enums.ProductType.MOUSE;
 import static com.techstore.model.enums.ProductType.TV;
 import static com.techstore.model.enums.ProductType.TWS;
 import static com.techstore.validation.builder.ConstraintViolationBuilder.buildConstraintViolation;
-import static java.util.stream.Collectors.toList;
 
 public class ProductValidator implements ConstraintValidator<ValidProduct, ProductDto> {
     private static final String DELIMITER = ", ";
@@ -36,10 +33,10 @@ public class ProductValidator implements ConstraintValidator<ValidProduct, Produ
     public boolean isValid(ProductDto product, ConstraintValidatorContext context) {
         String category = product.getCategory();
         String type = product.getType();
-        List<String> audioCategoryTypes = Arrays.asList(EARPHONES.getValue(), HEADSET.getValue(), TWS.getValue());
-        List<String> computersAndLaptopsTypes = Arrays.asList(DESKTOP_PC.getValue(), LAPTOP.getValue());
-        List<String> miceAndKeyboardsTypes = Arrays.asList(MOUSE.getValue(), KEYBOARD.getValue());
-        List<String> tvAndMonitorsTypes = Arrays.asList(TV.getValue(), MONITOR.getValue());
+        List<String> audioCategoryTypes = List.of(EARPHONES.getValue(), HEADSET.getValue(), TWS.getValue()); ;
+        List<String> computersAndLaptopsTypes = List.of(DESKTOP_PC.getValue(), LAPTOP.getValue());
+        List<String> miceAndKeyboardsTypes = List.of(MOUSE.getValue(), KEYBOARD.getValue());
+        List<String> tvAndMonitorsTypes = List.of(TV.getValue(), MONITOR.getValue());
 
         boolean isProductValid = false;
         if (category.equals(AUDIO.getValue())) {

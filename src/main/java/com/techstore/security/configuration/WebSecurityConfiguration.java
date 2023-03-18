@@ -19,8 +19,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static com.techstore.constants.ApiConstants.ALL_CART_URLS_MATCHER;
@@ -42,9 +40,9 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfiguration {
-    private static final List<String> ORIGINS = Collections.singletonList("*");
-    private static final List<String> METHODS = Arrays.asList("POST", "GET", "PUT", "DELETE");
-    private static final List<String> HEADERS = Collections.singletonList("*");
+    private static final List<String> ORIGINS = List.of("*");
+    private static final List<String> METHODS = List.of("POST", "GET", "PUT", "DELETE");
+    private static final List<String> HEADERS = List.of("*");
 
     @Value("${jwt.secret}")
     private String jwtSecret;
