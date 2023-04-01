@@ -16,7 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import static com.techstore.constants.ApiConstants.*;
+import static com.techstore.constants.ApiConstants.FULL_REFRESH_TOKEN_URL;
+import static com.techstore.constants.ApiConstants.LOGIN_URL;
 import static com.techstore.constants.JWTConstants.BEARER;
 import static com.techstore.constants.JWTConstants.ROLES_CLAIM;
 import static com.techstore.utils.JWTUtils.convertStringsToAuthorities;
@@ -30,7 +31,6 @@ import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpMethod.POST;
 
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
     @Value("${jwt.secret}")
@@ -39,13 +39,10 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestPath = request.getServletPath();
-        String requestMethod = request.getMethod();
         boolean isLoginUrl = requestPath.equals(LOGIN_URL);
         boolean isRefreshTokenUrl = requestPath.equals(FULL_REFRESH_TOKEN_URL);
-        boolean isUsersUrl = requestPath.equals(USERS_URL);
-        boolean isPostRequest = requestMethod.equals(POST.name());
 
-        if (!(isLoginUrl || isRefreshTokenUrl || (isUsersUrl && isPostRequest))) {
+        if (!(isLoginUrl || isRefreshTokenUrl)) {
             String authorizationHeader = request.getHeader(AUTHORIZATION);
             if (nonNull(authorizationHeader) && authorizationHeader.startsWith(BEARER)) {
                 try {

@@ -1,7 +1,8 @@
 package com.techstore.controller;
 
-import com.techstore.model.dto.AuthenticationDto;
+import com.techstore.model.dto.UpdateUserDto;
 import com.techstore.model.dto.UserDto;
+import com.techstore.model.dto.UsernameDto;
 import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.UserResponse;
 import com.techstore.service.user.IUserService;
@@ -52,13 +53,13 @@ public class UserController {
     }
 
     @PutMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> updateUser(@RequestBody @Valid UserDto userDto) {
+    public ResponseEntity<UserResponse> updateUser(@RequestBody @Valid UpdateUserDto userDto) {
         return ResponseEntity.status(OK).body(service.updateUser(userDto));
     }
 
     @DeleteMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteUser(@RequestBody @Valid AuthenticationDto deletionDto) {
-        service.deleteUser(deletionDto.getUsername(), deletionDto.getPassword());
+    public ResponseEntity<?> deleteUser(@RequestBody @Valid UsernameDto usernameDto) {
+        service.deleteUser(usernameDto.getUsername());
         return ResponseEntity.status(NO_CONTENT).build();
     }
 }

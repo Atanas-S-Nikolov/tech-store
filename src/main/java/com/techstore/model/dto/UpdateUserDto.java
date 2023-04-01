@@ -2,7 +2,6 @@ package com.techstore.model.dto;
 
 import com.techstore.validation.user.ValidEmail;
 import com.techstore.validation.user.ValidRole;
-import com.techstore.validation.user.ValidUser;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -17,8 +16,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
-@ValidUser
-public class UserDto {
+public class UpdateUserDto {
     @NotBlank(message = "First name must not be blank")
     @Getter
     private final String firstName;

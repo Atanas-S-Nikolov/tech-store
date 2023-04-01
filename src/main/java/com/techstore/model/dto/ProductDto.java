@@ -12,6 +12,7 @@ import lombok.ToString;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 
 @NoArgsConstructor(force = true)
@@ -40,9 +41,11 @@ public class ProductDto {
     @Getter
     private final String type;
 
+    @NotBlank(message = "Product brand must not be blank")
     @Getter
     private final String brand;
 
+    @NotBlank(message = "Product model must not be blank")
     @Getter
     private final String model;
 

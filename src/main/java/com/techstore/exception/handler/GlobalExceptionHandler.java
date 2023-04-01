@@ -124,7 +124,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 String message = fieldError.getDefaultMessage();
                 rejectedValues.add(new RejectedValue(message, property, value));
             }
-        } else if (bindingResult.hasGlobalErrors()) {
+        }
+        if (bindingResult.hasGlobalErrors()) {
             for (ObjectError globalError : bindingResult.getGlobalErrors()) {
                 globalMessages.add(globalError.getDefaultMessage());
             }

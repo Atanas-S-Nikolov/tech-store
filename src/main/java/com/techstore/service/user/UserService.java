@@ -1,8 +1,8 @@
 package com.techstore.service.user;
 
 import com.techstore.exception.authentication.InvalidCredentialsException;
-import com.techstore.exception.user.UserConstraintViolationException;
 import com.techstore.exception.user.UserNotFoundException;
+import com.techstore.model.dto.UpdateUserDto;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.entity.UserEntity;
 import com.techstore.model.response.PageResponse;
@@ -55,14 +55,11 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserResponse updateUser(UserDto user) {
-        UserEntity existingEntity = findUserByUsernameAndPassword(user.getUsername(), user.getPassword());
-        UserEntity entity = toEntity(user);
-        entity.setId(existingEntity.getId());
-
-        if (user.getRole() != entity.getRole()) {
-            throw new UserConstraintViolationException("Cannot overwrite user role");
-        }
+    public UserResponse updateUser(UpdateUserDto user) {
+        UserEntity existingEntity = findUserByUsername(user.getUsername());
+        UserEntity entity =  new UserEntity(existingEntity.getId(), user.getFirstName(), user.getLastName(), user.getEmail(),
+                user.getPhone(), existingEntity.getUsername(), existingEntity.getPassword(), existingEntity.getRole(),
+                existingEntity.getCart(), existingEntity.getFavorite());
 
         String newPassword = user.getNewPassword();
         if (nonNull(newPassword) && !newPassword.trim().isEmpty()) {
@@ -74,8 +71,8 @@ public class UserService implements IUserService {
 
     @Transactional
     @Override
-    public void deleteUser(String username, String password) {
-        UserEntity entity = findUserByUsernameAndPassword(username, password);
+    public void deleteUser(String username) {
+        UserEntity entity = findUserByUsername(username);
         cartService.deleteCart(username);
         favoritesService.deleteFavorites(username);
         repository.delete(entity);

@@ -1,5 +1,12 @@
 package com.techstore.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
+import com.fasterxml.jackson.databind.type.LogicalType;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+
 import com.techstore.repository.ICartRepository;
 import com.techstore.repository.IFavoritesRepository;
 import com.techstore.repository.IProductRepository;
@@ -22,6 +29,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import static java.time.format.DateTimeFormatter.ofPattern;
 
 @Configuration
 public class BeanConfiguration {
@@ -71,5 +80,16 @@ public class BeanConfiguration {
     @Bean("user-service")
     public IUserService userService() {
         return new UserService(userRepository, passwordEncoder(), cartService(), favoritesService());
+    }
+
+    @Bean("object-mapper")
+    public ObjectMapper objectMapper() {
+        JavaTimeModule module = new JavaTimeModule();
+        LocalDateTimeSerializer dateTimeSerializer = new LocalDateTimeSerializer(ofPattern("yyyy-MM-dd hh:mm:ss"));
+        module.addSerializer(dateTimeSerializer);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(module);
+        mapper.coercionConfigFor(LogicalType.Enum).setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull);
+        return mapper;
     }
 }

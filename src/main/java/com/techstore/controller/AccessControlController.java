@@ -40,7 +40,7 @@ public class AccessControlController {
 
     @PostMapping(path = REGISTER_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> register(@RequestBody @Valid UserDto userDto) {
-        userDto.setRole(ROLE_CUSTOMER);
+        userDto.setRole(ROLE_CUSTOMER.getValue());
         return ResponseEntity.status(CREATED).body(userService.createUser(userDto));
     }
 

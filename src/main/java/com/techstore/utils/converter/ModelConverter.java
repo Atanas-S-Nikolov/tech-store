@@ -1,5 +1,6 @@
 package com.techstore.utils.converter;
 
+import com.techstore.model.enums.UserRole;
 import com.techstore.model.response.CartResponse;
 import com.techstore.model.response.ProductResponse;
 import com.techstore.model.dto.ProductDto;
@@ -63,7 +64,7 @@ public class ModelConverter {
 
     public static UserEntity toEntity(UserDto user) {
         return new UserEntity(null, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getUsername(),
-                user.getPassword(), user.getRole(), null, null);
+                user.getPassword(), UserRole.getKeyByValue(user.getRole()), null, null);
     }
 
     public static Set<ProductToBuyResponse> convertEntitiesToResponses(Set<ProductToBuyEntity> entities) {
