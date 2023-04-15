@@ -17,10 +17,10 @@
 		<java.version>17</java.version>
 		<fasterxml.jackson.version>2.14.2</fasterxml.jackson.version>
 		<firebase.version>9.1.1</firebase.version>
-		<auth0.version>4.3.0</auth0.version>
+		<auth0.version>4.4.0</auth0.version>
 		<apache.commons.version>3.12.0</apache.commons.version>
 		<commons-validator.version>1.7</commons-validator.version>
-		<passay.version>1.6.2</passay.version>
+		<passay.version>1.6.3</passay.version>
 		<lombok.version>1.18.26</lombok.version>
 	</properties>
 	<dependencies>

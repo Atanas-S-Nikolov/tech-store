@@ -16,14 +16,16 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@ToString(exclude = {"cart", "favorite"})
-@EqualsAndHashCode(exclude = {"cart", "favorite"})
+@ToString(exclude = {"favorite"})
+@EqualsAndHashCode(exclude = {"favorite"})
 @Entity
 @Table(name = "users")
 public class UserEntity {
@@ -56,10 +58,9 @@ public class UserEntity {
     private UserRole role;
 
     @OneToOne
-    @JoinColumn(name = "cart_id", referencedColumnName = "id")
-    private CartEntity cart;
-
-    @OneToOne
     @JoinColumn(name = "favorite_id", referencedColumnName = "id")
     private FavoritesEntity favorite;
+
+    @OneToMany(mappedBy = "user")
+    private Set<OrderEntity> orders;
 }

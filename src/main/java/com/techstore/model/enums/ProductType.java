@@ -1,7 +1,13 @@
 package com.techstore.model.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
+
 import java.util.Arrays;
 
+@AllArgsConstructor
+@ToString(doNotUseGetters = true)
 public enum ProductType {
     DESKTOP_PC("Desktop PC"),
     LAPTOP("Laptop"),
@@ -13,26 +19,12 @@ public enum ProductType {
     EARPHONES("Earphones"),
     TWS("TWS");
 
+    @Getter
     private final String value;
-
-    ProductType(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
 
     public static ProductType getKeyByValue(String value) {
         return Arrays.stream(values())
                 .filter(productType -> productType.getValue().equals(value))
                 .findFirst().orElse(null);
-    }
-
-    @Override
-    public String toString() {
-        return "ProductType{" +
-                "value='" + value + '\'' +
-                '}';
     }
 }

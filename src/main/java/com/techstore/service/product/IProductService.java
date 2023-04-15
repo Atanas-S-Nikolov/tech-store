@@ -13,7 +13,7 @@ public interface IProductService {
 
     ProductResponse getProduct(String productName) throws ProductNotFoundException;
 
-    PageResponse<ProductResponse> getProducts(boolean earlyAccess, String category, String type, Integer page, Integer size);
+    PageResponse<ProductResponse> getProducts(boolean earlyAccess, String category, String type, int page, int size);
 
     ProductResponse updateProduct(ProductDto productDto, Collection<MultipartFile> images) throws ProductNotFoundException;
 

@@ -11,13 +11,13 @@ public class ProductToBuyResponse {
     private final ProductResponse product;
 
     @Getter
-    private final long quantity;
+    private final int quantity;
 
     public ProductToBuyResponse() {
-        this(null, 0L);
+        this(null, 0);
     }
 
-    public ProductToBuyResponse(ProductResponse product, long quantity) {
+    public ProductToBuyResponse(ProductResponse product, int quantity) {
         this.product = product;
         this.quantity = quantity;
     }

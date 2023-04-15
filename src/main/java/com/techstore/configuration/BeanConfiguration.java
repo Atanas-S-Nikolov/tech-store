@@ -9,13 +9,17 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import com.techstore.repository.ICartRepository;
 import com.techstore.repository.IFavoritesRepository;
+import com.techstore.repository.IOrderRepository;
 import com.techstore.repository.IProductRepository;
 import com.techstore.repository.IProductToBuyRepository;
+import com.techstore.repository.IPurchasedProductRepository;
 import com.techstore.repository.IUserRepository;
 import com.techstore.service.cart.CartService;
 import com.techstore.service.cart.ICartService;
 import com.techstore.service.favorites.FavoritesService;
 import com.techstore.service.favorites.IFavoritesService;
+import com.techstore.service.order.IOrderService;
+import com.techstore.service.order.OrderService;
 import com.techstore.service.product.IProductImageUploaderService;
 import com.techstore.service.product.IProductService;
 import com.techstore.service.product.ProductImageUploaderService;
@@ -52,6 +56,12 @@ public class BeanConfiguration {
     @Autowired
     private IProductToBuyRepository productToBuyRepository;
 
+    @Autowired
+    private IPurchasedProductRepository purchasedProductRepository;
+
+    @Autowired
+    private IOrderRepository orderRepository;
+
     @Bean("password-encoder")
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -69,7 +79,7 @@ public class BeanConfiguration {
 
     @Bean("cart-service")
     public ICartService cartService() {
-        return new CartService(cartRepository, userRepository, productRepository, productToBuyRepository);
+        return new CartService(cartRepository, productRepository, productToBuyRepository);
     }
 
     @Bean("favorites-service")
@@ -79,7 +89,12 @@ public class BeanConfiguration {
 
     @Bean("user-service")
     public IUserService userService() {
-        return new UserService(userRepository, passwordEncoder(), cartService(), favoritesService());
+        return new UserService(userRepository, passwordEncoder(), favoritesService());
+    }
+
+    @Bean("order-service")
+    public IOrderService orderService() {
+        return new OrderService(orderRepository, userRepository, cartService(), purchasedProductRepository);
     }
 
     @Bean("object-mapper")
