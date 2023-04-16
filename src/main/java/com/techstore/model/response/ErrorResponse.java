@@ -10,11 +10,12 @@ import java.util.Collection;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
+import static com.techstore.constants.DateConstants.LOCAL_DATE_TIME_PRECISION_FORMAT;
 
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
 public class ErrorResponse {
-    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd-HH-mm-ss-ns")
+    @JsonFormat(shape = STRING, pattern = LOCAL_DATE_TIME_PRECISION_FORMAT)
     @Getter
     private final LocalDateTime timestamp;
 

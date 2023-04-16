@@ -23,6 +23,7 @@ import java.util.List;
 
 import static com.techstore.constants.ApiConstants.ALL_CART_URLS_MATCHER;
 import static com.techstore.constants.ApiConstants.ALL_FAVORITES_URLS_MATCHER;
+import static com.techstore.constants.ApiConstants.ALL_ORDERS_URLS_MATCHER;
 import static com.techstore.constants.ApiConstants.BASE_API_URL_MATCHER;
 import static com.techstore.constants.ApiConstants.FULL_REFRESH_TOKEN_URL;
 import static com.techstore.constants.ApiConstants.FULL_REGISTER_URL;
@@ -100,7 +101,8 @@ public class WebSecurityConfiguration {
                     auth.antMatchers(GET, FULL_REFRESH_TOKEN_URL).permitAll();
                     auth.antMatchers(GET, PRODUCT_WITH_NAME_PATH_VARIABLE).permitAll();
                     auth.regexMatchers(GET, PRODUCTS_WITH_PARAMS_REGEX).permitAll();
-                    auth.antMatchers(ALL_CART_URLS_MATCHER, ALL_FAVORITES_URLS_MATCHER).hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
+                    auth.antMatchers(ALL_CART_URLS_MATCHER).permitAll();
+                    auth.antMatchers(ALL_ORDERS_URLS_MATCHER, ALL_FAVORITES_URLS_MATCHER).hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(GET, PRODUCTS_URL, PRODUCTS_URL + "/").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(BASE_API_URL_MATCHER).hasAuthority(ROLE_ADMIN);
                     auth.anyRequest().authenticated();

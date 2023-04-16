@@ -26,11 +26,13 @@ import javax.validation.Valid;
 import java.util.Collection;
 
 import static com.techstore.constants.ApiConstants.PAGE_PARAM;
+import static com.techstore.constants.ApiConstants.PAGE_PARAM_DEFAULT_VALUE;
 import static com.techstore.constants.ApiConstants.PRODUCTS_CATEGORY_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_EARLY_ACCESS_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_TYPE_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
 import static com.techstore.constants.ApiConstants.SIZE_PARAM;
+import static com.techstore.constants.ApiConstants.SIZE_PARAM_DEFAULT_VALUE;
 import static com.techstore.constants.FieldConstants.VALIDATED_PARAM_DEFAULT_VALUE;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -71,8 +73,8 @@ public class ProductController {
             @ProductTypeConstraint
             @RequestParam(value = PRODUCTS_TYPE_PARAM, required = false, defaultValue = VALIDATED_PARAM_DEFAULT_VALUE)
                     String type,
-            @RequestParam(value = PAGE_PARAM, defaultValue = "0") Integer page,
-            @RequestParam(value = SIZE_PARAM, defaultValue = "10") Integer size
+            @RequestParam(value = PAGE_PARAM, defaultValue = PAGE_PARAM_DEFAULT_VALUE) int page,
+            @RequestParam(value = SIZE_PARAM, defaultValue = SIZE_PARAM_DEFAULT_VALUE) int size
     ) {
         return ResponseEntity.status(OK).body(service.getProducts(earlyAccess, category, type, page, size));
     }

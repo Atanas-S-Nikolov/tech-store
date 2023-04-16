@@ -56,7 +56,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public PageResponse<ProductResponse> getProducts(boolean earlyAccess, String category, String type, Integer page, Integer size) {
+    public PageResponse<ProductResponse> getProducts(boolean earlyAccess, String category, String type, int page, int size) {
         boolean categoryIsPresent = !category.equals(VALIDATED_PARAM_DEFAULT_VALUE);
         boolean typeIsPresent = !type.equals(VALIDATED_PARAM_DEFAULT_VALUE);
         ProductCategory productCategory = ProductCategory.getKeyByValue(category);

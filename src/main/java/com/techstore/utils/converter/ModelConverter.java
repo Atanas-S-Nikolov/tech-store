@@ -1,28 +1,32 @@
 package com.techstore.utils.converter;
 
-import com.techstore.model.enums.UserRole;
-import com.techstore.model.response.CartResponse;
-import com.techstore.model.response.ProductResponse;
-import com.techstore.model.dto.ProductDto;
-import com.techstore.model.dto.UserDto;
 import com.techstore.model.entity.CartEntity;
 import com.techstore.model.entity.FavoritesEntity;
+import com.techstore.model.entity.OrderEntity;
 import com.techstore.model.entity.ProductEntity;
 import com.techstore.model.entity.ProductToBuyEntity;
+import com.techstore.model.entity.PurchasedProductEntity;
 import com.techstore.model.entity.UserEntity;
+import com.techstore.model.enums.UserRole;
+import com.techstore.model.dto.ProductDto;
+import com.techstore.model.dto.UserDto;
 import com.techstore.model.enums.ProductCategory;
 import com.techstore.model.enums.ProductType;
+import com.techstore.model.response.CartResponse;
 import com.techstore.model.response.FavoritesResponse;
+import com.techstore.model.response.OrderResponse;
+import com.techstore.model.response.ProductResponse;
 import com.techstore.model.response.ProductToBuyResponse;
+import com.techstore.model.response.PurchasedProductResponse;
 import com.techstore.model.response.UserResponse;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toSet;
 
 public class ModelConverter {
@@ -36,8 +40,7 @@ public class ModelConverter {
     }
 
     public static CartResponse toResponse(CartEntity entity) {
-        UserResponse userResponse = toResponse(entity.getUser());
-        return new CartResponse(userResponse, convertEntitiesToResponses(entity.getProductsToBuy()), entity.getTotalPrice());
+        return new CartResponse(entity.getCartKey(), convertEntitiesToResponses(entity.getProductsToBuy()), entity.getTotalPrice());
     }
 
     public static FavoritesResponse toResponse(FavoritesEntity entity) {
@@ -51,6 +54,15 @@ public class ModelConverter {
                 entity.getDateOfCreation(), entity.getDateOfModification(), entity.getImageUrls());
     }
 
+    public static PurchasedProductResponse toResponse(PurchasedProductEntity entity) {
+        return new PurchasedProductResponse(entity.getProduct().getName(), entity.getQuantity());
+    }
+
+    public static OrderResponse toResponse(OrderEntity entity) {
+        Set<PurchasedProductResponse> purchasedProducts = convertPurchasedEntitiesToResponses(entity.getPurchasedProducts());
+        return new OrderResponse(purchasedProducts, entity.getTotalPrice(), entity.getDate());
+    }
+
     public static ProductResponse toProductResponse(ProductToBuyEntity toBuyEntity) {
         return toResponse(toBuyEntity.getProduct());
     }
@@ -59,17 +71,21 @@ public class ModelConverter {
         return new ProductEntity(null, productDto.getName(), productDto.getPrice(), productDto.getStocks(),
                 ProductCategory.getKeyByValue(productDto.getCategory()), ProductType.getKeyByValue(productDto.getType()),
                 productDto.getBrand(), productDto.getModel(), productDto.getDescription(), productDto.isEarlyAccess(),
-                null, null, new HashSet<>(), null, new HashSet<>());
+                null, null, new HashSet<>(), null, new HashSet<>(), null);
     }
 
     public static UserEntity toEntity(UserDto user) {
         return new UserEntity(null, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getUsername(),
-                user.getPassword(), UserRole.getKeyByValue(user.getRole()), null, null);
+                user.getPassword(), UserRole.getKeyByValue(user.getRole()), null, new HashSet<>());
     }
 
     public static Set<ProductToBuyResponse> convertEntitiesToResponses(Set<ProductToBuyEntity> entities) {
         return entities.stream().map(ModelConverter::toResponse)
                 .sorted(comparing(toBuyResponse -> toBuyResponse.getProduct().getPrice(), reverseOrder()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+                .collect(toCollection(LinkedHashSet::new));
+    }
+
+    public static Set<PurchasedProductResponse> convertPurchasedEntitiesToResponses(Set<PurchasedProductEntity> entities) {
+        return entities.stream().map(ModelConverter::toResponse).collect(toSet());
     }
 }

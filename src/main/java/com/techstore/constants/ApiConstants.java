@@ -1,19 +1,28 @@
 package com.techstore.constants;
 
 public interface ApiConstants {
+    String PAGE_PARAM = "page";
+    String SIZE_PARAM = "size";
+    String PRODUCTS_EARLY_ACCESS_PARAM = "earlyAccess";
+    String PRODUCTS_CATEGORY_PARAM = "category";
+    String PRODUCTS_TYPE_PARAM = "type";
+    String ORDER_START_DATE_PARAM = "startDate";
+    String ORDER_END_DATE_PARAM = "endDate";
+
+    String PAGE_PARAM_DEFAULT_VALUE = "0";
+    String SIZE_PARAM_DEFAULT_VALUE = "10";
+
     String ALL_MATCHER = "/**";
     String BASE_API_URL = "/api/v1";
     String BASE_API_URL_MATCHER = BASE_API_URL + ALL_MATCHER;
     String BASE_API_REGEX = "\\/api\\/v1\\";
+
     String PRODUCT_URL = "/product";
-    String USERS_URL = BASE_API_URL + "/user";
     String PRODUCTS_URL = BASE_API_URL + PRODUCT_URL;
     String PRODUCTS_URL_REGEX = BASE_API_REGEX + PRODUCT_URL;
-    String PRODUCTS_EARLY_ACCESS_PARAM = "earlyAccess";
-    String PRODUCTS_CATEGORY_PARAM = "category";
-    String PRODUCTS_TYPE_PARAM = "type";
     String PRODUCTS_WITH_PARAMS_REGEX = PRODUCTS_URL_REGEX + ".*[?&]earlyAccess=false.*";
     String PRODUCT_WITH_NAME_PATH_VARIABLE = PRODUCTS_URL + "/{name:[A-z\\s\\d-]+}";
+    String USERS_URL = BASE_API_URL + "/user";
     String ACCESS_CONTROL_URL = BASE_API_URL + "/auth";
     String LOGIN_URL = ACCESS_CONTROL_URL + "/login";
     String REGISTER_URL = "/register";
@@ -24,10 +33,16 @@ public interface ApiConstants {
     String CLEAR_CART_URL = "/clear";
     String ALL_CART_URLS_MATCHER = CARTS_URL + ALL_MATCHER;
     String FAVORITES_URL = BASE_API_URL + "/favorites";
+    String ALL_FAVORITES_URLS_MATCHER = FAVORITES_URL + ALL_MATCHER;
     String ADD_URL = "/add";
     String REMOVE_URL = "/remove";
     String PURCHASE_URL = "/purchase";
-    String ALL_FAVORITES_URLS_MATCHER = FAVORITES_URL + ALL_MATCHER;
-    String PAGE_PARAM = "page";
-    String SIZE_PARAM = "size";
+    String ORDER_URL = "/order";
+    String ORDERS_URL = BASE_API_URL + ORDER_URL;
+    String ALL_ORDERS_URLS_MATCHER = ORDERS_URL + ALL_MATCHER;
+    String DELIVER_URL = "/deliver";
+    String RETURN_URL = "/return";
+    String FINALIZE_URL = "/finalize";
+    String GET_URL = "/get";
+    String ALL_URL = "/all";
 }

@@ -15,7 +15,7 @@ import java.util.Set;
 @EqualsAndHashCode(doNotUseGetters = true)
 public class CartResponse {
     @Getter
-    private final UserResponse user;
+    private final String key;
 
     @Getter
     private final Set<ProductToBuyResponse> products;

@@ -1,6 +1,5 @@
 package com.techstore.service.user;
 
-import com.techstore.exception.authentication.InvalidCredentialsException;
 import com.techstore.exception.user.UserNotFoundException;
 import com.techstore.model.dto.UpdateUserDto;
 import com.techstore.model.dto.UserDto;
@@ -8,8 +7,8 @@ import com.techstore.model.entity.UserEntity;
 import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.UserResponse;
 import com.techstore.repository.IUserRepository;
-import com.techstore.service.cart.ICartService;
 import com.techstore.service.favorites.IFavoritesService;
+import com.techstore.service.order.IOrderService;
 import com.techstore.utils.converter.ModelConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,14 +26,15 @@ import static java.util.stream.Collectors.toList;
 public class UserService implements IUserService {
     private final IUserRepository repository;
     private final PasswordEncoder passwordEncoder;
-    private final ICartService cartService;
     private final IFavoritesService favoritesService;
+    private final IOrderService orderService;
 
-    public UserService(IUserRepository repository, PasswordEncoder passwordEncoder, ICartService cartService, IFavoritesService favoritesService) {
+    public UserService(IUserRepository repository, PasswordEncoder passwordEncoder, IFavoritesService favoritesService,
+                       IOrderService orderService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
-        this.cartService = cartService;
         this.favoritesService = favoritesService;
+        this.orderService = orderService;
     }
 
     @Transactional
@@ -42,7 +42,6 @@ public class UserService implements IUserService {
     public UserResponse createUser(UserDto user) {
         UserEntity entity = toEntity(user);
         entity.setPassword(passwordEncoder.encode(user.getPassword().trim()));
-        entity.setCart(cartService.createDefaultCart());
         entity.setFavorite(favoritesService.createDefaultFavorites());
         return toResponse(repository.save(entity));
     }
@@ -59,7 +58,7 @@ public class UserService implements IUserService {
         UserEntity existingEntity = findUserByUsername(user.getUsername());
         UserEntity entity =  new UserEntity(existingEntity.getId(), user.getFirstName(), user.getLastName(), user.getEmail(),
                 user.getPhone(), existingEntity.getUsername(), existingEntity.getPassword(), existingEntity.getRole(),
-                existingEntity.getCart(), existingEntity.getFavorite());
+                existingEntity.getFavorite(), existingEntity.getOrders());
 
         String newPassword = user.getNewPassword();
         if (nonNull(newPassword) && !newPassword.trim().isEmpty()) {
@@ -73,17 +72,9 @@ public class UserService implements IUserService {
     @Override
     public void deleteUser(String username) {
         UserEntity entity = findUserByUsername(username);
-        cartService.deleteCart(username);
         favoritesService.deleteFavorites(username);
+        orderService.deleteOrdersForUser(username);
         repository.delete(entity);
-    }
-
-    private UserEntity findUserByUsernameAndPassword(String username, String password) {
-        UserEntity entity = findUserByUsername(username);
-        if (!passwordEncoder.matches(password, entity.getPassword())) {
-            throw new InvalidCredentialsException("Invalid credentials");
-        }
-        return entity;
     }
 
     private UserEntity findUserByUsername(String username) {
