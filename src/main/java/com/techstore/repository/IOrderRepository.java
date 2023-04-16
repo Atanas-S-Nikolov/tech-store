@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Optional;
 
 @Repository
@@ -16,11 +17,14 @@ public interface IOrderRepository extends PagingAndSortingRepository<OrderEntity
     @Query("SELECT o from OrderEntity o where o.user.username = :username AND o.cartKey = :cartKey")
     Optional<OrderEntity> findByUsernameAndCartKey(@Param("username") String username, @Param("cartKey") String cartKey);
 
-    @Query("SELECT o from OrderEntity o where o.user.username = :username AND o.date BETWEEN :startDate AND :endDate")
-    Page<OrderEntity> findAllByUsernameBetweenDates(@Param("username") String username, @Param("startDate") LocalDateTime startDate,
-                                                    @Param("endDate") LocalDateTime endDate, Pageable pageable);
+    @Query("SELECT o from OrderEntity o where o.user.username = :username")
+    Collection<OrderEntity> findAllByUsername(@Param("username") String username);
 
     @Query("SELECT o from OrderEntity o where o.date BETWEEN :startDate AND :endDate")
     Page<OrderEntity> findAllBetweenDates(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate,
                                           Pageable pageable);
+
+    @Query("SELECT o from OrderEntity o where o.user.username = :username AND o.date BETWEEN :startDate AND :endDate")
+    Page<OrderEntity> findAllByUsernameBetweenDates(@Param("username") String username, @Param("startDate") LocalDateTime startDate,
+                                                    @Param("endDate") LocalDateTime endDate, Pageable pageable);
 }

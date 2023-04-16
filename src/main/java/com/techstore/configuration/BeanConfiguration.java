@@ -89,7 +89,7 @@ public class BeanConfiguration {
 
     @Bean("user-service")
     public IUserService userService() {
-        return new UserService(userRepository, passwordEncoder(), favoritesService());
+        return new UserService(userRepository, passwordEncoder(), favoritesService(), orderService());
     }
 
     @Bean("order-service")

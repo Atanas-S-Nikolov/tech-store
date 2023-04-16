@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -112,6 +113,16 @@ public class OrderService implements IOrderService {
         OrderEntity order = findOrder(orderDto);
         deletePurchasedProducts(order.getPurchasedProducts());
         repository.delete(order);
+    }
+
+    @Transactional
+    @Override
+    public void deleteOrdersForUser(String username) {
+        Collection<OrderEntity> allOrders = repository.findAllByUsername(username);
+        allOrders.forEach(order -> {
+            deletePurchasedProducts(order.getPurchasedProducts());
+            repository.delete(order);
+        });
     }
 
     private OrderEntity findOrder(OrderDto orderDto) {

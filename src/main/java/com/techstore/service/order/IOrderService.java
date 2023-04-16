@@ -22,4 +22,6 @@ public interface IOrderService {
     OrderResponse finalizeOrder(OrderDto orderDto);
 
     void deleteOrder(OrderDto orderDto);
+
+    void deleteOrdersForUser(String username);
 }

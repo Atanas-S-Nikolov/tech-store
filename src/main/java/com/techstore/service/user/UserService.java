@@ -8,6 +8,7 @@ import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.UserResponse;
 import com.techstore.repository.IUserRepository;
 import com.techstore.service.favorites.IFavoritesService;
+import com.techstore.service.order.IOrderService;
 import com.techstore.utils.converter.ModelConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,11 +27,14 @@ public class UserService implements IUserService {
     private final IUserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final IFavoritesService favoritesService;
+    private final IOrderService orderService;
 
-    public UserService(IUserRepository repository, PasswordEncoder passwordEncoder, IFavoritesService favoritesService) {
+    public UserService(IUserRepository repository, PasswordEncoder passwordEncoder, IFavoritesService favoritesService,
+                       IOrderService orderService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.favoritesService = favoritesService;
+        this.orderService = orderService;
     }
 
     @Transactional
@@ -69,6 +73,7 @@ public class UserService implements IUserService {
     public void deleteUser(String username) {
         UserEntity entity = findUserByUsername(username);
         favoritesService.deleteFavorites(username);
+        orderService.deleteOrdersForUser(username);
         repository.delete(entity);
     }
 
