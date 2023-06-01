@@ -1,6 +1,7 @@
 package com.techstore.controller;
 
 import com.techstore.model.dto.CartDto;
+import com.techstore.model.dto.QuickOrderDto;
 import com.techstore.model.response.CartResponse;
 import com.techstore.model.dto.UpdateCartDto;
 import com.techstore.service.cart.ICartService;
@@ -19,10 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 import static com.techstore.constants.ApiConstants.ADD_URL;
-import static com.techstore.constants.ApiConstants.PURCHASE_URL;
 import static com.techstore.constants.ApiConstants.CARTS_URL;
-import static com.techstore.constants.ApiConstants.CLEAR_CART_URL;
+import static com.techstore.constants.ApiConstants.PURCHASE_URL;
 import static com.techstore.constants.ApiConstants.REMOVE_URL;
+import static com.techstore.constants.ApiConstants.VALIDATE_URL;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -59,14 +60,15 @@ public class CartController {
         return ResponseEntity.status(OK).body(service.removeProductFromCart(dto));
     }
 
-    @PutMapping(path = PURCHASE_URL + "/{key}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<CartResponse> purchase(@PathVariable String key) {
-        return ResponseEntity.status(OK).body(service.doPurchase(key));
+    @PutMapping(path = VALIDATE_URL + "/{key}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<QuickOrderDto> validateQuickOrder(@PathVariable String key, @Valid @RequestBody QuickOrderDto quickOrderDto) {
+        service.getCart(key);
+        return ResponseEntity.status(OK).body(quickOrderDto);
     }
 
-    @PutMapping(path = CLEAR_CART_URL + "/{key}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<CartResponse> clearCart(@PathVariable String key) {
-        return ResponseEntity.status(OK).body(service.clearCart(key));
+    @PutMapping(path = PURCHASE_URL + "/{key}", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<CartResponse> purchase(@PathVariable String key, @Valid @RequestBody QuickOrderDto quickOrderDto) {
+        return ResponseEntity.status(OK).body(service.doPurchase(key, quickOrderDto));
     }
 
     @DeleteMapping(path = "/{key}")

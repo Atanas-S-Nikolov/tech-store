@@ -16,6 +16,9 @@ import java.util.Set;
 @EqualsAndHashCode(doNotUseGetters = true)
 public class OrderResponse {
     @Getter
+    private String id;
+
+    @Getter
     private final Set<PurchasedProductResponse> products;
 
     @Getter
@@ -23,4 +26,7 @@ public class OrderResponse {
 
     @Getter
     private final LocalDateTime date;
+
+    @Getter
+    private final String status;
 }

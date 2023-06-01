@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,6 +32,7 @@ import static com.techstore.constants.ApiConstants.LOGIN_URL;
 import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
 import static com.techstore.constants.ApiConstants.PRODUCTS_WITH_PARAMS_REGEX;
 import static com.techstore.constants.ApiConstants.PRODUCT_WITH_NAME_PATH_VARIABLE;
+import static com.techstore.constants.ApiConstants.USER_GET_URL;
 import static com.techstore.constants.RoleConstants.ROLE_ADMIN;
 import static com.techstore.constants.RoleConstants.ROLE_CUSTOMER;
 
@@ -39,6 +41,7 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, proxyTargetClass = true)
 @Configuration
 public class WebSecurityConfiguration {
     private static final List<String> ORIGINS = List.of("*");
@@ -104,6 +107,7 @@ public class WebSecurityConfiguration {
                     auth.antMatchers(ALL_CART_URLS_MATCHER).permitAll();
                     auth.antMatchers(ALL_ORDERS_URLS_MATCHER, ALL_FAVORITES_URLS_MATCHER).hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(GET, PRODUCTS_URL, PRODUCTS_URL + "/").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
+                    auth.antMatchers(POST, USER_GET_URL, USER_GET_URL + "/").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(BASE_API_URL_MATCHER).hasAuthority(ROLE_ADMIN);
                     auth.anyRequest().authenticated();
                 })

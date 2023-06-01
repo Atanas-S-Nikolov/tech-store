@@ -34,6 +34,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static com.techstore.constants.DateConstants.LOCAL_DATE_TIME_PRECISION_FORMAT;
 import static java.time.format.DateTimeFormatter.ofPattern;
 
 @Configuration
@@ -100,7 +101,7 @@ public class BeanConfiguration {
     @Bean("object-mapper")
     public ObjectMapper objectMapper() {
         JavaTimeModule module = new JavaTimeModule();
-        LocalDateTimeSerializer dateTimeSerializer = new LocalDateTimeSerializer(ofPattern("yyyy-MM-dd hh:mm:ss"));
+        LocalDateTimeSerializer dateTimeSerializer = new LocalDateTimeSerializer(ofPattern(LOCAL_DATE_TIME_PRECISION_FORMAT));
         module.addSerializer(dateTimeSerializer);
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(module);

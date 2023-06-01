@@ -21,6 +21,9 @@ public class UserResponse {
     private final String phone;
 
     @Getter
+    private final String address;
+
+    @Getter
     private final String username;
 
     @Getter
@@ -31,15 +34,16 @@ public class UserResponse {
     }
 
     public UserResponse(String username) {
-        this(username, null, null, null, null, null);
+        this(username, null, null, null, null, null, null);
     }
 
-    public UserResponse(String username, String firstName, String lastName, String email, String phone, UserRole role) {
+    public UserResponse(String username, String firstName, String lastName, String email, String phone, String address, UserRole role) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
+        this.address = address;
         this.role = role;
     }
 }

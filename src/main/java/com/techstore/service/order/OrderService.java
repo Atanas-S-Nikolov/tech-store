@@ -19,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +27,10 @@ import static com.techstore.model.enums.OrderStatus.CREATED;
 import static com.techstore.model.enums.OrderStatus.DELIVERED;
 import static com.techstore.model.enums.OrderStatus.RECEIVED;
 import static com.techstore.model.enums.OrderStatus.RETURNED;
+import static com.techstore.utils.DateTimeUtils.parse;
+import static com.techstore.utils.auth.AuthUtils.checkOwner;
 import static com.techstore.utils.converter.ModelConverter.toResponse;
+import static java.time.LocalDateTime.now;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -49,12 +51,13 @@ public class OrderService implements IOrderService {
     @Transactional
     @Override
     public OrderResponse createOrder(OrderDto orderDto) {
+        checkOwner(orderDto.getUsername());
         String cartKey = orderDto.getCartKey();
         UserEntity userEntity = findUserByUsername(orderDto.getUsername());
         CartEntity cart = cartService.findCartEntity(cartKey);
         Set<PurchasedProductEntity> purchasedProductEntities = persistPurchasedProducts(cart.getProductsToBuy());
         OrderEntity persistedOrder = repository.save(
-                new OrderEntity(null, userEntity, cartKey, purchasedProductEntities, cart.getTotalPrice(), LocalDateTime.now(), CREATED));
+                new OrderEntity(null, userEntity, cartKey, purchasedProductEntities, cart.getTotalPrice(), now(), CREATED));
         setRelations(purchasedProductEntities, persistedOrder);
         cartService.decreaseStocks(cart.getProductsToBuy());
         cartService.deleteCart(orderDto.getCartKey());
@@ -63,20 +66,23 @@ public class OrderService implements IOrderService {
 
     @Override
     public OrderResponse getOrder(OrderDto orderDto) {
+        checkOwner(orderDto.getUsername());
         return toResponse(findOrder(orderDto));
     }
 
     @Override
-    public PageResponse<OrderResponse> getAllOrders(LocalDateTime startDate, LocalDateTime endDate, int page, int size) {
-        Page<OrderEntity> ordersPage = repository.findAllBetweenDates(startDate, endDate, PageRequest.of(page, size));
+    public PageResponse<OrderResponse> getAllOrders(String startDate, String endDate, int page, int size) {
+        Page<OrderEntity> ordersPage = repository.findAllBetweenDates(parse(startDate), parse(endDate),
+                PageRequest.of(page, size));
         List<OrderResponse> orders = ordersPage.getContent().stream().map(ModelConverter::toResponse).collect(toList());
         return new PageResponse<>(ordersPage.getTotalElements(), ordersPage.getTotalPages(), ordersPage.getNumber(), orders);
     }
 
     @Override
-    public PageResponse<OrderResponse> getAllOrdersForUser(String username, LocalDateTime startDate, LocalDateTime endDate,
+    public PageResponse<OrderResponse> getAllOrdersForUser(String username, String startDate, String endDate,
                                                            int page, int size) {
-        Page<OrderEntity> ordersPage = repository.findAllByUsernameBetweenDates(username, startDate, endDate,
+        checkOwner(username);
+        Page<OrderEntity> ordersPage = repository.findAllByUsernameBetweenDates(username, parse(startDate), parse(endDate),
                 PageRequest.of(page, size));
         List<OrderResponse> orders = ordersPage.getContent().stream().map(ModelConverter::toResponse).collect(toList());
         return new PageResponse<>(ordersPage.getTotalElements(), ordersPage.getTotalPages(), ordersPage.getNumber(), orders);
@@ -93,6 +99,7 @@ public class OrderService implements IOrderService {
     @Transactional
     @Override
     public OrderResponse returnOrder(OrderDto orderDto) {
+        checkOwner(orderDto.getUsername());
         OrderEntity order = findOrder(orderDto);
         cartService.increaseStocks(order.getPurchasedProducts());
         order.setStatus(RETURNED);

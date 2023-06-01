@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.transaction.Transactional;
 import java.util.List;
 
+import static com.techstore.utils.auth.AuthUtils.checkOwner;
 import static com.techstore.utils.converter.ModelConverter.toEntity;
 import static com.techstore.utils.converter.ModelConverter.toResponse;
 import static java.lang.String.format;
@@ -47,6 +48,12 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public UserResponse getUser(String username) {
+        checkOwner(username);
+        return toResponse(findUserByUsername(username));
+    }
+
+    @Override
     public PageResponse<UserResponse> getAllUsers(Integer page, Integer size) {
         Page<UserEntity> usersPage = repository.findAll(PageRequest.of(page, size));
         List<UserResponse> users = usersPage.stream().map(ModelConverter::toResponse).collect(toList());
@@ -57,7 +64,7 @@ public class UserService implements IUserService {
     public UserResponse updateUser(UpdateUserDto user) {
         UserEntity existingEntity = findUserByUsername(user.getUsername());
         UserEntity entity =  new UserEntity(existingEntity.getId(), user.getFirstName(), user.getLastName(), user.getEmail(),
-                user.getPhone(), existingEntity.getUsername(), existingEntity.getPassword(), existingEntity.getRole(),
+                user.getPhone(), user.getAddress(), existingEntity.getUsername(), existingEntity.getPassword(), existingEntity.getRole(),
                 existingEntity.getFavorite(), existingEntity.getOrders());
 
         String newPassword = user.getNewPassword();

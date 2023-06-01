@@ -19,7 +19,7 @@ import java.util.List;
 
 import static com.techstore.constants.JWTConstants.BEARER;
 import static com.techstore.constants.JWTConstants.ROLES_CLAIM;
-import static com.techstore.utils.JWTUtils.convertStringsToAuthorities;
+import static com.techstore.utils.auth.AuthUtils.convertStringsToAuthorities;
 import static com.techstore.utils.JWTUtils.generateAccessToken;
 import static com.techstore.utils.JWTUtils.generateAlgorithmWithSecret;
 import static com.techstore.utils.JWTUtils.verifyToken;

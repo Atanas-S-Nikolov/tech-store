@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.techstore.model.dto.AuthenticationDto;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,8 +13,8 @@ public class JsonConverter {
         buildObjectMapper().writeValue(outputStream, object);
     }
 
-    public static AuthenticationDto toJson(String jsonString) throws JsonProcessingException {
-        return buildObjectMapper().readValue(jsonString, AuthenticationDto.class);
+    public static <T> T toJson(String jsonString, Class<T> objectClass) throws JsonProcessingException {
+        return buildObjectMapper().readValue(jsonString, objectClass);
     }
 
     private static ObjectMapper buildObjectMapper() {

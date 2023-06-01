@@ -9,6 +9,8 @@ import com.techstore.model.response.UserResponse;
 public interface IUserService {
     UserResponse createUser(UserDto user);
 
+    UserResponse getUser(String username);
+
     PageResponse<UserResponse> getAllUsers(Integer page, Integer size);
 
     UserResponse updateUser(UpdateUserDto user) throws InvalidCredentialsException;

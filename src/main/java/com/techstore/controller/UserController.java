@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import static com.techstore.constants.ApiConstants.GET_URL;
 import static com.techstore.constants.ApiConstants.PAGE_PARAM;
 import static com.techstore.constants.ApiConstants.SIZE_PARAM;
 import static com.techstore.constants.ApiConstants.USERS_URL;
@@ -43,6 +44,11 @@ public class UserController {
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> createUser(@RequestBody @Valid UserDto userDto) {
         return ResponseEntity.status(CREATED).body(service.createUser(userDto));
+    }
+
+    @PostMapping(path = GET_URL,consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserResponse> getUser(@RequestBody @Valid UsernameDto usernameDto) {
+        return ResponseEntity.status(OK).body(service.getUser(usernameDto.getUsername()));
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)

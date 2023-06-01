@@ -24,8 +24,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@ToString(exclude = {"favorite"})
-@EqualsAndHashCode(exclude = {"favorite"})
+@ToString(exclude = {"favorite", "orders"})
+@EqualsAndHashCode(exclude = {"favorite", "orders"})
 @Entity
 @Table(name = "users")
 public class UserEntity {
@@ -46,6 +46,9 @@ public class UserEntity {
 
     @Column(name = "phone")
     private String phone;
+
+    @Column(name = "address")
+    private String address;
 
     @Column(name = "username", unique = true)
     private String username;

@@ -4,6 +4,7 @@ import com.techstore.exception.cart.CartNotFoundException;
 import com.techstore.exception.product.CannotBuyProductException;
 import com.techstore.exception.product.ProductNotFoundException;
 import com.techstore.model.dto.CartDto;
+import com.techstore.model.dto.QuickOrderDto;
 import com.techstore.model.entity.PurchasedProductEntity;
 import com.techstore.model.response.CartResponse;
 import com.techstore.model.dto.UpdateCartDto;
@@ -88,6 +89,7 @@ public class CartService implements ICartService {
             cartEntity.setTotalPrice(calculateTotalPrice(persistedToBuyEntities));
             toBuyEntity.setProduct(null);
             productEntity.setProductToBuy(null);
+            productToBuyRepository.delete(toBuyEntity);
         }
 
         return toResponse(repository.save(cartEntity));
@@ -95,18 +97,15 @@ public class CartService implements ICartService {
 
     @Transactional
     @Override
-    public CartResponse doPurchase(String key) {
+    public CartResponse doPurchase(String key, QuickOrderDto quickOrderDto) {
         CartEntity cartEntity = findCartEntity(key);
         Set<ProductToBuyEntity> products = cartEntity.getProductsToBuy();
         decreaseStocks(products);
-        return clearCartDetails(cartEntity, products);
-    }
-
-    @Transactional
-    @Override
-    public CartResponse clearCart(String key) {
-        CartEntity cartEntity = findCartEntity(key);
-        return clearCartDetails(cartEntity, cartEntity.getProductsToBuy());
+        // TODO: email confirmation should be done with https://github.com/Atanas-S-Nikolov/tech-store/issues/3
+        deleteCart(key);
+        cartEntity.setTotalPrice(BigDecimal.ZERO);
+        cartEntity.setProductsToBuy(new HashSet<>());
+        return toResponse(cartEntity);
     }
 
     @Transactional
@@ -177,13 +176,5 @@ public class CartService implements ICartService {
             totalPrice = totalPrice.add(price.multiply(quantity));
         }
         return totalPrice;
-    }
-
-    private CartResponse clearCartDetails(CartEntity cartEntity, Set<ProductToBuyEntity> productsToDelete) {
-        cartEntity.setTotalPrice(BigDecimal.ZERO);
-        cartEntity.setProductsToBuy(new HashSet<>());
-        CartEntity persistedEntity = repository.save(cartEntity);
-        deleteProductsToBuy(productsToDelete);
-        return toResponse(persistedEntity);
     }
 }

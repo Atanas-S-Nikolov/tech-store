@@ -30,7 +30,6 @@ public interface ApiConstants {
     String REFRESH_TOKEN_URL = "/refresh-token";
     String FULL_REFRESH_TOKEN_URL = ACCESS_CONTROL_URL + REFRESH_TOKEN_URL;
     String CARTS_URL = BASE_API_URL + "/cart";
-    String CLEAR_CART_URL = "/clear";
     String ALL_CART_URLS_MATCHER = CARTS_URL + ALL_MATCHER;
     String FAVORITES_URL = BASE_API_URL + "/favorites";
     String ALL_FAVORITES_URLS_MATCHER = FAVORITES_URL + ALL_MATCHER;
@@ -45,4 +44,6 @@ public interface ApiConstants {
     String FINALIZE_URL = "/finalize";
     String GET_URL = "/get";
     String ALL_URL = "/all";
+    String VALIDATE_URL = "/validate";
+    String USER_GET_URL = USERS_URL + GET_URL;
 }

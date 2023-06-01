@@ -6,9 +6,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.*;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.techstore.exception.authentication.InvalidJWTException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
 import java.util.Date;
@@ -16,7 +13,6 @@ import java.util.Date;
 import static com.techstore.constants.JWTConstants.ROLES_CLAIM;
 
 import static java.lang.System.currentTimeMillis;
-import static java.util.stream.Collectors.toList;
 
 public class JWTUtils {
     private static final long ONE_MINUTE = 1000L * 60L;
@@ -53,13 +49,5 @@ public class JWTUtils {
 
     public static Algorithm generateAlgorithmWithSecret(String secret) {
         return Algorithm.HMAC256(secret.getBytes());
-    }
-
-    public static List<String> convertAuthoritiesToStrings(Authentication authentication) {
-        return authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(toList());
-    }
-
-    public static List<GrantedAuthority> convertStringsToAuthorities(List<String> authoritiesStrings) {
-        return authoritiesStrings.stream().map(SimpleGrantedAuthority::new).collect(toList());
     }
 }

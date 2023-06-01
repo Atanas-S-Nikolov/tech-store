@@ -1,5 +1,6 @@
 package com.techstore.exception.handler;
 
+import com.techstore.exception.authentication.CustomAuthenticationException;
 import com.techstore.exception.authentication.InvalidJWTException;
 import com.techstore.exception.cart.CartNotFoundException;
 import com.techstore.exception.authentication.InvalidCredentialsException;
@@ -23,6 +24,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -63,8 +65,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(UNAUTHORIZED, exception);
     }
 
-    @ExceptionHandler(value = {InvalidJWTException.class})
-    public ResponseEntity<Object> handleForbidden(InvalidJWTException exception) {
+    @ExceptionHandler(value = {InvalidJWTException.class, AccessDeniedException.class, CustomAuthenticationException.class})
+    public ResponseEntity<Object> handleForbidden(RuntimeException exception) {
         logError(exception);
         return buildErrorResponse(FORBIDDEN, exception);
     }

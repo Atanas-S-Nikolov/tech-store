@@ -1,6 +1,7 @@
 package com.techstore.model.dto;
 
 import com.techstore.validation.user.ValidEmail;
+import com.techstore.validation.user.ValidPhone;
 import com.techstore.validation.user.ValidRole;
 
 import lombok.AllArgsConstructor;
@@ -29,8 +30,13 @@ public class UpdateUserDto {
     @Getter
     private final String email;
 
+    @ValidPhone
     @Getter
     private final String phone;
+
+    @NotBlank(message = "Address must not be blank")
+    @Getter
+    private final String address;
 
     @NotBlank(message = "Username must not be blank")
     @Getter

@@ -14,6 +14,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -79,17 +80,19 @@ public class ProductEntity {
     @ManyToMany(mappedBy = "products")
     private Set<FavoritesEntity> favorites;
 
-    @OneToOne(mappedBy = "product")
-    private PurchasedProductEntity purchasedProduct;
+    @OneToMany(mappedBy = "product")
+    private Set<PurchasedProductEntity> purchasedProducts;
 
     public ProductEntity() {
         this(null ,null, new BigDecimal("0.0"), 0, null, null, null, null,
-                null,false, null, null, new HashSet<>(), null, new HashSet<>(), null);
+                null,false, null, null, new HashSet<>(), null,
+                new HashSet<>(), new HashSet<>());
     }
 
     public ProductEntity(String id, String name, BigDecimal price, int stocks, ProductCategory category, ProductType type,
-                         String brand, String model, String description, boolean earlyAccess, LocalDateTime dateOfCreation, LocalDateTime dateOfModification,
-                         Set<String> imageUrls, ProductToBuyEntity productToBuy, Set<FavoritesEntity> favorites, PurchasedProductEntity purchasedProduct) {
+                         String brand, String model, String description, boolean earlyAccess, LocalDateTime dateOfCreation,
+                         LocalDateTime dateOfModification, Set<String> imageUrls, ProductToBuyEntity productToBuy, Set<FavoritesEntity> favorites,
+                         Set<PurchasedProductEntity> purchasedProducts) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -105,6 +108,6 @@ public class ProductEntity {
         this.imageUrls = nonNull(imageUrls) ? imageUrls : new HashSet<>();
         this.productToBuy = productToBuy;
         this.favorites = favorites;
-        this.purchasedProduct = purchasedProduct;
+        this.purchasedProducts = purchasedProducts;
     }
 }

@@ -20,10 +20,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.techstore.utils.JWTUtils.convertAuthoritiesToStrings;
 import static com.techstore.utils.JWTUtils.generateAlgorithmWithSecret;
 import static com.techstore.utils.JWTUtils.generateAccessToken;
 import static com.techstore.utils.JWTUtils.generateRefreshToken;
+import static com.techstore.utils.auth.AuthUtils.convertAuthoritiesToStrings;
 import static com.techstore.utils.converter.JsonConverter.toJson;
 
 import static java.lang.System.lineSeparator;
@@ -43,7 +43,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
         try {
             String jsonString = request.getReader().lines().collect(Collectors.joining(lineSeparator()));
-            authenticationDto = toJson(jsonString);
+            authenticationDto = toJson(jsonString, AuthenticationDto.class);
         } catch (IOException e) {
             e.printStackTrace();
         }

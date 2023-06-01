@@ -2,6 +2,7 @@ package com.techstore.service.cart;
 
 import com.techstore.exception.cart.CartNotFoundException;
 import com.techstore.model.dto.CartDto;
+import com.techstore.model.dto.QuickOrderDto;
 import com.techstore.model.entity.CartEntity;
 import com.techstore.model.entity.ProductToBuyEntity;
 import com.techstore.model.entity.PurchasedProductEntity;
@@ -19,9 +20,7 @@ public interface ICartService {
 
     CartResponse removeProductFromCart(UpdateCartDto updateCartDto) throws CartNotFoundException;
 
-    CartResponse doPurchase(String key) throws CartNotFoundException;
-
-    CartResponse clearCart(String key) throws CartNotFoundException;
+    CartResponse doPurchase(String key, QuickOrderDto quickOrderDto) throws CartNotFoundException;
 
     void deleteCart(String key) throws CartNotFoundException;
 
