@@ -8,6 +8,7 @@ import lombok.ToString;
 @ToString(doNotUseGetters = true)
 public enum OrderStatus {
     CREATED("Created"),
+    CANCELED("Canceled"),
     DELIVERED("Delivered"),
     RECEIVED("Received"),
     RETURNED("Returned");

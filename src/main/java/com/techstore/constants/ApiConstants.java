@@ -41,6 +41,7 @@ public interface ApiConstants {
     String ALL_ORDERS_URLS_MATCHER = ORDERS_URL + ALL_MATCHER;
     String DELIVER_URL = "/deliver";
     String RETURN_URL = "/return";
+    String CANCEL_URL = "/cancel";
     String FINALIZE_URL = "/finalize";
     String GET_URL = "/get";
     String ALL_URL = "/all";
