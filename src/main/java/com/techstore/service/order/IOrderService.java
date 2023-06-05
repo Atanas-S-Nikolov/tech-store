@@ -15,6 +15,8 @@ public interface IOrderService {
 
     OrderResponse deliverOrder(OrderDto orderDto);
 
+    OrderResponse cancelOrder(OrderDto orderDto);
+
     OrderResponse returnOrder(OrderDto orderDto);
 
     OrderResponse finalizeOrder(OrderDto orderDto);

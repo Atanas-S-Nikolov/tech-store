@@ -61,7 +61,8 @@ public class ModelConverter {
 
     public static OrderResponse toResponse(OrderEntity entity) {
         Set<PurchasedProductResponse> purchasedProducts = convertPurchasedEntitiesToResponses(entity.getPurchasedProducts());
-        return new OrderResponse(entity.getCartKey(), purchasedProducts, entity.getTotalPrice(), entity.getDate(), entity.getStatus().getValue());
+        return new OrderResponse(entity.getCartKey(), purchasedProducts, entity.getTotalPrice(), entity.getDate(),
+                entity.getStatus().getValue(), entity.getUser().getUsername());
     }
 
     public static ProductResponse toProductResponse(ProductToBuyEntity toBuyEntity) {

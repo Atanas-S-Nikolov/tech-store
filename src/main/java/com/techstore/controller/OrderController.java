@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 import static com.techstore.constants.ApiConstants.ALL_URL;
+import static com.techstore.constants.ApiConstants.CANCEL_URL;
 import static com.techstore.constants.ApiConstants.DELIVER_URL;
 import static com.techstore.constants.ApiConstants.FINALIZE_URL;
 import static com.techstore.constants.ApiConstants.GET_URL;
@@ -62,7 +63,7 @@ public class OrderController {
     }
 
     @PreAuthorize(HAS_ROLE_ADMIN)
-    @GetMapping(path = ALL_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @GetMapping(path = ALL_URL, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<PageResponse<OrderResponse>> getAllOrders(
             @RequestParam(value = ORDER_START_DATE_PARAM, required = false, defaultValue = LOCAL_DATE_TIME_EPOCH)
                     String startDate,
@@ -74,7 +75,7 @@ public class OrderController {
         return ResponseEntity.status(OK).body(service.getAllOrders(startDate, endDate, page, size));
     }
 
-    @PostMapping(path = ALL_URL,consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(path = ALL_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<PageResponse<OrderResponse>> getAllOrdersForUser(
             @RequestBody @Valid UsernameDto usernameDto,
             @RequestParam(value = ORDER_START_DATE_PARAM, required = false, defaultValue = LOCAL_DATE_TIME_EPOCH)
@@ -93,6 +94,11 @@ public class OrderController {
     @PutMapping(path = DELIVER_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<OrderResponse> deliverOrder(@RequestBody @Valid OrderDto orderDto) {
         return ResponseEntity.status(OK).body(service.deliverOrder(orderDto));
+    }
+
+    @PutMapping(path = CANCEL_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<OrderResponse> cancelOrder(@RequestBody @Valid OrderDto orderDto) {
+        return ResponseEntity.status(OK).body(service.cancelOrder(orderDto));
     }
 
     @PutMapping(path = RETURN_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

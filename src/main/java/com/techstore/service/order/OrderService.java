@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import static com.techstore.model.enums.OrderStatus.CANCELED;
 import static com.techstore.model.enums.OrderStatus.CREATED;
 import static com.techstore.model.enums.OrderStatus.DELIVERED;
 import static com.techstore.model.enums.OrderStatus.RECEIVED;
@@ -93,6 +94,15 @@ public class OrderService implements IOrderService {
     public OrderResponse deliverOrder(OrderDto orderDto) {
         OrderEntity order = findOrder(orderDto);
         order.setStatus(DELIVERED);
+        return toResponse(repository.save(order));
+    }
+
+    @Transactional
+    @Override
+    public OrderResponse cancelOrder(OrderDto orderDto) {
+        checkOwner(orderDto.getUsername());
+        OrderEntity order = findOrder(orderDto);
+        order.setStatus(CANCELED);
         return toResponse(repository.save(order));
     }
 

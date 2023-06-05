@@ -29,4 +29,7 @@ public class OrderResponse {
 
     @Getter
     private final String status;
+
+    @Getter
+    private final String username;
 }
