@@ -101,7 +101,10 @@ public class CartService implements ICartService {
         CartEntity cartEntity = findCartEntity(key);
         Set<ProductToBuyEntity> products = cartEntity.getProductsToBuy();
         decreaseStocks(products);
-        // TODO: email confirmation should be done with https://github.com/Atanas-S-Nikolov/tech-store/issues/3
+        /*
+        TODO: email confirmation should be done with https://github.com/Atanas-S-Nikolov/tech-store/issues/3
+        TODO: remove deleteCart(key) from here and delete the cart after confirmation is successful
+        */
         deleteCart(key);
         cartEntity.setTotalPrice(BigDecimal.ZERO);
         cartEntity.setProductsToBuy(new HashSet<>());

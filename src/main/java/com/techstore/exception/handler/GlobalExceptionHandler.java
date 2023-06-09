@@ -5,6 +5,7 @@ import com.techstore.exception.authentication.InvalidJWTException;
 import com.techstore.exception.cart.CartNotFoundException;
 import com.techstore.exception.authentication.InvalidCredentialsException;
 import com.techstore.exception.favorites.FavoritesNotFoundException;
+import com.techstore.exception.mail.MailServiceException;
 import com.techstore.exception.order.OrderNotFoundException;
 import com.techstore.exception.order.OrderServiceException;
 import com.techstore.exception.product.CannotBuyProductException;
@@ -103,7 +104,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(INTERNAL_SERVER_ERROR, exception);
     }
 
-    @ExceptionHandler(value = {ProductImageUploaderServiceException.class, OrderServiceException.class, Exception.class})
+    @ExceptionHandler(value = {ProductImageUploaderServiceException.class, OrderServiceException.class, MailServiceException.class,
+            Exception.class})
     public ResponseEntity<Object> handleServiceAndUnknownExceptions(Exception exception) {
         logError(exception);
         return buildErrorResponse(INTERNAL_SERVER_ERROR, "Internal server error");

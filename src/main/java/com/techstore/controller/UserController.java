@@ -1,8 +1,10 @@
 package com.techstore.controller;
 
+import com.techstore.model.dto.EmailDto;
 import com.techstore.model.dto.UpdateUserDto;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.dto.UsernameDto;
+import com.techstore.model.response.GenericResponse;
 import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.UserResponse;
 import com.techstore.service.user.IUserService;
@@ -21,10 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import static com.techstore.constants.ApiConstants.GET_URL;
-import static com.techstore.constants.ApiConstants.PAGE_PARAM;
-import static com.techstore.constants.ApiConstants.SIZE_PARAM;
-import static com.techstore.constants.ApiConstants.USERS_URL;
+import static com.techstore.constants.ApiConstants.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -61,6 +60,11 @@ public class UserController {
     @PutMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> updateUser(@RequestBody @Valid UpdateUserDto userDto) {
         return ResponseEntity.status(OK).body(service.updateUser(userDto));
+    }
+
+    @PutMapping(path = FORGOT_PASSWORD_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<GenericResponse> forgotPassword(@RequestBody EmailDto emailDto) {
+        return ResponseEntity.status(OK).body(service.forgotPassword(emailDto));
     }
 
     @DeleteMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

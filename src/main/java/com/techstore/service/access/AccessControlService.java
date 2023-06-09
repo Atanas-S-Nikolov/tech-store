@@ -4,8 +4,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import com.techstore.exception.authentication.InvalidJWTException;
+import com.techstore.exception.user.TokenException;
+import com.techstore.exception.user.UserNotFoundException;
+import com.techstore.model.entity.RegisterConfirmationTokenEntity;
 import com.techstore.model.entity.UserEntity;
+import com.techstore.model.response.GenericResponse;
 import com.techstore.model.response.JWTResponse;
+import com.techstore.repository.IRegisterConfirmationTokenRepository;
 import com.techstore.repository.IUserRepository;
 import com.techstore.service.jwt.IJWTService;
 
@@ -15,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.util.List;
 
 import static com.techstore.constants.JWTConstants.BEARER;
@@ -31,12 +37,14 @@ import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 public class AccessControlService implements UserDetailsService, IJWTService {
-    private final IUserRepository repository;
     private final String jwtSecret;
+    private final IUserRepository userRepository;
+    private final IRegisterConfirmationTokenRepository registerConfirmationTokenRepository;
 
-    public AccessControlService(IUserRepository repository, String jwtSecret) {
-        this.repository = repository;
+    public AccessControlService(String jwtSecret, IUserRepository userRepository, IRegisterConfirmationTokenRepository registerConfirmationTokenRepository) {
         this.jwtSecret = jwtSecret;
+        this.userRepository = userRepository;
+        this.registerConfirmationTokenRepository = registerConfirmationTokenRepository;
     }
 
     @Override
@@ -65,8 +73,37 @@ public class AccessControlService implements UserDetailsService, IJWTService {
         return jwtResponse;
     }
 
+    @Transactional
+    public GenericResponse confirmRegistration(String token) {
+        RegisterConfirmationTokenEntity tokenEntity = findRegisterConfirmationTokenEntity(token);
+        UserEntity userEntity = findUserEntityByRegistrationConfirmationToken(tokenEntity);
+        checkTokenExpiration(tokenEntity);
+        userEntity.setEnabled(true);
+        userRepository.save(userEntity);
+        registerConfirmationTokenRepository.delete(tokenEntity);
+        return new GenericResponse("Registration is confirmed successfully");
+    }
+
     private UserEntity findUserByUsername(String username) {
-        return repository.findUserByUsername(username)
+        return userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(format("User with username '%s' is not found", username)));
+    }
+
+    private UserEntity findUserEntityByRegistrationConfirmationToken(RegisterConfirmationTokenEntity tokenEntity) {
+        return userRepository.findUserByRegisterConfirmationToken(tokenEntity)
+                .orElseThrow(() -> new UserNotFoundException(format("User with register confirmation token '%s' is not found", tokenEntity.getToken())));
+    }
+
+    private RegisterConfirmationTokenEntity findRegisterConfirmationTokenEntity(String token) {
+        return registerConfirmationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new TokenException(format("Token: %s is not found", token)));
+    }
+
+    private void checkTokenExpiration(RegisterConfirmationTokenEntity tokenEntity) {
+        long currentTimeMs = System.currentTimeMillis();
+        long tokenEntityExpirationMs = tokenEntity.getExpirationMs();
+        if (currentTimeMs > tokenEntityExpirationMs) {
+            throw new TokenException(format("Token: %s is expired",tokenEntity.getToken()));
+        }
     }
 }

@@ -78,7 +78,8 @@ public class ModelConverter {
 
     public static UserEntity toEntity(UserDto user) {
         return new UserEntity(null, user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhone(), user.getAddress(),
-                user.getUsername(), user.getPassword(), UserRole.getKeyByValue(user.getRole()), null, new HashSet<>());
+                user.getUsername(), user.getPassword(), UserRole.getKeyByValue(user.getRole()), false, null, null,
+                null, new HashSet<>());
     }
 
     public static Set<ProductToBuyResponse> convertEntitiesToResponses(Set<ProductToBuyEntity> entities) {

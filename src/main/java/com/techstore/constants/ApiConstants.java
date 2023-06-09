@@ -3,6 +3,7 @@ package com.techstore.constants;
 public interface ApiConstants {
     String PAGE_PARAM = "page";
     String SIZE_PARAM = "size";
+    String TOKEN_PARAM = "token";
     String PRODUCTS_EARLY_ACCESS_PARAM = "earlyAccess";
     String PRODUCTS_CATEGORY_PARAM = "category";
     String PRODUCTS_TYPE_PARAM = "type";
@@ -27,7 +28,12 @@ public interface ApiConstants {
     String LOGIN_URL = ACCESS_CONTROL_URL + "/login";
     String REGISTER_URL = "/register";
     String FULL_REGISTER_URL = ACCESS_CONTROL_URL + REGISTER_URL;
-    String REFRESH_TOKEN_URL = "/refresh-token";
+    String CONFIRM_URL = "/confirm";
+    String CONFIRM_REGISTER_URL = REGISTER_URL + CONFIRM_URL;
+    String FULL_CONFIRM_REGISTER_URL = ACCESS_CONTROL_URL + CONFIRM_REGISTER_URL;
+    String FORGOT_PASSWORD_URL = "/forgotPassword";
+    String FULL_FORGOT_PASSWORD_URL = USERS_URL + FORGOT_PASSWORD_URL;
+    String REFRESH_TOKEN_URL = "/refreshToken";
     String FULL_REFRESH_TOKEN_URL = ACCESS_CONTROL_URL + REFRESH_TOKEN_URL;
     String CARTS_URL = BASE_API_URL + "/cart";
     String ALL_CART_URLS_MATCHER = CARTS_URL + ALL_MATCHER;
