@@ -1,7 +1,6 @@
 package com.techstore.service.mail;
 
 import com.techstore.exception.mail.MailServiceException;
-import com.techstore.model.dto.EmailDto;
 import com.techstore.model.dto.OrderDto;
 import com.techstore.model.dto.QuickOrderDto;
 import freemarker.core.ParseException;
@@ -19,13 +18,10 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-import static com.techstore.constants.ApiConstants.FULL_CONFIRM_REGISTER_URL;
-import static com.techstore.constants.DateTimeConstants.LOCAL_DATE_TIME_PRECISION_FORMAT;
+import static com.techstore.constants.ApiConstants.*;
+import static com.techstore.utils.DateTimeUtils.millisToDateString;
 import static org.springframework.ui.freemarker.FreeMarkerTemplateUtils.processTemplateIntoString;
 
 public class MailSenderService implements IMailSenderService {
@@ -41,9 +37,7 @@ public class MailSenderService implements IMailSenderService {
 
     @Override
     public void sendRegistrationMailConfirmation(String email, String token, long limitTimeMs) {
-        String limitTime = Instant.ofEpochMilli(limitTimeMs)
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime().format(DateTimeFormatter.ofPattern(LOCAL_DATE_TIME_PRECISION_FORMAT));
+        String limitTime = millisToDateString(limitTimeMs);
         String confirmationLink = getApplicationUrl() + FULL_CONFIRM_REGISTER_URL + "?token=" + token;
         Map<String, Object> model = Map.of(
                 "time", limitTime,
@@ -53,8 +47,15 @@ public class MailSenderService implements IMailSenderService {
     }
 
     @Override
-    public void sendForgottenPasswordMail(EmailDto emailDto) {
-
+    public void sendForgottenPasswordMail(String email, String token, long limitTimeMs) {
+        String limitTime = millisToDateString(limitTimeMs);
+        String link = "http://localhost:3000/" + "auth" + RESET_PASSWORD_URL;
+        Map<String, Object> model = Map.of(
+                "token", token,
+                "time", limitTime,
+                "link", link
+        );
+        composeAndSendMail(email, "Reset password", "forgot-password-email.ftl", model);
     }
 
     @Override

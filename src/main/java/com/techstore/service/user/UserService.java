@@ -4,11 +4,13 @@ import com.techstore.exception.user.UserNotFoundException;
 import com.techstore.model.dto.EmailDto;
 import com.techstore.model.dto.UpdateUserDto;
 import com.techstore.model.dto.UserDto;
+import com.techstore.model.entity.PasswordResetTokenEntity;
 import com.techstore.model.entity.RegisterConfirmationTokenEntity;
 import com.techstore.model.entity.UserEntity;
 import com.techstore.model.response.GenericResponse;
 import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.UserResponse;
+import com.techstore.repository.IPasswordResetTokenRepository;
 import com.techstore.repository.IRegisterConfirmationTokenRepository;
 import com.techstore.repository.IUserRepository;
 import com.techstore.service.favorites.IFavoritesService;
@@ -39,16 +41,18 @@ public class UserService implements IUserService {
     private final IFavoritesService favoritesService;
     private final IOrderService orderService;
     private final IRegisterConfirmationTokenRepository registerConfirmationTokenRepository;
+    private final IPasswordResetTokenRepository passwordResetTokenRepository;
     private final IMailSenderService mailSenderService;
 
     public UserService(IUserRepository repository, PasswordEncoder passwordEncoder, IFavoritesService favoritesService,
                        IOrderService orderService, IRegisterConfirmationTokenRepository registerConfirmationTokenRepository,
-                       IMailSenderService mailSenderService) {
+                       IPasswordResetTokenRepository passwordResetTokenRepository, IMailSenderService mailSenderService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.favoritesService = favoritesService;
         this.orderService = orderService;
         this.registerConfirmationTokenRepository = registerConfirmationTokenRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.mailSenderService = mailSenderService;
     }
 
@@ -68,7 +72,8 @@ public class UserService implements IUserService {
         long randomLong = currentTimeMs + userEntity.getUsername().hashCode() + userEmail.hashCode();
         long tokenExpirationMs = currentTimeMs + FIVE_MINUTES;
         String tokenValue = hashSha256(Long.toString(randomLong));
-        RegisterConfirmationTokenEntity registerConfirmationToken = new RegisterConfirmationTokenEntity(null, tokenValue, tokenExpirationMs, userEntity);
+        RegisterConfirmationTokenEntity registerConfirmationToken =
+                new RegisterConfirmationTokenEntity(null, tokenValue, tokenExpirationMs, userEntity);
         UserEntity savedUser = repository.save(userEntity);
         favoritesService.createDefaultFavorites(savedUser);
         registerConfirmationToken.setUser(userEntity);
@@ -107,8 +112,23 @@ public class UserService implements IUserService {
     }
 
     @Transactional
+    @Override
     public GenericResponse forgotPassword(EmailDto emailDto) {
-        return null;
+        String userEmail = emailDto.getEmail();
+        UserEntity userEntity = repository.findUserByEmail(userEmail);
+
+        if (userEntity != null) {
+            long currentTimeMs = currentTimeMillis();
+            long randomLong = currentTimeMs + userEntity.getPassword().hashCode() + userEmail.hashCode();
+            long tokenExpirationMs = currentTimeMs + FIVE_MINUTES;
+            String tokenValue = hashSha256(Long.toString(randomLong));
+            PasswordResetTokenEntity passwordResetTokenEntity =
+                    new PasswordResetTokenEntity(null, tokenValue, tokenExpirationMs, userEntity);
+            passwordResetTokenRepository.save(passwordResetTokenEntity);
+            mailSenderService.sendForgottenPasswordMail(userEmail, tokenValue, tokenExpirationMs);
+        }
+
+        return new GenericResponse("Email sent");
     }
 
     @Transactional

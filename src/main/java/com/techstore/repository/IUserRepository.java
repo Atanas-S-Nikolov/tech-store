@@ -1,5 +1,6 @@
 package com.techstore.repository;
 
+import com.techstore.model.entity.PasswordResetTokenEntity;
 import com.techstore.model.entity.RegisterConfirmationTokenEntity;
 import com.techstore.model.entity.UserEntity;
 import org.springframework.data.jpa.repository.Query;
@@ -13,6 +14,11 @@ import java.util.Optional;
 public interface IUserRepository extends PagingAndSortingRepository<UserEntity, String> {
     Optional<UserEntity> findUserByUsername(String username);
 
-    @Query("SELECT u FROM UserEntity u WHERE u.registerConfirmationToken = :tokenEntity")
-    Optional<UserEntity> findUserByRegisterConfirmationToken(@Param(value = "tokenEntity") RegisterConfirmationTokenEntity tokenEntity);
+    UserEntity findUserByEmail(String email);
+
+    @Query("SELECT u FROM UserEntity u WHERE u.registerConfirmationToken = :token")
+    Optional<UserEntity> findUserByRegisterConfirmationToken(@Param(value = "token") RegisterConfirmationTokenEntity token);
+
+    @Query("SELECT u FROM UserEntity u WHERE u.passwordResetToken = :token")
+    Optional<UserEntity> findUserByPasswordResetToken(@Param(value = "token") PasswordResetTokenEntity token);
 }

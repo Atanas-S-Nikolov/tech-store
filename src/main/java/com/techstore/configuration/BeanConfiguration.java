@@ -7,7 +7,15 @@ import com.fasterxml.jackson.databind.type.LogicalType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
-import com.techstore.repository.*;
+import com.techstore.repository.ICartRepository;
+import com.techstore.repository.IFavoritesRepository;
+import com.techstore.repository.IOrderRepository;
+import com.techstore.repository.IPasswordResetTokenRepository;
+import com.techstore.repository.IProductRepository;
+import com.techstore.repository.IProductToBuyRepository;
+import com.techstore.repository.IPurchasedProductRepository;
+import com.techstore.repository.IRegisterConfirmationTokenRepository;
+import com.techstore.repository.IUserRepository;
 import com.techstore.service.cart.CartService;
 import com.techstore.service.cart.ICartService;
 import com.techstore.service.favorites.FavoritesService;
@@ -116,7 +124,7 @@ public class BeanConfiguration {
     @Bean("user-service")
     public IUserService userService() {
         return new UserService(userRepository, passwordEncoder(), favoritesService(), orderService(), registerConfirmationTokenRepository,
-                mailSenderService());
+                passwordResetTokenRepository, mailSenderService());
     }
 
     @Bean("order-service")

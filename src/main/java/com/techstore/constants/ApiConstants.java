@@ -34,6 +34,8 @@ public interface ApiConstants {
     String FORGOT_PASSWORD_URL = "/forgotPassword";
     String FULL_FORGOT_PASSWORD_URL = USERS_URL + FORGOT_PASSWORD_URL;
     String REFRESH_TOKEN_URL = "/refreshToken";
+    String RESET_PASSWORD_URL = "/resetPassword";
+    String FULL_RESET_PASSWORD_URL = ACCESS_CONTROL_URL + RESET_PASSWORD_URL;
     String FULL_REFRESH_TOKEN_URL = ACCESS_CONTROL_URL + REFRESH_TOKEN_URL;
     String CARTS_URL = BASE_API_URL + "/cart";
     String ALL_CART_URLS_MATCHER = CARTS_URL + ALL_MATCHER;

@@ -1,5 +1,6 @@
 package com.techstore.controller;
 
+import com.techstore.model.dto.ResetPasswordDto;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.response.GenericResponse;
 import com.techstore.model.response.JWTResponse;
@@ -9,12 +10,22 @@ import com.techstore.service.user.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
-import static com.techstore.constants.ApiConstants.*;
+import static com.techstore.constants.ApiConstants.ACCESS_CONTROL_URL;
+import static com.techstore.constants.ApiConstants.CONFIRM_REGISTER_URL;
+import static com.techstore.constants.ApiConstants.REFRESH_TOKEN_URL;
+import static com.techstore.constants.ApiConstants.REGISTER_URL;
+import static com.techstore.constants.ApiConstants.RESET_PASSWORD_URL;
+import static com.techstore.constants.ApiConstants.TOKEN_PARAM;
 import static com.techstore.model.enums.UserRole.ROLE_CUSTOMER;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -47,5 +58,10 @@ public class AccessControlController {
     @GetMapping(path = CONFIRM_REGISTER_URL, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<GenericResponse> confirmRegistration(@RequestParam(value = TOKEN_PARAM) String token) {
         return ResponseEntity.status(OK).body(service.confirmRegistration(token));
+    }
+
+    @PutMapping(path = RESET_PASSWORD_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<GenericResponse> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto) {
+        return ResponseEntity.status(OK).body(service.resetPassword(resetPasswordDto));
     }
 }
