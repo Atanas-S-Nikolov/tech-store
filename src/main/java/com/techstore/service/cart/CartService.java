@@ -15,6 +15,7 @@ import com.techstore.model.entity.ProductToBuyEntity;
 import com.techstore.repository.ICartRepository;
 import com.techstore.repository.IProductRepository;
 import com.techstore.repository.IProductToBuyRepository;
+import com.techstore.service.mail.IMailSenderService;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
@@ -31,11 +32,14 @@ public class CartService implements ICartService {
     private final ICartRepository repository;
     private final IProductRepository productRepository;
     private final IProductToBuyRepository productToBuyRepository;
+    private final IMailSenderService mailSenderService;
 
-    public CartService(ICartRepository repository, IProductRepository productRepository, IProductToBuyRepository productToBuyRepository) {
+    public CartService(ICartRepository repository, IProductRepository productRepository, IProductToBuyRepository productToBuyRepository,
+                       IMailSenderService mailSenderService) {
         this.repository = repository;
         this.productRepository = productRepository;
         this.productToBuyRepository = productToBuyRepository;
+        this.mailSenderService = mailSenderService;
     }
 
     @Transactional
@@ -101,11 +105,9 @@ public class CartService implements ICartService {
         CartEntity cartEntity = findCartEntity(key);
         Set<ProductToBuyEntity> products = cartEntity.getProductsToBuy();
         decreaseStocks(products);
-        /*
-        TODO: email confirmation should be done with https://github.com/Atanas-S-Nikolov/tech-store/issues/3
-        TODO: remove deleteCart(key) from here and delete the cart after confirmation is successful
-        */
-        deleteCart(key);
+        deleteProductsToBuy(cartEntity.getProductsToBuy());
+        repository.delete(cartEntity);
+        mailSenderService.sendQuickOrderMail(cartEntity, quickOrderDto);
         cartEntity.setTotalPrice(BigDecimal.ZERO);
         cartEntity.setProductsToBuy(new HashSet<>());
         return toResponse(cartEntity);

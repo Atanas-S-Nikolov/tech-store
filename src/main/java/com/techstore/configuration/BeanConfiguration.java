@@ -113,7 +113,7 @@ public class BeanConfiguration {
 
     @Bean("cart-service")
     public ICartService cartService() {
-        return new CartService(cartRepository, productRepository, productToBuyRepository);
+        return new CartService(cartRepository, productRepository, productToBuyRepository, mailSenderService());
     }
 
     @Bean("favorites-service")
@@ -129,7 +129,7 @@ public class BeanConfiguration {
 
     @Bean("order-service")
     public IOrderService orderService() {
-        return new OrderService(orderRepository, userRepository, cartService(), purchasedProductRepository);
+        return new OrderService(orderRepository, userRepository, cartService(), purchasedProductRepository, mailSenderService());
     }
 
     @Bean("object-mapper")
