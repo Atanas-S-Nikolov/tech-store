@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
-import static com.techstore.constants.DateConstants.LOCAL_DATE_TIME_PRECISION_FORMAT;
+import static com.techstore.constants.DateTimeConstants.LOCAL_DATE_TIME_PRECISION_FORMAT;
 
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)

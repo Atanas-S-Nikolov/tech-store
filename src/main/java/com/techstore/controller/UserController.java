@@ -1,8 +1,10 @@
 package com.techstore.controller;
 
+import com.techstore.model.dto.EmailDto;
 import com.techstore.model.dto.UpdateUserDto;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.dto.UsernameDto;
+import com.techstore.model.response.GenericResponse;
 import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.UserResponse;
 import com.techstore.service.user.IUserService;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import static com.techstore.constants.ApiConstants.FORGOT_PASSWORD_URL;
 import static com.techstore.constants.ApiConstants.GET_URL;
 import static com.techstore.constants.ApiConstants.PAGE_PARAM;
 import static com.techstore.constants.ApiConstants.SIZE_PARAM;
@@ -49,6 +52,11 @@ public class UserController {
     @PostMapping(path = GET_URL,consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> getUser(@RequestBody @Valid UsernameDto usernameDto) {
         return ResponseEntity.status(OK).body(service.getUser(usernameDto.getUsername()));
+    }
+
+    @PostMapping(path = FORGOT_PASSWORD_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<GenericResponse> forgotPassword(@RequestBody EmailDto emailDto) {
+        return ResponseEntity.status(OK).body(service.forgotPassword(emailDto));
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)

@@ -6,12 +6,11 @@ import com.techstore.exception.cart.CartNotFoundException;
 import com.techstore.exception.authentication.InvalidCredentialsException;
 import com.techstore.exception.favorites.FavoritesNotFoundException;
 import com.techstore.exception.order.OrderNotFoundException;
-import com.techstore.exception.order.OrderServiceException;
 import com.techstore.exception.product.CannotBuyProductException;
 import com.techstore.exception.product.DeleteProductImageException;
-import com.techstore.exception.product.ProductImageUploaderServiceException;
 import com.techstore.exception.product.ProductNotFoundException;
 import com.techstore.exception.product.UploadProductImageException;
+import com.techstore.exception.user.TokenException;
 import com.techstore.exception.user.UserConstraintViolationException;
 import com.techstore.exception.user.UserNotFoundException;
 import com.techstore.model.response.ValidationErrorResponse.RejectedValue;
@@ -59,8 +58,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(BAD_REQUEST, exception);
     }
 
-    @ExceptionHandler(value = {InvalidCredentialsException.class})
-    public ResponseEntity<Object> handleUnauthorized(InvalidCredentialsException exception) {
+    @ExceptionHandler(value = {InvalidCredentialsException.class, TokenException.class})
+    public ResponseEntity<Object> handleUnauthorized(RuntimeException exception) {
         logError(exception);
         return buildErrorResponse(UNAUTHORIZED, exception);
     }
@@ -103,7 +102,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(INTERNAL_SERVER_ERROR, exception);
     }
 
-    @ExceptionHandler(value = {ProductImageUploaderServiceException.class, OrderServiceException.class, Exception.class})
+    @ExceptionHandler(value = Exception.class)
     public ResponseEntity<Object> handleServiceAndUnknownExceptions(Exception exception) {
         logError(exception);
         return buildErrorResponse(INTERNAL_SERVER_ERROR, "Internal server error");

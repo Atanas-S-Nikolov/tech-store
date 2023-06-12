@@ -15,7 +15,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -41,7 +40,7 @@ public class UserEntity {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "phone")
@@ -60,8 +59,16 @@ public class UserEntity {
     @Column(name = "role")
     private UserRole role;
 
-    @OneToOne
-    @JoinColumn(name = "favorite_id", referencedColumnName = "id")
+    @Column(name = "is_enabled")
+    private boolean isEnabled;
+
+    @OneToOne(mappedBy = "user")
+    private RegisterConfirmationTokenEntity registerConfirmationToken;
+
+    @OneToOne(mappedBy = "user")
+    private PasswordResetTokenEntity passwordResetToken;
+
+    @OneToOne(mappedBy = "user")
     private FavoritesEntity favorite;
 
     @OneToMany(mappedBy = "user")

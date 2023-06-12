@@ -1,8 +1,11 @@
 package com.techstore.security.filter;
 
 import com.auth0.jwt.algorithms.Algorithm;
+import com.techstore.exception.user.UserConstraintViolationException;
 import com.techstore.model.dto.AuthenticationDto;
+import com.techstore.model.entity.UserEntity;
 import com.techstore.model.response.JWTResponse;
+import com.techstore.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +29,7 @@ import static com.techstore.utils.JWTUtils.generateRefreshToken;
 import static com.techstore.utils.auth.AuthUtils.convertAuthoritiesToStrings;
 import static com.techstore.utils.converter.JsonConverter.toJson;
 
+import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -36,6 +40,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Autowired
     private AuthenticationManager authenticationManager;
+    
+    private IUserRepository userRepository;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -47,9 +53,12 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         } catch (IOException e) {
             e.printStackTrace();
         }
+        String username = authenticationDto.getUsername();
+        String password = authenticationDto.getPassword();
 
+        checkIfUserIsEnabled(username);
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(authenticationDto.getUsername(), authenticationDto.getPassword());
+                new UsernamePasswordAuthenticationToken(username, password);
         return authenticationManager.authenticate(authenticationToken);
     }
 
@@ -72,8 +81,21 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         toJson(response.getOutputStream(), new JWTResponse(accessToken, refreshToken));
     }
 
+    //TODO: Implement failure authentication handler
+
     @Override
     public void setAuthenticationManager(AuthenticationManager authenticationManager) {
         super.setAuthenticationManager(authenticationManager);
+    }
+
+    public void setUserRepository(IUserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public void checkIfUserIsEnabled(String username) {
+        UserEntity entity = userRepository.findUserByUsername(username).orElse(new UserEntity());
+        if (!entity.isEnabled()) {
+            throw new UserConstraintViolationException("User is not enabled");
+        }
     }
 }

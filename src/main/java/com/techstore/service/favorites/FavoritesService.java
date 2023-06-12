@@ -32,8 +32,8 @@ public class FavoritesService implements IFavoritesService {
     }
 
     @Override
-    public FavoritesEntity createDefaultFavorites() {
-        return repository.save(new FavoritesEntity(null, null, new HashSet<>()));
+    public FavoritesEntity createDefaultFavorites(UserEntity user) {
+        return repository.save(new FavoritesEntity(null, user, new HashSet<>()));
     }
 
     @Override

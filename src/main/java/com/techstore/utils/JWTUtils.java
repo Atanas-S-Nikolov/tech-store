@@ -10,17 +10,14 @@ import com.techstore.exception.authentication.InvalidJWTException;
 import java.util.List;
 import java.util.Date;
 
+import static com.techstore.constants.DateTimeConstants.FOUR_WEEKS;
+import static com.techstore.constants.DateTimeConstants.ONE_HOUR;
 import static com.techstore.constants.JWTConstants.ROLES_CLAIM;
 
 import static java.lang.System.currentTimeMillis;
 
 public class JWTUtils {
-    private static final long ONE_MINUTE = 1000L * 60L;
-    private static final long FIVE_MINUTES = ONE_MINUTE * 5L;
-    private static final long ONE_HOUR = ONE_MINUTE *  60L;
-    private static final long ONE_DAY = ONE_HOUR * 24L;
-    private static final long FOUR_WEEKS = ONE_DAY * 28L;
-    
+
     public static DecodedJWT verifyToken(String token, Algorithm algorithm) {
         DecodedJWT decodedJWT;
         try {

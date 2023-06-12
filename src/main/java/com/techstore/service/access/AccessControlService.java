@@ -4,8 +4,16 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import com.techstore.exception.authentication.InvalidJWTException;
+import com.techstore.exception.user.TokenException;
+import com.techstore.exception.user.UserNotFoundException;
+import com.techstore.model.dto.ResetPasswordDto;
+import com.techstore.model.entity.PasswordResetTokenEntity;
+import com.techstore.model.entity.RegisterConfirmationTokenEntity;
 import com.techstore.model.entity.UserEntity;
+import com.techstore.model.response.GenericResponse;
 import com.techstore.model.response.JWTResponse;
+import com.techstore.repository.IPasswordResetTokenRepository;
+import com.techstore.repository.IRegisterConfirmationTokenRepository;
 import com.techstore.repository.IUserRepository;
 import com.techstore.service.jwt.IJWTService;
 
@@ -13,8 +21,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.util.List;
 
 import static com.techstore.constants.JWTConstants.BEARER;
@@ -31,12 +41,19 @@ import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 public class AccessControlService implements UserDetailsService, IJWTService {
-    private final IUserRepository repository;
     private final String jwtSecret;
+    private final IUserRepository userRepository;
+    private final IRegisterConfirmationTokenRepository registerConfirmationTokenRepository;
+    private final IPasswordResetTokenRepository passwordResetTokenRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AccessControlService(IUserRepository repository, String jwtSecret) {
-        this.repository = repository;
+    public AccessControlService(String jwtSecret, IUserRepository userRepository, IRegisterConfirmationTokenRepository registerConfirmationTokenRepository,
+                                IPasswordResetTokenRepository passwordResetTokenRepository, PasswordEncoder passwordEncoder) {
         this.jwtSecret = jwtSecret;
+        this.userRepository = userRepository;
+        this.registerConfirmationTokenRepository = registerConfirmationTokenRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -65,8 +82,59 @@ public class AccessControlService implements UserDetailsService, IJWTService {
         return jwtResponse;
     }
 
+    @Transactional
+    public GenericResponse confirmRegistration(String token) {
+        RegisterConfirmationTokenEntity tokenEntity = findRegisterConfirmationTokenEntity(token);
+        UserEntity userEntity = findUserEntityByRegistrationConfirmationToken(tokenEntity);
+        checkTokenExpiration(tokenEntity.getToken(), tokenEntity.getExpirationMs());
+        userEntity.setEnabled(true);
+        userRepository.save(userEntity);
+        registerConfirmationTokenRepository.delete(tokenEntity);
+        return new GenericResponse("Registration is confirmed successfully");
+    }
+
+    @Transactional
+    public GenericResponse resetPassword(ResetPasswordDto resetPasswordDto) {
+        PasswordResetTokenEntity tokenEntity = findPasswordResetTokenEntity(resetPasswordDto.getToken());
+        try {
+            UserEntity userEntity = findUserEntityByPasswordResetToken(tokenEntity);
+            checkTokenExpiration(tokenEntity.getToken(), tokenEntity.getExpirationMs());
+            userEntity.setPassword(passwordEncoder.encode(resetPasswordDto.getPassword().trim()));
+            userRepository.save(userEntity);
+        } finally {
+            passwordResetTokenRepository.delete(tokenEntity);
+        }
+        return new GenericResponse("Password has been changed");
+    }
+
     private UserEntity findUserByUsername(String username) {
-        return repository.findUserByUsername(username)
+        return userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(format("User with username '%s' is not found", username)));
+    }
+
+    private UserEntity findUserEntityByRegistrationConfirmationToken(RegisterConfirmationTokenEntity tokenEntity) {
+        return userRepository.findUserByRegisterConfirmationToken(tokenEntity)
+                .orElseThrow(() -> new UserNotFoundException(format("User with register confirmation token '%s' is not found", tokenEntity.getToken())));
+    }
+
+    private UserEntity findUserEntityByPasswordResetToken(PasswordResetTokenEntity tokenEntity) {
+        return userRepository.findUserByPasswordResetToken(tokenEntity)
+                .orElseThrow(() -> new UserNotFoundException(format("User with password reset token '%s' is not found", tokenEntity.getToken())));
+    }
+
+    private RegisterConfirmationTokenEntity findRegisterConfirmationTokenEntity(String token) {
+        return registerConfirmationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new TokenException(format("Token: %s is not found", token)));
+    }
+
+    private PasswordResetTokenEntity findPasswordResetTokenEntity(String token) {
+        return passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new TokenException(format("Token: %s is not found", token)));
+    }
+
+    private void checkTokenExpiration(String token, long tokenExpirationMs) {
+        if (System.currentTimeMillis() > tokenExpirationMs) {
+            throw new TokenException(format("Token: %s is expired", token));
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.techstore.security.configuration;
 
+import com.techstore.repository.IPasswordResetTokenRepository;
+import com.techstore.repository.IRegisterConfirmationTokenRepository;
 import com.techstore.repository.IUserRepository;
 import com.techstore.security.filter.CustomAuthenticationFilter;
 import com.techstore.security.filter.CustomAuthorizationFilter;
@@ -14,6 +16,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -26,8 +30,11 @@ import static com.techstore.constants.ApiConstants.ALL_CART_URLS_MATCHER;
 import static com.techstore.constants.ApiConstants.ALL_FAVORITES_URLS_MATCHER;
 import static com.techstore.constants.ApiConstants.ALL_ORDERS_URLS_MATCHER;
 import static com.techstore.constants.ApiConstants.BASE_API_URL_MATCHER;
+import static com.techstore.constants.ApiConstants.FULL_CONFIRM_REGISTER_URL;
+import static com.techstore.constants.ApiConstants.FULL_FORGOT_PASSWORD_URL;
 import static com.techstore.constants.ApiConstants.FULL_REFRESH_TOKEN_URL;
 import static com.techstore.constants.ApiConstants.FULL_REGISTER_URL;
+import static com.techstore.constants.ApiConstants.FULL_RESET_PASSWORD_URL;
 import static com.techstore.constants.ApiConstants.LOGIN_URL;
 import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
 import static com.techstore.constants.ApiConstants.PRODUCTS_WITH_PARAMS_REGEX;
@@ -38,6 +45,7 @@ import static com.techstore.constants.RoleConstants.ROLE_CUSTOMER;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @EnableWebSecurity
@@ -54,9 +62,21 @@ public class WebSecurityConfiguration {
     @Autowired
     private IUserRepository userRepository;
 
+    @Autowired
+    private IRegisterConfirmationTokenRepository registerConfirmationTokenRepository;
+
+    @Autowired
+    private IPasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Bean("password-encoder2")
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean("access-control-service")
     public AccessControlService accessControlService() {
-        return new AccessControlService(userRepository, jwtSecret);
+        return new AccessControlService(jwtSecret, userRepository, registerConfirmationTokenRepository, passwordResetTokenRepository,
+                passwordEncoder());
     }
 
     @Bean("cors-config-source")
@@ -74,6 +94,7 @@ public class WebSecurityConfiguration {
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 .userDetailsService(accessControlService())
+                .passwordEncoder(passwordEncoder())
                 .and()
                 .build();
     }
@@ -82,6 +103,7 @@ public class WebSecurityConfiguration {
     public CustomAuthenticationFilter customAuthenticationFilter(HttpSecurity http) throws Exception {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter();
         customAuthenticationFilter.setAuthenticationManager(authenticationManager(http));
+        customAuthenticationFilter.setUserRepository(userRepository);
         customAuthenticationFilter.setFilterProcessesUrl(LOGIN_URL);
         return customAuthenticationFilter;
     }
@@ -100,9 +122,9 @@ public class WebSecurityConfiguration {
                 .sessionManagement().sessionCreationPolicy(STATELESS)
                 .and()
                 .authorizeRequests(auth -> {
-                    auth.antMatchers(POST, LOGIN_URL, FULL_REGISTER_URL).permitAll();
-                    auth.antMatchers(GET, FULL_REFRESH_TOKEN_URL).permitAll();
-                    auth.antMatchers(GET, PRODUCT_WITH_NAME_PATH_VARIABLE).permitAll();
+                    auth.antMatchers(POST, LOGIN_URL, FULL_REGISTER_URL, FULL_REFRESH_TOKEN_URL, FULL_FORGOT_PASSWORD_URL).permitAll();
+                    auth.antMatchers(PUT, FULL_RESET_PASSWORD_URL).permitAll();
+                    auth.antMatchers(GET, PRODUCT_WITH_NAME_PATH_VARIABLE, FULL_CONFIRM_REGISTER_URL + "/**").permitAll();
                     auth.regexMatchers(GET, PRODUCTS_WITH_PARAMS_REGEX).permitAll();
                     auth.antMatchers(ALL_CART_URLS_MATCHER).permitAll();
                     auth.antMatchers(ALL_ORDERS_URLS_MATCHER, ALL_FAVORITES_URLS_MATCHER).hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);

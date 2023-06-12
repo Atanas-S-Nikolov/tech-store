@@ -14,6 +14,7 @@ import com.techstore.repository.IOrderRepository;
 import com.techstore.repository.IPurchasedProductRepository;
 import com.techstore.repository.IUserRepository;
 import com.techstore.service.cart.ICartService;
+import com.techstore.service.mail.IMailSenderService;
 import com.techstore.utils.converter.ModelConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,13 +41,15 @@ public class OrderService implements IOrderService {
     private final IUserRepository userRepository;
     private final ICartService cartService;
     private final IPurchasedProductRepository purchasedProductRepository;
+    private final IMailSenderService mailSenderService;
 
     public OrderService(IOrderRepository repository, IUserRepository userRepository, ICartService cartService,
-                        IPurchasedProductRepository purchasedProductRepository) {
+                        IPurchasedProductRepository purchasedProductRepository, IMailSenderService mailSenderService) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.cartService = cartService;
         this.purchasedProductRepository = purchasedProductRepository;
+        this.mailSenderService = mailSenderService;
     }
 
     @Transactional
@@ -62,6 +65,7 @@ public class OrderService implements IOrderService {
         setRelations(purchasedProductEntities, persistedOrder);
         cartService.decreaseStocks(cart.getProductsToBuy());
         cartService.deleteCart(orderDto.getCartKey());
+        mailSenderService.sendOrderMail(persistedOrder);
         return toResponse(persistedOrder);
     }
 
