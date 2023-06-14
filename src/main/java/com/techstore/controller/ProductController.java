@@ -24,13 +24,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.List;
 
 import static com.techstore.constants.ApiConstants.PAGE_PARAM;
 import static com.techstore.constants.ApiConstants.PAGE_PARAM_DEFAULT_VALUE;
 import static com.techstore.constants.ApiConstants.PRODUCTS_CATEGORY_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_EARLY_ACCESS_PARAM;
+import static com.techstore.constants.ApiConstants.PRODUCTS_SEARCH_KEYWORD_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_TYPE_PARAM;
 import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
+import static com.techstore.constants.ApiConstants.SEARCH_QUERY_URL;
+import static com.techstore.constants.ApiConstants.SEARCH_URL;
 import static com.techstore.constants.ApiConstants.SIZE_PARAM;
 import static com.techstore.constants.ApiConstants.SIZE_PARAM_DEFAULT_VALUE;
 import static com.techstore.constants.FieldConstants.VALIDATED_PARAM_DEFAULT_VALUE;
@@ -73,10 +77,31 @@ public class ProductController {
             @ProductTypeConstraint
             @RequestParam(value = PRODUCTS_TYPE_PARAM, required = false, defaultValue = VALIDATED_PARAM_DEFAULT_VALUE)
                     String type,
+
             @RequestParam(value = PAGE_PARAM, defaultValue = PAGE_PARAM_DEFAULT_VALUE) int page,
             @RequestParam(value = SIZE_PARAM, defaultValue = SIZE_PARAM_DEFAULT_VALUE) int size
     ) {
         return ResponseEntity.status(OK).body(service.getProducts(earlyAccess, category, type, page, size));
+    }
+
+    @GetMapping(path = SEARCH_URL, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ProductResponse>> search(
+            @RequestParam(value = PRODUCTS_SEARCH_KEYWORD_PARAM, required = false) String keyword,
+            @RequestParam(value = PRODUCTS_EARLY_ACCESS_PARAM, required = false, defaultValue = "true")
+                    boolean earlyAccess
+    ) {
+        return ResponseEntity.status(OK).body(service.search(keyword, earlyAccess));
+    }
+
+    @GetMapping(path = SEARCH_QUERY_URL, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<PageResponse<ProductResponse>> searchQuery(
+            @RequestParam(value = PRODUCTS_SEARCH_KEYWORD_PARAM, required = false) String keyword,
+            @RequestParam(value = PRODUCTS_EARLY_ACCESS_PARAM, required = false, defaultValue = "true")
+                    boolean earlyAccess,
+            @RequestParam(value = PAGE_PARAM, defaultValue = PAGE_PARAM_DEFAULT_VALUE) int page,
+            @RequestParam(value = SIZE_PARAM, defaultValue = SIZE_PARAM_DEFAULT_VALUE) int size
+    ) {
+        return ResponseEntity.status(OK).body(service.searchQuery(keyword, earlyAccess, page, size));
     }
 
     @PutMapping(consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)

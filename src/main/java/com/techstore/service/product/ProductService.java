@@ -93,6 +93,22 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    public List<ProductResponse> search(String keyword, boolean earlyAccess) {
+        List<ProductEntity> products = earlyAccess ? repository.search(keyword) : repository.searchWithoutEarlyAccess(keyword);
+        return products.stream().map(ModelConverter::toResponse).collect(toList());
+    }
+
+    @Override
+    public PageResponse<ProductResponse> searchQuery(String keyword, boolean earlyAccess, int page, int size) {
+        PageRequest paging = PageRequest.of(page, size);
+        Page<ProductEntity> productsPage = earlyAccess
+                ? repository.searchQuery(keyword, paging)
+                : repository.searchQueryWithoutEarlyAccess(keyword, paging);
+        List<ProductResponse> products = productsPage.getContent().stream().map(ModelConverter::toResponse).collect(toList());
+        return new PageResponse<>(productsPage.getTotalElements(), productsPage.getTotalPages(), productsPage.getNumber(), products);
+    }
+
+    @Override
     public ProductResponse updateProduct(ProductDto productDto, Collection<MultipartFile> images) {
         ProductEntity existingEntity = findProductEntityByName(productDto.getName());
         ProductEntity productEntity = toEntity(productDto);
