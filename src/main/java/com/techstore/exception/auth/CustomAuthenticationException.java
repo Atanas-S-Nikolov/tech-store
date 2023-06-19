@@ -1,4 +1,4 @@
-package com.techstore.exception.authentication;
+package com.techstore.exception.auth;
 
 import org.springframework.security.core.AuthenticationException;
 

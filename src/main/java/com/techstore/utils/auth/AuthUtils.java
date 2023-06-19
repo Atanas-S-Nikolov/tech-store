@@ -1,6 +1,6 @@
 package com.techstore.utils.auth;
 
-import com.techstore.exception.authentication.CustomAuthenticationException;
+import com.techstore.exception.auth.CustomAuthorizationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,7 +17,7 @@ public class AuthUtils {
         String userDetailsString = authentication.getName();
         List<String> roles = convertAuthoritiesToStrings(authentication);
         if (!userDetailsString.contains(username) && !roles.contains(ROLE_ADMIN)){
-            throw new CustomAuthenticationException("This user is not supposed to view/edit this resource");
+            throw new CustomAuthorizationException("This user is not supposed to view/edit this resource");
         }
     }
 

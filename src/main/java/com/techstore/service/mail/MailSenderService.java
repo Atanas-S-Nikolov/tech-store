@@ -42,7 +42,7 @@ public class MailSenderService implements IMailSenderService {
     }
 
     @Override
-    public void sendRegistrationMailConfirmation(String email, String token, long limitTimeMs) {
+    public void sendRegistrationConfirmationMail(String email, String token, long limitTimeMs) {
         String limitTime = millisToDateString(limitTimeMs);
         String confirmationLink = getApplicationUrl() + FULL_CONFIRM_REGISTER_URL + "?token=" + token;
         Map<String, Object> model = Map.of(
@@ -113,7 +113,7 @@ public class MailSenderService implements IMailSenderService {
         } catch (MailAuthenticationException e) {
             throw new MailServiceException("Mail authentication failed", e);
         } catch (MailSendException e) {
-            throw new MailServiceException("Failed sending mail", e);
+            throw new MailServiceException("Failed to send mail", e);
         } catch(MessagingException e) {
             throw new MailServiceException("Failed to compose mail", e);
         }

@@ -78,7 +78,7 @@ public class UserService implements IUserService {
         favoritesService.createDefaultFavorites(savedUser);
         registerConfirmationToken.setUser(userEntity);
         registerConfirmationTokenRepository.save(registerConfirmationToken);
-        mailSenderService.sendRegistrationMailConfirmation(userEmail, tokenValue, tokenExpirationMs);
+        mailSenderService.sendRegistrationConfirmationMail(userEmail, tokenValue, tokenExpirationMs);
         return toResponse(savedUser);
     }
 
@@ -137,7 +137,10 @@ public class UserService implements IUserService {
         UserEntity entity = findUserByUsername(username);
         favoritesService.deleteFavorites(username);
         orderService.deleteOrdersForUser(username);
-        registerConfirmationTokenRepository.delete(entity.getRegisterConfirmationToken());
+        RegisterConfirmationTokenEntity registerConfirmationToken = entity.getRegisterConfirmationToken();
+        if (nonNull(registerConfirmationToken)) {
+            registerConfirmationTokenRepository.delete(registerConfirmationToken);
+        }
         repository.delete(entity);
     }
 

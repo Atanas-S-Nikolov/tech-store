@@ -1,9 +1,10 @@
 package com.techstore.exception.handler;
 
-import com.techstore.exception.authentication.CustomAuthenticationException;
-import com.techstore.exception.authentication.InvalidJWTException;
+import com.techstore.exception.auth.CustomAuthenticationException;
+import com.techstore.exception.auth.CustomAuthorizationException;
+import com.techstore.exception.auth.InvalidJWTException;
 import com.techstore.exception.cart.CartNotFoundException;
-import com.techstore.exception.authentication.InvalidCredentialsException;
+import com.techstore.exception.auth.InvalidCredentialsException;
 import com.techstore.exception.favorites.FavoritesNotFoundException;
 import com.techstore.exception.order.OrderNotFoundException;
 import com.techstore.exception.product.CannotBuyProductException;
@@ -58,13 +59,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(BAD_REQUEST, exception);
     }
 
-    @ExceptionHandler(value = {InvalidCredentialsException.class, TokenException.class})
+    @ExceptionHandler(value = {InvalidCredentialsException.class, TokenException.class, CustomAuthenticationException.class})
     public ResponseEntity<Object> handleUnauthorized(RuntimeException exception) {
         logError(exception);
         return buildErrorResponse(UNAUTHORIZED, exception);
     }
 
-    @ExceptionHandler(value = {InvalidJWTException.class, AccessDeniedException.class, CustomAuthenticationException.class})
+    @ExceptionHandler(value = {InvalidJWTException.class, AccessDeniedException.class, CustomAuthorizationException.class})
     public ResponseEntity<Object> handleForbidden(RuntimeException exception) {
         logError(exception);
         return buildErrorResponse(FORBIDDEN, exception);
@@ -78,7 +79,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(value = UserConstraintViolationException.class)
-    public ResponseEntity<Object> handleCustomConstraintViolationException(RuntimeException exception) {
+    public ResponseEntity<Object> handleCustomConstraintViolationException(UserConstraintViolationException exception) {
         logError(exception);
         return buildErrorResponse(CONFLICT, exception);
     }

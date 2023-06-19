@@ -128,7 +128,7 @@ public class WebSecurityConfiguration {
                     auth.regexMatchers(GET, PRODUCTS_WITH_PARAMS_REGEX).permitAll();
                     auth.antMatchers(ALL_CART_URLS_MATCHER).permitAll();
                     auth.antMatchers(ALL_ORDERS_URLS_MATCHER, ALL_FAVORITES_URLS_MATCHER).hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
-                    auth.antMatchers(GET, PRODUCTS_URL, PRODUCTS_URL + "/").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
+                    auth.antMatchers(GET, PRODUCTS_URL, PRODUCTS_URL + "/**").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(POST, USER_GET_URL, USER_GET_URL + "/").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(BASE_API_URL_MATCHER).hasAuthority(ROLE_ADMIN);
                     auth.anyRequest().authenticated();

@@ -1,10 +1,9 @@
 package com.techstore.service.user;
 
-import com.techstore.exception.authentication.InvalidCredentialsException;
+import com.techstore.exception.auth.InvalidCredentialsException;
 import com.techstore.model.dto.EmailDto;
 import com.techstore.model.dto.UpdateUserDto;
 import com.techstore.model.dto.UserDto;
-import com.techstore.model.entity.UserEntity;
 import com.techstore.model.response.GenericResponse;
 import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.UserResponse;

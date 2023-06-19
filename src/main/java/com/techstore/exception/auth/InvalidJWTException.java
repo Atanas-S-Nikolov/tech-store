@@ -1,4 +1,4 @@
-package com.techstore.exception.authentication;
+package com.techstore.exception.auth;
 
 public class InvalidJWTException extends RuntimeException {
     public InvalidJWTException() {

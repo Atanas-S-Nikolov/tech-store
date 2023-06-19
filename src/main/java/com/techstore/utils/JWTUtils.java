@@ -5,7 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.*;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.techstore.exception.authentication.InvalidJWTException;
+import com.techstore.exception.auth.InvalidJWTException;
 
 import java.util.List;
 import java.util.Date;
