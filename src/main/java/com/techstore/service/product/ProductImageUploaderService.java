@@ -1,12 +1,13 @@
 package com.techstore.service.product;
 
 import com.google.auth.oauth2.GoogleCredentials;
+
+import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
 import com.google.cloud.storage.StorageOptions;
-
 import com.techstore.exception.product.ProductImageUploaderServiceException;
 import com.techstore.exception.product.DeleteProductImageException;
 import com.techstore.exception.product.UploadProductImageException;
@@ -23,6 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.techstore.utils.ImageUploadUtils.formatDeleteUrl;
+import static com.techstore.utils.ImageUploadUtils.formatProductName;
 import static com.techstore.utils.ImageUploadUtils.formatUrl;
 import static com.techstore.utils.ImageUploadUtils.generateFilePath;
 import static java.lang.System.lineSeparator;
@@ -40,7 +42,7 @@ public class ProductImageUploaderService implements IProductImageUploaderService
     }
 
     @Override
-    public Set<String> upload(Collection<MultipartFile> images, String productName) {
+    public Set<String> upload(Collection<MultipartFile> images, String productName, String ...existingImageUrls) {
         HashSet<BlobId> failedBloIds = new HashSet<>();
         final Storage[] storage = {StorageOptions.newBuilder().build().getService()};
         final Exception[] occurredException = {null};
@@ -57,8 +59,7 @@ public class ProductImageUploaderService implements IProductImageUploaderService
 
             String token = "";
             try {
-                GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_URL));
-                storage[0] = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+                storage[0] = getStorage();
                 storage[0].create(blobInfo, imageFile.getBytes());
                 token = storage[0].get(bucketName, filePath).getMetadata().get(METADATA_DOWNLOAD_TOKENS_KEY);
             } catch (IOException ioe) {
@@ -91,16 +92,39 @@ public class ProductImageUploaderService implements IProductImageUploaderService
                     .collect(Collectors.toSet());
 
             try {
-                GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_URL));
-                Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+                Storage storage = getStorage();
                 storage.delete(blobIds);
             } catch (StorageException e) {
                 String message = "Failed to delete images" + lineSeparator() + buildFailedImageUploadsMessage(blobIds);
                 throw new DeleteProductImageException(message);
-            } catch (IOException e) {
-                throw new ProductImageUploaderServiceException("Failed to load google credentials", e);
             }
         }
+    }
+
+    @Override
+    public Set<String> getImageUrlsForProduct(String productName) {
+        Storage storage = getStorage();
+        String directoryName = formatProductName(productName);
+        Iterable<Blob> blobs = storage.list(bucketName, Storage.BlobListOption.prefix(directoryName)).iterateAll();
+        Set<String> urls = new HashSet<>();
+        for (Blob blob : blobs) {
+            String token = blob.getMetadata().get(METADATA_DOWNLOAD_TOKENS_KEY);
+            String selfLink = blob.getSelfLink();
+            String filePath = selfLink.substring(selfLink.indexOf("/o/") + 3);
+            String url = String.format(IMAGE_URL_FORMAT, bucketName, filePath, token);
+            urls.add(url);
+        }
+        return urls;
+    }
+
+    private Storage getStorage() {
+        GoogleCredentials credentials;
+        try {
+            credentials = GoogleCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_URL));
+        } catch (IOException e) {
+            throw new ProductImageUploaderServiceException("Failed to load google credentials", e);
+        }
+        return StorageOptions.newBuilder().setCredentials(credentials).build().getService();
     }
 
     private String buildFailedImageUploadsMessage(Collection<BlobId> failedBloIds) {

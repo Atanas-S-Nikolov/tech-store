@@ -7,7 +7,9 @@ import java.util.Collection;
 import java.util.Set;
 
 public interface IProductImageUploaderService {
-    Set<String> upload(Collection<MultipartFile> images, String productName) throws ProductImageUploaderServiceException;
+    Set<String> upload(Collection<MultipartFile> images, String productName, String ...existingImageUrls) throws ProductImageUploaderServiceException;
 
     void deleteImagesForProduct(Collection<String> imageUrls) throws ProductImageUploaderServiceException;
+
+    Set<String> getImageUrlsForProduct(String productName);
 }
