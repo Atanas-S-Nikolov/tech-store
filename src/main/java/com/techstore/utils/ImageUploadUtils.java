@@ -28,7 +28,7 @@ public class ImageUploadUtils {
         return UUID.randomUUID() + "-" + requireNonNull(imageFile.getOriginalFilename()).replace(" ", "_");
     }
 
-    private static String formatProductName(String productName) {
+    public static String formatProductName(String productName) {
         return productName.replaceAll(WHITESPACE, DASH);
     }
 }

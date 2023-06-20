@@ -109,11 +109,13 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductResponse updateProduct(ProductDto productDto, Collection<MultipartFile> images) {
-        ProductEntity existingEntity = findProductEntityByName(productDto.getName());
+    public ProductResponse updateProduct(ProductDto productDto, Collection<MultipartFile> images, Collection<String> deleteImageUrls) {
+        String productName = productDto.getName();
+        ProductEntity existingEntity = findProductEntityByName(productName);
         ProductEntity productEntity = toEntity(productDto);
         productEntity.setId(existingEntity.getId());
-        productEntity.setImageUrls(existingEntity.getImageUrls());
+        imageUploaderService.deleteImagesForProduct(deleteImageUrls);
+        productEntity.setImageUrls(imageUploaderService.getImageUrlsForProduct(productName));
         return tryToSaveProduct(images, productEntity);
     }
 
@@ -128,8 +130,9 @@ public class ProductService implements IProductService {
     private ProductResponse tryToSaveProduct(Collection<MultipartFile> images, ProductEntity entity) {
         try {
             images = nonNull(images) ? images : new HashSet<>();
-            Collection<MultipartFile> imagesToRemove = findImagesToBeRemoved(images, entity.getImageUrls());
-            images.removeAll(imagesToRemove);
+//            //Used only for Postman
+//            Collection<MultipartFile> imagesToRemove = findImagesToBeRemoved(images, entity.getImageUrls());
+//            images.removeAll(imagesToRemove);
             entity.setDateOfModification(LocalDateTime.now());
             return toResponse(repository.save(uploadImages(images, entity)));
         } catch (Exception exception) {
@@ -138,23 +141,23 @@ public class ProductService implements IProductService {
         }
     }
 
-    private Collection<MultipartFile> findImagesToBeRemoved(Collection<MultipartFile> images, Set<String> existingImageUrls) {
-        Collection<MultipartFile> imagesToRemove = new HashSet<>();
-        if (!isEmpty(images)) {
-            for (String url : existingImageUrls) {
-                for (MultipartFile image : images) {
-                    String imageName = nonNull(image.getOriginalFilename())
-                            ? image.getOriginalFilename()
-                            : EMPTY;
-                    if (url.contains(imageName)) {
-                        imagesToRemove.add(image);
-                        break;
-                    }
-                }
-            }
-        }
-        return imagesToRemove;
-    }
+//    private Collection<MultipartFile> findImagesToBeRemoved(Collection<MultipartFile> images, Set<String> existingImageUrls) {
+//        Collection<MultipartFile> imagesToRemove = new HashSet<>();
+//        if (!isEmpty(images)) {
+//            for (String url : existingImageUrls) {
+//                for (MultipartFile image : images) {
+//                    String imageName = nonNull(image.getOriginalFilename())
+//                            ? image.getOriginalFilename()
+//                            : EMPTY;
+//                    if (url.contains(imageName)) {
+//                        imagesToRemove.add(image);
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+//        return imagesToRemove;
+//    }
 
     private ProductEntity uploadImages(Collection<MultipartFile> images, ProductEntity entity) {
         if (!isEmpty(images)) {
