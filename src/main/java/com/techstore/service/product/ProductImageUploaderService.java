@@ -42,7 +42,7 @@ public class ProductImageUploaderService implements IProductImageUploaderService
     }
 
     @Override
-    public Set<String> upload(Collection<MultipartFile> images, String productName, String ...existingImageUrls) {
+    public Set<String> upload(Collection<MultipartFile> images, String productName) {
         HashSet<BlobId> failedBloIds = new HashSet<>();
         final Storage[] storage = {StorageOptions.newBuilder().build().getService()};
         final Exception[] occurredException = {null};
