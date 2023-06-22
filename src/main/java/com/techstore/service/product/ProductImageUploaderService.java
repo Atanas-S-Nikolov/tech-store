@@ -12,6 +12,8 @@ import com.techstore.exception.product.ProductImageUploaderServiceException;
 import com.techstore.exception.product.DeleteProductImageException;
 import com.techstore.exception.product.UploadProductImageException;
 
+import com.techstore.model.dto.ImageDto;
+import com.techstore.model.response.ImageResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
@@ -42,12 +44,13 @@ public class ProductImageUploaderService implements IProductImageUploaderService
     }
 
     @Override
-    public Set<String> upload(Collection<MultipartFile> images, String productName) {
+    public Set<ImageResponse> upload(Collection<ImageDto> images, String productName) {
         HashSet<BlobId> failedBloIds = new HashSet<>();
         final Storage[] storage = {StorageOptions.newBuilder().build().getService()};
         final Exception[] occurredException = {null};
 
-        Set<String> imageUrls = images.stream().map(imageFile -> {
+        Set<ImageResponse> imageResponses = images.stream().map(imageDto -> {
+            MultipartFile imageFile = imageDto.getFile();
             String filePath = generateFilePath(imageFile, productName);
             BlobId blobId = BlobId.of(bucketName, filePath);
             Map<String, String> metadata = new HashMap<>();
@@ -67,7 +70,8 @@ public class ProductImageUploaderService implements IProductImageUploaderService
                 occurredException[0] = ioe;
             }
 
-            return String.format(IMAGE_URL_FORMAT, bucketName, formatUrl(filePath), formatUrl(token));
+            String imageUrl = String.format(IMAGE_URL_FORMAT, bucketName, formatUrl(filePath), formatUrl(token));
+            return new ImageResponse(imageUrl, imageDto.isMain());
         }).collect(Collectors.toSet());
 
         if (!failedBloIds.isEmpty()) {
@@ -76,7 +80,7 @@ public class ProductImageUploaderService implements IProductImageUploaderService
             throw new UploadProductImageException(message, occurredException[0]);
         }
 
-        return imageUrls;
+        return imageResponses;
     }
 
     @Override

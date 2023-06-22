@@ -1,76 +1,38 @@
 package com.techstore.model.response;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
 
-@ToString(doNotUseGetters = true)
-@EqualsAndHashCode(doNotUseGetters = true)
+@Data
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
 public class ProductResponse {
-    @Getter
     private final String name;
 
-    @Getter
     private final BigDecimal price;
 
-    @Getter
     private final int stocks;
 
-    @Getter
     private final String category;
 
-    @Getter
     private final String type;
 
-    @Getter
     private final String brand;
 
-    @Getter
     private final String model;
 
-    @Getter
     private final String description;
 
-    @Getter
     private final boolean earlyAccess;
 
-    @Getter
     private final LocalDateTime dateOfCreation;
 
-    @Getter
     private final LocalDateTime dateOfModification;
 
-    @Getter
-    private final Set<String> imageUrls;
-
-    public ProductResponse() {
-        this("");
-    }
-
-    public ProductResponse(String name) {
-        this(name, new BigDecimal("0.0"), 0, null, null, null, null, null,
-                false, null, null, new HashSet<>());
-    }
-
-    public ProductResponse(String name, BigDecimal price, int stocks, String category, String type, String brand, String model,
-                           String description, boolean earlyAccess, LocalDateTime dateOfCreation, LocalDateTime dateOfModification,
-                           Set<String> imageUrls) {
-        this.name = name;
-        this.price = price;
-        this.stocks = stocks;
-        this.category = category;
-        this.type = type;
-        this.brand = brand;
-        this.model = model;
-        this.description = description;
-        this.earlyAccess = earlyAccess;
-        this.dateOfCreation = dateOfCreation;
-        this.dateOfModification = dateOfModification;
-        this.imageUrls = imageUrls;
-    }
+    private final Collection<ImageResponse> images;
 }

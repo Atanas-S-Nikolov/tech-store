@@ -1,6 +1,7 @@
 package com.techstore.controller;
 
 import com.techstore.model.dto.DeleteImagesDto;
+import com.techstore.model.dto.ImageDto;
 import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.ProductResponse;
 import com.techstore.model.dto.ProductDto;
@@ -59,9 +60,10 @@ public class ProductController {
     @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProductResponse> createProduct(
             @RequestPart(value = "product") @Valid ProductDto productDto,
-            @RequestPart(value = "images", required = false) Collection<MultipartFile> images
+            @RequestPart(value = "images", required = false) Collection<MultipartFile> images,
+            @RequestPart(value = "mainImage", required = false) MultipartFile mainImage
     ) {
-        return ResponseEntity.status(CREATED).body(service.createProduct(productDto, images));
+        return ResponseEntity.status(CREATED).body(service.createProduct(productDto, images, mainImage));
     }
 
     @GetMapping(path = "/{name}", produces = APPLICATION_JSON_VALUE)
@@ -110,10 +112,10 @@ public class ProductController {
     public ResponseEntity<ProductResponse> updateProduct(
             @RequestPart(value = "product") @Valid ProductDto productDto,
             @RequestPart(value = "images", required = false) Collection<MultipartFile> images,
+            @RequestPart(value = "mainImage", required = false) MultipartFile mainImage,
             @RequestPart(value = "deleteImages", required = false) DeleteImagesDto deleteImagesDto
     ) {
-
-        return ResponseEntity.status(OK).body(service.updateProduct(productDto, images, deleteImagesDto.getUrls()));
+        return ResponseEntity.status(OK).body(service.updateProduct(productDto, images, mainImage, deleteImagesDto.getUrls()));
     }
 
     @DeleteMapping(path = "/{name}")

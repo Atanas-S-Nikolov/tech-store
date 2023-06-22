@@ -6,17 +6,7 @@ import com.techstore.model.enums.ProductType;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -70,7 +60,11 @@ public class ProductEntity {
     @Column(name = "date_of_modification")
     private LocalDateTime dateOfModification;
 
+    @Column(name = "main_image_url", length = 10000)
+    private String mainImageUrl;
+
     @ElementCollection
+    @CollectionTable(name = "product_image_urls", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "image_urls", length = 10000)
     private Set<String> imageUrls;
 
@@ -85,14 +79,14 @@ public class ProductEntity {
 
     public ProductEntity() {
         this(null ,null, new BigDecimal("0.0"), 0, null, null, null, null,
-                null,false, null, null, new HashSet<>(), null,
+                null,false, null, null, null, new HashSet<>(), null,
                 new HashSet<>(), new HashSet<>());
     }
 
     public ProductEntity(String id, String name, BigDecimal price, int stocks, ProductCategory category, ProductType type,
                          String brand, String model, String description, boolean earlyAccess, LocalDateTime dateOfCreation,
-                         LocalDateTime dateOfModification, Set<String> imageUrls, ProductToBuyEntity productToBuy, Set<FavoritesEntity> favorites,
-                         Set<PurchasedProductEntity> purchasedProducts) {
+                         LocalDateTime dateOfModification, String mainImageUrl, Set<String> imageUrls, ProductToBuyEntity productToBuy,
+                         Set<FavoritesEntity> favorites, Set<PurchasedProductEntity> purchasedProducts) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -105,6 +99,7 @@ public class ProductEntity {
         this.earlyAccess = earlyAccess;
         this.dateOfCreation = dateOfCreation;
         this.dateOfModification = dateOfModification;
+        this.mainImageUrl = mainImageUrl;
         this.imageUrls = nonNull(imageUrls) ? imageUrls : new HashSet<>();
         this.productToBuy = productToBuy;
         this.favorites = favorites;

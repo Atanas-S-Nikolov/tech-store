@@ -10,7 +10,7 @@ import com.techstore.model.response.ProductResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface IProductService {
-    ProductResponse createProduct(ProductDto productDto, Collection<MultipartFile> images);
+    ProductResponse createProduct(ProductDto productDto, Collection<MultipartFile> images, MultipartFile mainImage);
 
     ProductResponse getProduct(String productName) throws ProductNotFoundException;
 
@@ -20,8 +20,8 @@ public interface IProductService {
 
     PageResponse<ProductResponse> searchQuery(String keyword, boolean earlyAccess, int page, int size);
 
-    ProductResponse updateProduct(ProductDto productDto, Collection<MultipartFile> images, Collection<String> deleteImageUrls)
-            throws ProductNotFoundException;
+    ProductResponse updateProduct(ProductDto productDto, Collection<MultipartFile> images, MultipartFile mainImage,
+                                  Collection<String> deleteImageUrls) throws ProductNotFoundException;
 
     void deleteProduct(String productName) throws ProductNotFoundException;
 }
