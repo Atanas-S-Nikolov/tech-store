@@ -12,13 +12,7 @@ import com.techstore.model.dto.ProductDto;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.enums.ProductCategory;
 import com.techstore.model.enums.ProductType;
-import com.techstore.model.response.CartResponse;
-import com.techstore.model.response.FavoritesResponse;
-import com.techstore.model.response.OrderResponse;
-import com.techstore.model.response.ProductResponse;
-import com.techstore.model.response.ProductToBuyResponse;
-import com.techstore.model.response.PurchasedProductResponse;
-import com.techstore.model.response.UserResponse;
+import com.techstore.model.response.*;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -49,9 +43,13 @@ public class ModelConverter {
     }
 
     public static ProductResponse toResponse(ProductEntity entity) {
+        Set<ImageResponse> imageResponses = entity.getImageUrls().stream()
+                .map(imageUrl -> new ImageResponse(imageUrl, false))
+                .collect(toSet());
+        imageResponses.add(new ImageResponse(entity.getMainImageUrl(), true));
         return new ProductResponse(entity.getName(), entity.getPrice(), entity.getStocks(), entity.getCategory().getValue(),
                 entity.getType().getValue(), entity.getBrand(), entity.getModel(), entity.getDescription(), entity.isEarlyAccess(),
-                entity.getDateOfCreation(), entity.getDateOfModification(), entity.getImageUrls());
+                entity.getDateOfCreation(), entity.getDateOfModification(), imageResponses);
     }
 
     public static PurchasedProductResponse toResponse(PurchasedProductEntity entity) {
@@ -73,7 +71,7 @@ public class ModelConverter {
         return new ProductEntity(null, productDto.getName(), productDto.getPrice(), productDto.getStocks(),
                 ProductCategory.getKeyByValue(productDto.getCategory()), ProductType.getKeyByValue(productDto.getType()),
                 productDto.getBrand(), productDto.getModel(), productDto.getDescription(), productDto.isEarlyAccess(),
-                null, null, new HashSet<>(), null, new HashSet<>(), new HashSet<>());
+                null, null, null, new HashSet<>(), null, new HashSet<>(), new HashSet<>());
     }
 
     public static UserEntity toEntity(UserDto user) {

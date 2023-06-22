@@ -1,10 +1,12 @@
 package com.techstore.service.product;
 
 import com.techstore.exception.product.ProductNotFoundException;
+import com.techstore.model.dto.ImageDto;
 import com.techstore.model.dto.ProductDto;
 import com.techstore.model.entity.ProductEntity;
 import com.techstore.model.enums.ProductCategory;
 import com.techstore.model.enums.ProductType;
+import com.techstore.model.response.ImageResponse;
 import com.techstore.model.response.PageResponse;
 import com.techstore.model.response.ProductResponse;
 import com.techstore.repository.IProductRepository;
@@ -28,7 +30,7 @@ import static com.techstore.utils.converter.ModelConverter.toEntity;
 import static com.techstore.utils.converter.ModelConverter.toResponse;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static java.util.stream.Collectors.toSet;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class ProductService implements IProductService {
@@ -44,10 +46,10 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductResponse createProduct(ProductDto productDto, Collection<MultipartFile> images) {
+    public ProductResponse createProduct(ProductDto productDto, Collection<MultipartFile> images, MultipartFile mainImage) {
         ProductEntity entity = toEntity(productDto);
         entity.setDateOfCreation(LocalDateTime.now());
-        return tryToSaveProduct(images, entity);
+        return tryToSaveProduct(images, mainImage, entity);
     }
 
     @Override
@@ -109,62 +111,56 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductResponse updateProduct(ProductDto productDto, Collection<MultipartFile> images, Collection<String> deleteImageUrls) {
+    public ProductResponse updateProduct(ProductDto productDto, Collection<MultipartFile> images, MultipartFile mainImage,
+                                         Collection<String> deleteImageUrls) {
         String productName = productDto.getName();
         ProductEntity existingEntity = findProductEntityByName(productName);
         ProductEntity productEntity = toEntity(productDto);
         productEntity.setId(existingEntity.getId());
         imageUploaderService.deleteImagesForProduct(deleteImageUrls);
         productEntity.setImageUrls(imageUploaderService.getImageUrlsForProduct(productName));
-        return tryToSaveProduct(images, productEntity);
+        return tryToSaveProduct(images, mainImage, productEntity);
     }
 
     @Transactional
     @Override
     public void deleteProduct(String productName) {
         ProductEntity entity = findProductEntityByName(productName);
-        imageUploaderService.deleteImagesForProduct(entity.getImageUrls());
+        Set<String> imageUrls = entity.getImageUrls();
+        imageUrls.add(entity.getMainImageUrl());
+        imageUploaderService.deleteImagesForProduct(imageUrls);
         repository.delete(entity);
     }
 
-    private ProductResponse tryToSaveProduct(Collection<MultipartFile> images, ProductEntity entity) {
+    private ProductResponse tryToSaveProduct(Collection<MultipartFile> images, MultipartFile mainImage, ProductEntity entity) {
         try {
             images = nonNull(images) ? images : new HashSet<>();
-//            //Used only for Postman
-//            Collection<MultipartFile> imagesToRemove = findImagesToBeRemoved(images, entity.getImageUrls());
-//            images.removeAll(imagesToRemove);
             entity.setDateOfModification(LocalDateTime.now());
-            return toResponse(repository.save(uploadImages(images, entity)));
+            List<ImageDto> imageDtos = images.stream().map(image -> new ImageDto(image, false)).collect(toList());
+            imageDtos.add(new ImageDto(mainImage, true));
+            return toResponse(repository.save(uploadImages(imageDtos, entity)));
         } catch (Exception exception) {
             imageUploaderService.deleteImagesForProduct(lastUploadedImageUrls);
             throw exception;
         }
     }
 
-//    private Collection<MultipartFile> findImagesToBeRemoved(Collection<MultipartFile> images, Set<String> existingImageUrls) {
-//        Collection<MultipartFile> imagesToRemove = new HashSet<>();
-//        if (!isEmpty(images)) {
-//            for (String url : existingImageUrls) {
-//                for (MultipartFile image : images) {
-//                    String imageName = nonNull(image.getOriginalFilename())
-//                            ? image.getOriginalFilename()
-//                            : EMPTY;
-//                    if (url.contains(imageName)) {
-//                        imagesToRemove.add(image);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//        return imagesToRemove;
-//    }
-
-    private ProductEntity uploadImages(Collection<MultipartFile> images, ProductEntity entity) {
+    private ProductEntity uploadImages(Collection<ImageDto> images, ProductEntity entity) {
         if (!isEmpty(images)) {
-            lastUploadedImageUrls = imageUploaderService.upload(images, entity.getName());
+            Set<ImageResponse> uploadedImages = imageUploaderService.upload(images, entity.getName());
+            Set<String> uploadedImageUrls = uploadedImages.stream().map(ImageResponse::getUrl).collect(toSet());
+            lastUploadedImageUrls = Set.copyOf(uploadedImageUrls);
             Set<String> existingImageUrls = entity.getImageUrls();
-            existingImageUrls.addAll(lastUploadedImageUrls);
+            ImageResponse mainImage = new ImageResponse();
+            for (ImageResponse image : uploadedImages) {
+                if (image.isMain()) {
+                    mainImage = image;
+                    uploadedImageUrls.remove(image.getUrl());
+                }
+            }
+            existingImageUrls.addAll(uploadedImageUrls);
             entity.setImageUrls(existingImageUrls);
+            entity.setMainImageUrl(mainImage.getUrl());
         }
         return entity;
     }
