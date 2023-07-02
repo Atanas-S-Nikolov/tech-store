@@ -23,6 +23,7 @@ public interface ApiConstants {
     String PRODUCTS_URL = BASE_API_URL + PRODUCT_URL;
     String PRODUCTS_URL_REGEX = BASE_API_REGEX + PRODUCT_URL;
     String PRODUCTS_WITH_PARAMS_REGEX = PRODUCTS_URL_REGEX + ".*[?&]earlyAccess=false.*";
+    String PRODUCT_WITH_NAME_PARAM_REGEX = PRODUCTS_URL_REGEX + "[A-z\\s\\d-]+";
     String PRODUCT_WITH_NAME_PATH_VARIABLE = PRODUCTS_URL + "/{name:[A-z\\s\\d-]+}";
     String SEARCH_URL = "/search";
     String SEARCH_QUERY_URL = SEARCH_URL + "/query";

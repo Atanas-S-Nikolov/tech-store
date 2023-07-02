@@ -1,5 +1,6 @@
 package com.techstore.controller;
 
+import com.techstore.model.dto.RegisterDto;
 import com.techstore.model.dto.ResetPasswordDto;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.response.GenericResponse;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import static com.techstore.constants.ApiConstants.ACCESS_CONTROL_URL;
 import static com.techstore.constants.ApiConstants.CONFIRM_REGISTER_URL;
@@ -27,6 +29,7 @@ import static com.techstore.constants.ApiConstants.REGISTER_URL;
 import static com.techstore.constants.ApiConstants.RESET_PASSWORD_URL;
 import static com.techstore.constants.ApiConstants.TOKEN_PARAM;
 import static com.techstore.model.enums.UserRole.ROLE_CUSTOMER;
+import static com.techstore.utils.converter.ModelConverter.toDto;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -45,7 +48,8 @@ public class AccessControlController {
     }
 
     @PostMapping(path = REGISTER_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> register(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserResponse> register(@RequestBody @Valid RegisterDto registerDto) {
+        UserDto userDto = toDto(registerDto);
         userDto.setRole(ROLE_CUSTOMER.getValue());
         return ResponseEntity.status(CREATED).body(userService.createUser(userDto));
     }

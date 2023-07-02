@@ -38,6 +38,7 @@ import static com.techstore.constants.ApiConstants.FULL_RESET_PASSWORD_URL;
 import static com.techstore.constants.ApiConstants.LOGIN_URL;
 import static com.techstore.constants.ApiConstants.PRODUCTS_URL;
 import static com.techstore.constants.ApiConstants.PRODUCTS_WITH_PARAMS_REGEX;
+import static com.techstore.constants.ApiConstants.PRODUCT_WITH_NAME_PARAM_REGEX;
 import static com.techstore.constants.ApiConstants.PRODUCT_WITH_NAME_PATH_VARIABLE;
 import static com.techstore.constants.ApiConstants.USER_GET_URL;
 import static com.techstore.constants.RoleConstants.ROLE_ADMIN;
@@ -130,6 +131,7 @@ public class WebSecurityConfiguration {
                     auth.antMatchers(ALL_ORDERS_URLS_MATCHER, ALL_FAVORITES_URLS_MATCHER).hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(GET, PRODUCTS_URL, PRODUCTS_URL + "/**").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
                     auth.antMatchers(POST, USER_GET_URL, USER_GET_URL + "/").hasAnyAuthority(ROLE_ADMIN, ROLE_CUSTOMER);
+                    auth.regexMatchers(PUT, PRODUCT_WITH_NAME_PARAM_REGEX).hasAnyAuthority(ROLE_ADMIN);
                     auth.antMatchers(BASE_API_URL_MATCHER).hasAuthority(ROLE_ADMIN);
                     auth.anyRequest().authenticated();
                 })

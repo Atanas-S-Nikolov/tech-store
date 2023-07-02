@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Set;
 
 public interface IProductImageUploaderService {
-    Set<ImageResponse> upload(Collection<ImageDto> images, String productName) throws ProductImageUploaderServiceException;
+    Set<ImageResponse> upload(Collection<ImageDto> images, String directoryName) throws ProductImageUploaderServiceException;
 
     void deleteImagesForProduct(Collection<String> imageUrls) throws ProductImageUploaderServiceException;
 

@@ -84,10 +84,10 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public PageResponse<OrderResponse> getAllOrdersForUser(String username, String startDate, String endDate,
-                                                           int page, int size) {
+    public PageResponse<OrderResponse> searchOrdersByUsername(String username, String startDate, String endDate,
+                                                              int page, int size) {
         checkOwner(username);
-        Page<OrderEntity> ordersPage = repository.findAllByUsernameBetweenDates(username, parse(startDate), parse(endDate),
+        Page<OrderEntity> ordersPage = repository.searchByUsernameBetweenDates(username, parse(startDate), parse(endDate),
                 PageRequest.of(page, size));
         List<OrderResponse> orders = ordersPage.getContent().stream().map(ModelConverter::toResponse).collect(toList());
         return new PageResponse<>(ordersPage.getTotalElements(), ordersPage.getTotalPages(), ordersPage.getNumber(), orders);

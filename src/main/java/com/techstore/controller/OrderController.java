@@ -76,7 +76,7 @@ public class OrderController {
     }
 
     @PostMapping(path = ALL_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<PageResponse<OrderResponse>> getAllOrdersForUser(
+    public ResponseEntity<PageResponse<OrderResponse>> searchOrdersByUser(
             @RequestBody @Valid UsernameDto usernameDto,
             @RequestParam(value = ORDER_START_DATE_PARAM, required = false, defaultValue = LOCAL_DATE_TIME_EPOCH)
             @DateTimeFormat(pattern = LOCAL_DATE_TIME_PRECISION_FORMAT)
@@ -87,7 +87,7 @@ public class OrderController {
             @RequestParam(value = PAGE_PARAM, defaultValue = PAGE_PARAM_DEFAULT_VALUE) int page,
             @RequestParam(value = SIZE_PARAM, defaultValue = SIZE_PARAM_DEFAULT_VALUE) int size
     ) {
-        return ResponseEntity.status(OK).body(service.getAllOrdersForUser(usernameDto.getUsername(), startDate, endDate, page, size));
+        return ResponseEntity.status(OK).body(service.searchOrdersByUsername(usernameDto.getUsername(), startDate, endDate, page, size));
     }
 
     @PreAuthorize(HAS_ROLE_ADMIN)

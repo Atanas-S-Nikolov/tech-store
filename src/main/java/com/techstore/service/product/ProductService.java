@@ -24,13 +24,16 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.techstore.constants.FieldConstants.VALIDATED_PARAM_DEFAULT_VALUE;
+import static com.techstore.utils.auth.AuthUtils.checkCurrentAuthentication;
 import static com.techstore.utils.converter.ModelConverter.toEntity;
 import static com.techstore.utils.converter.ModelConverter.toResponse;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class ProductService implements IProductService {
@@ -48,13 +51,18 @@ public class ProductService implements IProductService {
     @Override
     public ProductResponse createProduct(ProductDto productDto, Collection<MultipartFile> images, MultipartFile mainImage) {
         ProductEntity entity = toEntity(productDto);
+        entity.setImagesDirectory(UUID.randomUUID().toString());
         entity.setDateOfCreation(LocalDateTime.now());
         return tryToSaveProduct(images, mainImage, entity);
     }
 
     @Override
     public ProductResponse getProduct(String productName) {
-        return toResponse(findProductEntityByName(productName));
+        ProductEntity entity = findProductEntityByName(productName);
+        if (entity.isEarlyAccess()) {
+            checkCurrentAuthentication();
+        }
+        return toResponse(entity);
     }
 
     @Override
@@ -111,14 +119,17 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductResponse updateProduct(ProductDto productDto, Collection<MultipartFile> images, MultipartFile mainImage,
+    public ProductResponse updateProduct(String productName, ProductDto productDto, Collection<MultipartFile> images, MultipartFile mainImage,
                                          Collection<String> deleteImageUrls) {
-        String productName = productDto.getName();
         ProductEntity existingEntity = findProductEntityByName(productName);
+        String imagesDirectory = existingEntity.getImagesDirectory();
         ProductEntity productEntity = toEntity(productDto);
         productEntity.setId(existingEntity.getId());
+        productEntity.setDateOfCreation(existingEntity.getDateOfCreation());
+        productEntity.setImagesDirectory(imagesDirectory);
+        productEntity.setMainImageUrl(existingEntity.getMainImageUrl());
         imageUploaderService.deleteImagesForProduct(deleteImageUrls);
-        productEntity.setImageUrls(imageUploaderService.getImageUrlsForProduct(productName));
+        productEntity.setImageUrls(imageUploaderService.getImageUrlsForProduct(imagesDirectory));
         return tryToSaveProduct(images, mainImage, productEntity);
     }
 
@@ -127,8 +138,11 @@ public class ProductService implements IProductService {
     public void deleteProduct(String productName) {
         ProductEntity entity = findProductEntityByName(productName);
         Set<String> imageUrls = entity.getImageUrls();
-        imageUrls.add(entity.getMainImageUrl());
-        imageUploaderService.deleteImagesForProduct(imageUrls);
+        String mainImageUrl = entity.getMainImageUrl();
+        if (isNotEmpty(imageUrls) && nonNull(mainImageUrl)) {
+            imageUrls.add(mainImageUrl);
+            imageUploaderService.deleteImagesForProduct(imageUrls);
+        }
         repository.delete(entity);
     }
 
@@ -137,7 +151,9 @@ public class ProductService implements IProductService {
             images = nonNull(images) ? images : new HashSet<>();
             entity.setDateOfModification(LocalDateTime.now());
             List<ImageDto> imageDtos = images.stream().map(image -> new ImageDto(image, false)).collect(toList());
-            imageDtos.add(new ImageDto(mainImage, true));
+            if (nonNull(mainImage)) {
+                imageDtos.add(new ImageDto(mainImage, true));
+            }
             return toResponse(repository.save(uploadImages(imageDtos, entity)));
         } catch (Exception exception) {
             imageUploaderService.deleteImagesForProduct(lastUploadedImageUrls);
@@ -147,7 +163,7 @@ public class ProductService implements IProductService {
 
     private ProductEntity uploadImages(Collection<ImageDto> images, ProductEntity entity) {
         if (!isEmpty(images)) {
-            Set<ImageResponse> uploadedImages = imageUploaderService.upload(images, entity.getName());
+            Set<ImageResponse> uploadedImages = imageUploaderService.upload(images, entity.getImagesDirectory());
             Set<String> uploadedImageUrls = uploadedImages.stream().map(ImageResponse::getUrl).collect(toSet());
             lastUploadedImageUrls = Set.copyOf(uploadedImageUrls);
             Set<String> existingImageUrls = entity.getImageUrls();

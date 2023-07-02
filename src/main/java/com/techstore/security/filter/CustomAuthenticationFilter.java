@@ -2,6 +2,7 @@ package com.techstore.security.filter;
 
 import com.auth0.jwt.algorithms.Algorithm;
 import com.techstore.exception.auth.CustomAuthenticationException;
+import com.techstore.exception.auth.InvalidCredentialsException;
 import com.techstore.exception.user.UserConstraintViolationException;
 import com.techstore.model.dto.AuthenticationDto;
 import com.techstore.model.entity.UserEntity;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -43,8 +45,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        AuthenticationDto authenticationDto = new AuthenticationDto();
-
+        AuthenticationDto authenticationDto;
         try {
             String jsonString = request.getReader().lines().collect(Collectors.joining(lineSeparator()));
             authenticationDto = toJson(jsonString, AuthenticationDto.class);
@@ -53,7 +54,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         }
         String username = authenticationDto.getUsername();
         String password = authenticationDto.getPassword();
-
         checkIfUserIsEnabled(username);
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(username, password);
@@ -83,8 +83,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         }
     }
 
-    //TODO: Implement failure authentication handler
-
     @Override
     public void setAuthenticationManager(AuthenticationManager authenticationManager) {
         super.setAuthenticationManager(authenticationManager);
@@ -95,7 +93,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     }
 
     public void checkIfUserIsEnabled(String username) {
-        UserEntity entity = userRepository.findUserByUsername(username).orElse(new UserEntity());
+        UserEntity entity = userRepository.findUserByUsername(username).orElseGet(UserEntity::new);
         if (!entity.isEnabled()) {
             throw new UserConstraintViolationException("User is not enabled");
         }

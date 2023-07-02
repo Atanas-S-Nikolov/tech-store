@@ -20,7 +20,7 @@ public interface IProductService {
 
     PageResponse<ProductResponse> searchQuery(String keyword, boolean earlyAccess, int page, int size);
 
-    ProductResponse updateProduct(ProductDto productDto, Collection<MultipartFile> images, MultipartFile mainImage,
+    ProductResponse updateProduct(String productName, ProductDto productDto, Collection<MultipartFile> images, MultipartFile mainImage,
                                   Collection<String> deleteImageUrls) throws ProductNotFoundException;
 
     void deleteProduct(String productName) throws ProductNotFoundException;

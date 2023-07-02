@@ -1,43 +1,36 @@
 package com.techstore.validation.user;
 
-import com.techstore.model.dto.UserDto;
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.EnglishSequenceData;
 import org.passay.IllegalSequenceRule;
 import org.passay.LengthRule;
 import org.passay.PasswordData;
-import org.passay.PasswordValidator;
-import org.passay.RuleResult;
 import org.passay.WhitespaceRule;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import static com.techstore.validation.builder.ConstraintViolationBuilder.buildConstraintViolation;
-import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 
-public class UserValidator implements ConstraintValidator<ValidUser, UserDto> {
+public class PasswordValidator implements ConstraintValidator<ValidPassword, String> {
     @Override
-    public void initialize(ValidUser constraintAnnotation) {
+    public void initialize(ValidPassword constraintAnnotation) {
     }
 
     @Override
-    public boolean isValid(UserDto user, ConstraintValidatorContext context) {
-        RuleResult ruleResult = validatePasswords(user);
-
-        if (!ruleResult.isValid()) {
+    public boolean isValid(String password, ConstraintValidatorContext context) {
+        if (!validatePassword(password) ) {
             buildConstraintViolation(context, "Too weak password");
             return false;
         }
-
         return true;
     }
 
-    private RuleResult validatePasswords(UserDto user) {
-        String password = user.getPassword();
-        String newPassword = user.getNewPassword();
-        PasswordValidator validator = new PasswordValidator(
+    private boolean validatePassword(String password) {
+        if (isNull(password)) return false;
+        org.passay.PasswordValidator validator = new org.passay.PasswordValidator(
                 new LengthRule(8, 30),
                 new CharacterRule(EnglishCharacterData.UpperCase, 1),
                 new CharacterRule(EnglishCharacterData.LowerCase, 1),
@@ -48,10 +41,6 @@ public class UserValidator implements ConstraintValidator<ValidUser, UserDto> {
                 new IllegalSequenceRule(EnglishSequenceData.USQwerty, 3, false),
                 new WhitespaceRule()
         );
-        RuleResult ruleResult = validator.validate(new PasswordData(password));
-        if (nonNull(newPassword) && !newPassword.isEmpty() && ruleResult.isValid()) {
-            ruleResult = validator.validate(new PasswordData(newPassword));
-        }
-        return ruleResult;
+        return validator.validate(new PasswordData(password)).isValid();
     }
 }
