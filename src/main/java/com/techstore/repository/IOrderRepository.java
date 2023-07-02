@@ -24,7 +24,7 @@ public interface IOrderRepository extends PagingAndSortingRepository<OrderEntity
     Page<OrderEntity> findAllBetweenDates(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate,
                                           Pageable pageable);
 
-    @Query("SELECT o from OrderEntity o where o.user.username = :username AND o.date BETWEEN :startDate AND :endDate")
-    Page<OrderEntity> findAllByUsernameBetweenDates(@Param("username") String username, @Param("startDate") LocalDateTime startDate,
-                                                    @Param("endDate") LocalDateTime endDate, Pageable pageable);
+    @Query("SELECT o from OrderEntity o where o.user.username LIKE  %:username% AND o.date BETWEEN :startDate AND :endDate")
+    Page<OrderEntity> searchByUsernameBetweenDates(@Param("username") String username, @Param("startDate") LocalDateTime startDate,
+                                                   @Param("endDate") LocalDateTime endDate, Pageable pageable);
 }

@@ -2,9 +2,7 @@ package com.techstore.model.dto;
 
 import com.techstore.validation.user.ValidEmail;
 import com.techstore.validation.user.ValidPhone;
-import com.techstore.validation.user.ValidRole;
 import com.techstore.validation.user.ValidPassword;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,7 +16,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
-public class UserDto {
+public class RegisterDto{
     @NotBlank(message = "First name must not be blank")
     @Getter
     private final String firstName;
@@ -47,7 +45,6 @@ public class UserDto {
     @Getter
     private final String password;
 
-    @ValidRole
     @Getter
     @Setter
     private String role;

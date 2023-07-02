@@ -42,6 +42,8 @@ import java.util.Set;
 
 import static com.techstore.model.response.builder.ErrorResponseBuilder.buildErrorResponse;
 import static com.techstore.model.response.builder.ErrorResponseBuilder.buildValidationErrorResponse;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -124,7 +126,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         if (bindingResult.hasFieldErrors()) {
             for (FieldError fieldError : bindingResult.getFieldErrors()) {
                 String property = fieldError.getField();
-                String value = fieldError.getRejectedValue().toString();
+                Object rejectedValue = fieldError.getRejectedValue();
+                String value = nonNull(rejectedValue) ? rejectedValue.toString() : EMPTY;
                 String message = fieldError.getDefaultMessage();
                 rejectedValues.add(new RejectedValue(message, property, value));
             }

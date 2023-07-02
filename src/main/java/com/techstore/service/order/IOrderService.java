@@ -11,7 +11,7 @@ public interface IOrderService {
 
     PageResponse<OrderResponse> getAllOrders(String startDate, String endDate, int page, int size);
 
-    PageResponse<OrderResponse> getAllOrdersForUser(String username, String startDate, String endDate, int page, int size);
+    PageResponse<OrderResponse> searchOrdersByUsername(String username, String startDate, String endDate, int page, int size);
 
     OrderResponse deliverOrder(OrderDto orderDto);
 

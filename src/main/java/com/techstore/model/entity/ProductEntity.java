@@ -60,6 +60,9 @@ public class ProductEntity {
     @Column(name = "date_of_modification")
     private LocalDateTime dateOfModification;
 
+    @Column(name = "images_directory")
+    private String imagesDirectory;
+
     @Column(name = "main_image_url", length = 10000)
     private String mainImageUrl;
 
@@ -79,13 +82,13 @@ public class ProductEntity {
 
     public ProductEntity() {
         this(null ,null, new BigDecimal("0.0"), 0, null, null, null, null,
-                null,false, null, null, null, new HashSet<>(), null,
+                null,false, null, null, null, null, new HashSet<>(), null,
                 new HashSet<>(), new HashSet<>());
     }
 
     public ProductEntity(String id, String name, BigDecimal price, int stocks, ProductCategory category, ProductType type,
                          String brand, String model, String description, boolean earlyAccess, LocalDateTime dateOfCreation,
-                         LocalDateTime dateOfModification, String mainImageUrl, Set<String> imageUrls, ProductToBuyEntity productToBuy,
+                         LocalDateTime dateOfModification, String imagesDirectory, String mainImageUrl, Set<String> imageUrls, ProductToBuyEntity productToBuy,
                          Set<FavoritesEntity> favorites, Set<PurchasedProductEntity> purchasedProducts) {
         this.id = id;
         this.name = name;
@@ -99,6 +102,7 @@ public class ProductEntity {
         this.earlyAccess = earlyAccess;
         this.dateOfCreation = dateOfCreation;
         this.dateOfModification = dateOfModification;
+        this.imagesDirectory = imagesDirectory;
         this.mainImageUrl = mainImageUrl;
         this.imageUrls = nonNull(imageUrls) ? imageUrls : new HashSet<>();
         this.productToBuy = productToBuy;

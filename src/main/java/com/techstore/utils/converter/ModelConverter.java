@@ -1,5 +1,6 @@
 package com.techstore.utils.converter;
 
+import com.techstore.model.dto.RegisterDto;
 import com.techstore.model.entity.CartEntity;
 import com.techstore.model.entity.FavoritesEntity;
 import com.techstore.model.entity.OrderEntity;
@@ -12,7 +13,14 @@ import com.techstore.model.dto.ProductDto;
 import com.techstore.model.dto.UserDto;
 import com.techstore.model.enums.ProductCategory;
 import com.techstore.model.enums.ProductType;
-import com.techstore.model.response.*;
+import com.techstore.model.response.CartResponse;
+import com.techstore.model.response.FavoritesResponse;
+import com.techstore.model.response.ImageResponse;
+import com.techstore.model.response.OrderResponse;
+import com.techstore.model.response.ProductResponse;
+import com.techstore.model.response.ProductToBuyResponse;
+import com.techstore.model.response.PurchasedProductResponse;
+import com.techstore.model.response.UserResponse;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -24,6 +32,11 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toSet;
 
 public class ModelConverter {
+    public static UserDto toDto(RegisterDto registerDto) {
+        return new UserDto(registerDto.getFirstName(), registerDto.getLastName(), registerDto.getEmail(), registerDto.getPhone(),
+                registerDto.getAddress(), registerDto.getUsername(), registerDto.getPassword(), registerDto.getRole());
+    }
+
     public static UserResponse toResponse(UserEntity entity) {
         return new UserResponse(entity.getUsername(), entity.getFirstName(), entity.getLastName(), entity.getEmail(),
                 entity.getPhone(), entity.getAddress(), entity.getRole());
@@ -68,9 +81,10 @@ public class ModelConverter {
     }
 
     public static ProductEntity toEntity(ProductDto productDto) {
-        return new ProductEntity(null, productDto.getName(), productDto.getPrice(), productDto.getStocks(),
+        String productName = productDto.getBrand() + " " + productDto.getModel();
+        return new ProductEntity(null, productName, productDto.getPrice(), productDto.getStocks(),
                 ProductCategory.getKeyByValue(productDto.getCategory()), ProductType.getKeyByValue(productDto.getType()),
-                productDto.getBrand(), productDto.getModel(), productDto.getDescription(), productDto.isEarlyAccess(),
+                productDto.getBrand(), productDto.getModel(), productDto.getDescription(), productDto.isEarlyAccess(), null,
                 null, null, null, new HashSet<>(), null, new HashSet<>(), new HashSet<>());
     }
 

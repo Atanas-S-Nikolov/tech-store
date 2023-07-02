@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.techstore.utils.ImageUploadUtils.formatDeleteUrl;
-import static com.techstore.utils.ImageUploadUtils.formatProductName;
 import static com.techstore.utils.ImageUploadUtils.formatUrl;
 import static com.techstore.utils.ImageUploadUtils.generateFilePath;
 import static java.lang.System.lineSeparator;
@@ -44,14 +43,14 @@ public class ProductImageUploaderService implements IProductImageUploaderService
     }
 
     @Override
-    public Set<ImageResponse> upload(Collection<ImageDto> images, String productName) {
+    public Set<ImageResponse> upload(Collection<ImageDto> images, String directoryName) {
         HashSet<BlobId> failedBloIds = new HashSet<>();
         final Storage[] storage = {StorageOptions.newBuilder().build().getService()};
         final Exception[] occurredException = {null};
 
         Set<ImageResponse> imageResponses = images.stream().map(imageDto -> {
             MultipartFile imageFile = imageDto.getFile();
-            String filePath = generateFilePath(imageFile, productName);
+            String filePath = generateFilePath(imageFile, directoryName);
             BlobId blobId = BlobId.of(bucketName, filePath);
             Map<String, String> metadata = new HashMap<>();
             metadata.put(METADATA_DOWNLOAD_TOKENS_KEY, filePath);
@@ -106,9 +105,8 @@ public class ProductImageUploaderService implements IProductImageUploaderService
     }
 
     @Override
-    public Set<String> getImageUrlsForProduct(String productName) {
+    public Set<String> getImageUrlsForProduct(String directoryName) {
         Storage storage = getStorage();
-        String directoryName = formatProductName(productName);
         Iterable<Blob> blobs = storage.list(bucketName, Storage.BlobListOption.prefix(directoryName)).iterateAll();
         Set<String> urls = new HashSet<>();
         for (Blob blob : blobs) {

@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.techstore.validation.builder.ConstraintViolationBuilder.buildConstraintViolation;
+import static java.util.Objects.isNull;
 
 public class PhoneValidator implements ConstraintValidator<ValidPhone, String> {
     private static final String FIXED_LINE_REGEX = "^[1-9]\\d{8}$";
@@ -21,6 +22,11 @@ public class PhoneValidator implements ConstraintValidator<ValidPhone, String> {
 
     @Override
     public boolean isValid(String phone, ConstraintValidatorContext context) {
+        if (isNull(phone)) {
+            buildConstraintViolation(context, "Phone number must not be blank");
+            return false;
+        }
+
         if (FORBIDDEN_NUMBERS.contains(phone)) {
             buildConstraintViolation(context, "This phone number is forbidden");
             return false;

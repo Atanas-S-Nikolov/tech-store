@@ -2,15 +2,17 @@ package com.techstore.validation.user;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(validatedBy = UserValidator.class)
-@Target(ElementType.TYPE)
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.PARAMETER;
+
+@Constraint(validatedBy = PasswordValidator.class)
+@Target({FIELD, PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidUser {
+public @interface ValidPassword {
     String message() default "";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
