@@ -65,7 +65,7 @@ public class AccessControlController {
     }
 
     @PutMapping(path = RESET_PASSWORD_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<GenericResponse> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto) {
+    public ResponseEntity<GenericResponse> resetPassword(@RequestBody @Valid ResetPasswordDto resetPasswordDto) {
         return ResponseEntity.status(OK).body(service.resetPassword(resetPasswordDto));
     }
 }

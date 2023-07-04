@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @PostMapping(path = FORGOT_PASSWORD_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<GenericResponse> forgotPassword(@RequestBody EmailDto emailDto) {
+    public ResponseEntity<GenericResponse> forgotPassword(@RequestBody @Valid EmailDto emailDto) {
         return ResponseEntity.status(OK).body(service.forgotPassword(emailDto));
     }
 

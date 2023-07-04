@@ -1,5 +1,6 @@
 package com.techstore.model.dto;
 
+import com.techstore.validation.user.ValidEmail;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.ToString;
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
 public class EmailDto {
+    @ValidEmail
     @Getter
     private final String email;
 }

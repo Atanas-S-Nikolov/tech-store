@@ -25,7 +25,7 @@
     <h3>Order summary:</h3>
     <#list products as productWrapper>
         <div class="product">
-            <img src="${productWrapper.product.imageUrls[0]}" alt="Product image" style="width: 70px"/>
+            <img src="${productWrapper.product.mainImageUrl}" alt="Product image" style="width: 70px"/>
             <span>${productWrapper.product.name}</span>
             <span>${productWrapper.quantity} pcs</span>
             <span>${productWrapper.product.price} lv.</span>

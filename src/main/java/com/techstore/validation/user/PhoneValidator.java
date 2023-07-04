@@ -10,10 +10,12 @@ import static com.techstore.validation.builder.ConstraintViolationBuilder.buildC
 import static java.util.Objects.isNull;
 
 public class PhoneValidator implements ConstraintValidator<ValidPhone, String> {
-    private static final String FIXED_LINE_REGEX = "^[1-9]\\d{8}$";
-    private static final String MOBILE_REGEX = "^(8)\\d{8}$";
-    private static final String FREEPHONE_REGEX = "^(800)\\d{5}$";
-    private static final List<String> FORBIDDEN_NUMBERS = List.of("888888888");
+    private static final String BG_DIALING_CODE_PREFIX_REGEX = "^\\+359 ";
+    private static final String DIALING_CODE_PREFIX_REGEX = "^\\+((\\d|-){1,5}) ";
+    private static final String MOBILE_REGEX = DIALING_CODE_PREFIX_REGEX + "\\d{9}$";
+    private static final String FIXED_LINE_REGEX = BG_DIALING_CODE_PREFIX_REGEX + "[1-9]\\d{8}$";
+    private static final String FREEPHONE_REGEX = BG_DIALING_CODE_PREFIX_REGEX + "(800)\\d{5}$";
+    private static final List<String> FORBIDDEN_NUMBERS = List.of("+359 888888888");
 
     @Override
     public void initialize(ValidPhone constraintAnnotation) {
