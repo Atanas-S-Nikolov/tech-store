@@ -86,7 +86,7 @@ public class AccessControlService implements UserDetailsService, IJWTService {
     public GenericResponse confirmRegistration(String token) {
         RegisterConfirmationTokenEntity tokenEntity = findRegisterConfirmationTokenEntity(token);
         UserEntity userEntity = findUserEntityByRegistrationConfirmationToken(tokenEntity);
-        checkTokenExpiration(tokenEntity.getToken(), tokenEntity.getExpirationMs());
+        checkTokenExpiration(tokenEntity.getExpirationMs());
         userEntity.setEnabled(true);
         userRepository.save(userEntity);
         registerConfirmationTokenRepository.delete(tokenEntity);
@@ -98,7 +98,7 @@ public class AccessControlService implements UserDetailsService, IJWTService {
         PasswordResetTokenEntity tokenEntity = findPasswordResetTokenEntity(resetPasswordDto.getToken());
         try {
             UserEntity userEntity = findUserEntityByPasswordResetToken(tokenEntity);
-            checkTokenExpiration(tokenEntity.getToken(), tokenEntity.getExpirationMs());
+            checkTokenExpiration(tokenEntity.getExpirationMs());
             userEntity.setPassword(passwordEncoder.encode(resetPasswordDto.getPassword().trim()));
             userRepository.save(userEntity);
         } finally {
@@ -114,27 +114,27 @@ public class AccessControlService implements UserDetailsService, IJWTService {
 
     private UserEntity findUserEntityByRegistrationConfirmationToken(RegisterConfirmationTokenEntity tokenEntity) {
         return userRepository.findUserByRegisterConfirmationToken(tokenEntity)
-                .orElseThrow(() -> new UserNotFoundException(format("User with register confirmation token '%s' is not found", tokenEntity.getToken())));
+                .orElseThrow(() -> new UserNotFoundException("User with this register confirmation token is not found"));
     }
 
     private UserEntity findUserEntityByPasswordResetToken(PasswordResetTokenEntity tokenEntity) {
         return userRepository.findUserByPasswordResetToken(tokenEntity)
-                .orElseThrow(() -> new UserNotFoundException(format("User with password reset token '%s' is not found", tokenEntity.getToken())));
+                .orElseThrow(() -> new UserNotFoundException("User with this password reset token is not found"));
     }
 
     private RegisterConfirmationTokenEntity findRegisterConfirmationTokenEntity(String token) {
         return registerConfirmationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new TokenException(format("Token: %s is not found", token)));
+                .orElseThrow(() -> new TokenException("Token is not found"));
     }
 
     private PasswordResetTokenEntity findPasswordResetTokenEntity(String token) {
         return passwordResetTokenRepository.findByToken(token)
-                .orElseThrow(() -> new TokenException(format("Token: %s is not found", token)));
+                .orElseThrow(() -> new TokenException("Token is not found"));
     }
 
-    private void checkTokenExpiration(String token, long tokenExpirationMs) {
+    private void checkTokenExpiration(long tokenExpirationMs) {
         if (System.currentTimeMillis() > tokenExpirationMs) {
-            throw new TokenException(format("Token: %s is expired", token));
+            throw new TokenException("Token is expired");
         }
     }
 }
